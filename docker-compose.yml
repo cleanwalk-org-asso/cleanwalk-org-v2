@@ -1,0 +1,81 @@
+services:
+    front:
+        hostname: front
+        container_name: front
+        image: cleanwalk-org/front
+        build:
+            context: ./front
+            dockerfile: Dockerfile
+        restart: unless-stopped
+        depends_on:
+            - api
+            - db
+        ports:
+            - "80:5173"
+        networks:
+            - frontend
+            
+    api:
+        hostname: api
+        container_name: api
+        image: cleanwalk-org/api
+        build:
+            context: ./api
+            dockerfile: Dockerfile
+        restart: unless-stopped
+        depends_on:
+            - db
+        ports:
+            - "5000:5000"
+        env_file:
+            - .env
+        networks:
+            - frontend
+            - backend
+            
+    db:
+        hostname: db
+        container_name: db
+        image: mysql:latest
+        restart: unless-stopped
+        ports:
+            - "3306:3306"
+        env_file:
+            - .env
+        volumes:
+            - db:/var/lib/mysql
+        networks:
+            - backend
+            
+    adminer:
+        container_name: adminer
+        image: adminer:latest
+        restart: unless-stopped
+        depends_on:
+            - db
+        ports:
+            - "8080:8080"
+        env_file:
+            - .env
+        networks:
+            - backend
+
+    homepage:
+        image: ghcr.io/gethomepage/homepage:latest
+        container_name: homepage
+        ports:
+            - "3000:3000"
+        volumes:
+            - /usr/src/cleanwalk-org/homepage-config:/app/config
+            - /var/run/docker.sock:/var/run/docker.sock
+        networks:
+            - frontend
+            - backend
+
+volumes:
+    db:
+
+networks:
+    frontend:
+    backend:
+    
