@@ -1,7 +1,4 @@
 <script lang="ts" setup>
-import { useAccountStore } from '@/stores/AccountStore';
-import { acceptHMRUpdate } from 'pinia';
-const AccountStore = useAccountStore();
 </script>
 
 <template>
@@ -10,8 +7,8 @@ const AccountStore = useAccountStore();
 
   <div class="flex-header">
     <div class="flex-header">
-      <div class="logoCleanwalk">
-        <img src="../assets/img/logoCleanwalk.svg">
+      <div>
+        <img class="logoCleanwalk" src="../assets/img/logoCleanwalk.svg">
       </div>
       <a href="#" class="header-text title">Cleanwalks à venir</a>
       <a href="#" class="header-text title">Organiser une cleanwalk</a>
@@ -30,14 +27,12 @@ const AccountStore = useAccountStore();
         <RouterLink class="nav-link" to="/signup">S'inscrire</RouterLink>
         <RouterLink class="nav-link" to="/login">Se connecter</RouterLink>
       </div>
-  </div>
-
-      
-    
-
-
-</header>
-
+    </div>
+    <!-- <div class="vague-container">
+      <img class="vague" src="../assets/img/vague.svg" alt="">
+    </div> -->
+  </header>
+  
 
 </template>
 
@@ -45,18 +40,12 @@ const AccountStore = useAccountStore();
 @import '../assets/main.scss';
 .header {
     width: 100%;
-    height: 6rem;
     position: fixed;
+    top: 0;
     background-color: $primary;
     color: $onPrimary;
     z-index: 1001;
-  }
-
-
-  .logoCleanwalk {
-
-    
-    margin: 2rem;
+    border-bottom: 2px solid #cccccc;
   }
 
   .flex-header {
@@ -65,6 +54,12 @@ const AccountStore = useAccountStore();
     gap: 1.5rem;
     align-items: center;
     justify-content: space-between;
+  }
+
+  .logoCleanwalk {
+    width: 8rem;
+    margin:0.8rem 0 0 1rem;
+
   }
 
     .right-flex {
@@ -154,4 +149,18 @@ const AccountStore = useAccountStore();
   text-decoration: none;
 }
   }
+
+.vague {
+  position: absolute;
+  top: 3.3rem;
+  z-index: 1002;
+  height: 28px;
+  object-fit: cover;
+}
+
+.vague-container {
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+}
 </style>

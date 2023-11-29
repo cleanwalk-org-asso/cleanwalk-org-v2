@@ -84,7 +84,6 @@ nominatimHelper.nominatimReverseWrittenAddress(prop.cleanwalk.pos_lat, prop.clea
     .primaryContainer-Background {
         background-color: $primaryContainer;
         color: $onPrimaryContainer;
-        border: 3px solid $onBackground-20;
     }
 
     .main-information {

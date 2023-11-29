@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import DesktopHomeBanner from '@/components/DesktopHomeBanner.vue';
-import DesktopCleanwalkToCome from '@/components/DesktopCleanwalkToCome.vue';
+import DesktopHomeBody from '@/components/DesktopHomeBody.vue';
 import DesktopFooter from '@/components/DesktopFooter.vue';
 import DesktopHeader from '@/components/DesktopHeader.vue';
 </script>
@@ -11,7 +11,7 @@ import DesktopHeader from '@/components/DesktopHeader.vue';
 
   <main>
     <DesktopHomeBanner/>
-    <DesktopCleanwalkToCome/>
+    <DesktopHomeBody/>
 
   </main>
   <DesktopFooter></DesktopFooter>

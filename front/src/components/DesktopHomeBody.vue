@@ -6,99 +6,227 @@ import GlobalCleanwalkCard from './GlobalCleanwalkCard.vue';
 import IconMiniLogo from './icons/IconMiniLogo.vue';
 import Icon4Logo from './icons/Icon4Logo.vue';
 import DekstopCarousel from "@/components/DekstopCarousel.vue";
+import IconX from './icons/IconX.vue';
+import IconInsta from './icons/IconInsta.vue';
+import IconFacebook from './icons/IconFacebook.vue';
+import IconDiscord from './icons/IconDiscord.vue';
+
 
 </script>
 
 <template>
-    <h1 class="title fontClean padding-top">Les cleanwalks à venir</h1>
-    <div class="flex center" >
-        <input class="text-field text-field-fix margin-top" placeholder="Rechercher par nom, ville, organisateurs" type="search"/>
-        <button class="searchButton">
-            <IconGlass class="glassIcon" />
-        </button>
-    </div>
-    <div class="flexCartMap">
-        <div class="flexCart">
-            <DesktopMap></DesktopMap>
+    <section>
+
+        <h1 class="title fontClean padding-top">Les cleanwalks à venir</h1>
+        <div class="flex center" >
+            <input class="text-field text-field-fix margin-top" placeholder="Rechercher par nom, ville, organisateurs" type="search"/>
+            <button class="searchButton">
+                <IconGlass class="glassIcon" />
+            </button>
         </div>
-        <div class="flexCart">
-            <GlobalCleanwalkCard v-for="(_,index) in [1,2,3]" :key="index" colored-background more-button></GlobalCleanwalkCard>
+        <div class="flexCartMap">
+            <div class="flexCart">
+                <DesktopMap></DesktopMap>
+            </div>
+            <div class="flexCart">
+                <GlobalCleanwalkCard v-for="(_,index) in [1,2,3]" :key="index" colored-background more-button></GlobalCleanwalkCard>
+            </div>
         </div>
-    </div>
-    <div class="flex-button">
-        <div class="icon-Button image">
-            <img class="arrow-left" src="../assets/img/leftArrow.svg">
+        <div class="flex-button">
+            <div class="icon-Button image">
+                <img class="arrow-left" src="../assets/img/leftArrow.svg">
+            </div>
+            <div class="icon-Button">1</div>
+            <div class="icon-Button">2</div>
+            <div class="icon-Button">3</div>
+            <div class="icon-Button">
+                <img class="arrow-right" src="../assets/img/rightArrow.svg">
+            </div>
         </div>
-        <div class="icon-Button">1</div>
-        <div class="icon-Button">2</div>
-        <div class="icon-Button">3</div>
-        <div class="icon-Button">
-            <img class="arrow-right" src="../assets/img/rightArrow.svg">
-        </div>
-    </div>
-    <div class="backgroundRDM" >
-        <div class="flexRDM">
-            <div class="leftAdjustment">
-                <h1 class="title h1">Vous êtes un citoyen qui souhaite s'engager ?</h1>
-                <p class="avecClean">Avec cleanwalk.org vous pouvez : </p>
-                <ul class="ulRDM">
-                    <li>
-                        <p class="main-text title"><span class="bold">Prendre connaissance</span> des initiatives de ramassage de déchets près de chez vous et y prendre part</p>
-                    </li>
-                    <li class="li2">
-                        <p class="main-text title"><span class="bold">Lancer</span> des initiatives citoyennes</p>
-                    </li>
-                    <li>
-                        <p class="main-text title"><span class="bold">Rencontrer</span> d'autres personnes engagées !</p>
-                    </li>
+    </section>
+    <section class="section2">
+        <div class="left-side">
+            <div class="list1">
+                <h3>Vous êtes un citoyen qui souhaite s'engager ?</h3>
+                <h4>Avec cleanwalk.org vous pouvez :</h4>
+                <ul>
+                    <li><strong>Prendre connaissance</strong> des initiatives de ramassage de déchets pres de chez vous et y prendre part.</li>
+                    <li><strong>Lancer</strong> des initiatives citoyennes.</li>
+                    <li><strong>Rencontrer</strong> d'autres personnes engagées !</li>
                 </ul>
             </div>
-            <div class="grandCircle">
-                <div class="flexCircle">
-                    <IconMiniLogo></IconMiniLogo>
-                    <p class="textCircle">Rejoignez dès maintenant l'aventure en créant votre compte en 2 minutes</p>
-                    <a href="#" class="primary-button button-sizing">Je m'inscris</a>
-                </div>
-            </div>
-            <div class="rightAdjustment">
-                <h1 class="title h1">Vous êtes une association ?</h1>
-                <p class="avecClean">Avec cleanwalk.org vous pouvez : </p>
-                <ul class="ulRDM">
-                    <li>
-                        <p class="main-text title"><span class="bold">Faire connaître</span> les ramassages que vous organisez aux utilisateurs de la plateforme pour les encourager à s'y inscrire.</p>
-                    </li>
-                    <li class="li2">
-                        <p class="main-text title"><span class="bold">Prendre connaissance</span> des initiatives citoyennes similaires aux vôtres près de chez vous.</p>
-                    </li>
-                    <li>
-                        <p class="main-text title"><span class="bold">Rencontrer de nouvelles personnes</span> prêtes à s'engager à vos côtés !</p>
-                    </li>
+            <div class="list2">
+                <h3>Vous êtes une association ?</h3>
+                <h4>Avec cleanwalk.org vous pouvez : </h4>
+                <ul>
+                    <li><strong>Faire connaître</strong>les ramassages que vous organisez aux utilisateurs de la plateforme pour les encourager à s'y inscrire.</li>
+                    <li><strong>Prendre connaissance</strong> des initiatives citoyennes similaires aux vôtres près de chez vous..</li>
+                    <li><strong>Rencontrer de nouvelles personnes</strong> prêtes à s'engager à vos côtés !</li>
                 </ul>
             </div>
         </div>
+        <div class="right-side">
+            <h3>Retrouve nous sur les réseaux !</h3>
+            <ul class="reseaux">
+                <li><IconInsta></IconInsta></li>
+                <li><IconDiscord></IconDiscord></li>
+                <li><IconX></IconX></li>
+                <li><IconFacebook></IconFacebook></li>
+            </ul>
+            <div class="green-circle">
+                <IconMiniLogo></IconMiniLogo>
+                <p>
+                    Rejoignez dès maintenant l’aventure en créant votre compte en 2 minutes
+                </p>
+                <button class="button-on-circle">Je m'inscris</button>
+            </div>
+        </div>
+    </section>
+    <section class="serction3">
         
-    </div>
-    <div class="backgroundDNA">
-        <h1 class="title h1DNA">Découvrez nos articles</h1>
-        <DekstopCarousel></DekstopCarousel>
-    </div>
-    <div class="retrouvezClean"> 
-        <div class="flexRECRS">
-        <h1 class="RECRS">Retrouvez également Cleanwalk.org sur les réseaux sociaux</h1>
-            <Icon4Logo class="margin4Logo"></Icon4Logo>
-        </div>
-    </div>
-    <div class="div-vague">
-        <img class="IconVagueFooter" src="../assets/img/vague.svg">
-    </div>
-    <div class="PhotoInox">     
-    </div>
+    </section>
+    
+        
 
     
 </template>
 
 <style lang="scss" scoped >
 @import '@/assets/main.scss';
+
+.section2 {
+    margin-top: 5rem;
+    width: 100%;
+    background-color: #132778;
+    color: #fff;
+    padding: 4rem 6rem;
+    display: flex;
+    justify-content: space-between;
+
+
+
+    .left-side {
+        h3 {
+            font-size: 30px;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        h4 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        ul {
+            margin-left: 3rem;
+        }
+        li {
+            list-style-type: disc;
+        }
+        
+        strong {
+            font-weight: bold;
+        }
+
+        .list2 {
+            margin-top: 5rem;
+        }
+
+    }
+
+    .right-side {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        h3 {
+            font-size: 30px;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            margin-top: 4rem;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            padding: 0 2rem;
+            text-align: center;
+        }
+
+        .reseaux {
+            display: flex;
+            margin: 2rem 0;
+
+            li {
+                cursor: pointer;
+                &:hover {
+                    scale: 1.1;
+                }
+                padding: 0 1rem;
+            }
+        }
+
+
+        .green-circle {
+            background-color: #72BDA3;
+            width: 472px;
+            height: 472px;
+            border-radius: 9999rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .button-on-circle {
+            background-color: #132778;
+            color: #fff;
+            border: none;
+            border-radius: 999rem;
+            padding: 1rem 2rem;
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-top: 2rem;
+            cursor: pointer;
+
+            &:hover {
+                scale: 1.1;
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     .fontClean {
     color: #000;
