@@ -2,15 +2,12 @@
 import IconPoint from './icons/IconPoint.vue';
 import IconArrow from './icons/IconArrow.vue';
 import IconVague from './icons/IconVague.vue';
-function scrollTo() {
-
-    window.scrollBy({
-      top: 700,
-      behavior:"smooth"
-    });
-
-};
-
+function scrollTo(divId: string) {
+    const maDiv = document.getElementById(divId);
+    if (maDiv) {
+        maDiv.scrollIntoView({ behavior: 'smooth' });
+    }
+}
 
 </script>
 
@@ -25,7 +22,7 @@ function scrollTo() {
               <p class="fontHeaderbanner marginElements5">citoyens mobilisés</p>
         </div>
         <nav class="nav">
-        <button @click="scrollTo" class="centerButton">
+        <button @click="scrollTo('section1')" class="centerButton">
             <IconArrow class="arrow"></IconArrow>
         </button>
         </nav>

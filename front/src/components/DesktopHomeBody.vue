@@ -15,9 +15,8 @@ import IconDiscord from './icons/IconDiscord.vue';
 </script>
 
 <template>
-    <section>
-
-        <h1 class="title fontClean padding-top">Les cleanwalks à venir</h1>
+    <section class="padding-top">
+        <h1 id="section1" class="title fontClean padding-top">Les cleanwalks à venir</h1>
         <div class="flex center" >
             <input class="text-field text-field-fix margin-top" placeholder="Rechercher par nom, ville, organisateurs" type="search"/>
             <button class="searchButton">
@@ -68,10 +67,10 @@ import IconDiscord from './icons/IconDiscord.vue';
         <div class="right-side">
             <h3>Retrouve nous sur les réseaux !</h3>
             <ul class="reseaux">
-                <li><IconInsta></IconInsta></li>
-                <li><IconDiscord></IconDiscord></li>
-                <li><IconX></IconX></li>
-                <li><IconFacebook></IconFacebook></li>
+                <li><a href="https://www.instagram.com/cleanwalk_org/?hl=fr"><IconInsta></IconInsta></a></li>
+                <li><a href="https://discord.com/invite/XZNHvvd"><IconDiscord></IconDiscord></a></li>
+                <li><a href="https://twitter.com/Cleanwalk_org"><IconX></IconX></a></li>
+                <li> <a href="https://www.facebook.com/Cleanwalk.org/"><IconFacebook></IconFacebook></a></li>
             </ul>
             <div class="green-circle">
                 <IconMiniLogo></IconMiniLogo>
@@ -243,9 +242,10 @@ import IconDiscord from './icons/IconDiscord.vue';
 
 .padding-top {
 
-    padding-top: 11rem;
+    padding-top: 5.5rem;
 
 }
+
 .margin-top {
 
     margin-top: 2rem;

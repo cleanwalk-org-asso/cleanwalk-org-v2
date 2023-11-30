@@ -3,11 +3,11 @@
 import DesktopHomeBanner from '@/components/DesktopHomeBanner.vue';
 import DesktopHomeBody from '@/components/DesktopHomeBody.vue';
 import DesktopFooter from '@/components/DesktopFooter.vue';
-import DesktopHeader from '@/components/DesktopHeader.vue';
+import DesktopNavBar from '@/components/DesktopNavBar.vue';
 </script>
 
 <template>
-  <DesktopHeader></DesktopHeader>
+  <DesktopNavBar></DesktopNavBar>
 
   <main>
     <DesktopHomeBanner/>
