@@ -45,7 +45,8 @@
     background-color: $primary;
     color: $onPrimary;
     z-index: 1001;
-    border-bottom: 2px solid #cccccc;
+    // border-bottom: 2px solid #cccccc;
+    box-shadow: 0 2px 6px rgba(15, 15, 15, 0.5);
   }
 
   .flex-header {
