@@ -46,7 +46,7 @@ function scrollTo(divId: string) {
 
   img {
     object-fit: fill;
-    min-height: 51px;
+    max-height: 51px;
   }
 }
 

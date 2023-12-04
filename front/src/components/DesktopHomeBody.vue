@@ -80,10 +80,12 @@ import DesktopArticleCard from './icons/DesktopArticleCard.vue';
                 </p>
                 <button class="button-on-circle">Je m'inscris</button>
             </div>
+
         </div>
     </section>
     <section class="section3">
         <DesktopArticleCard></DesktopArticleCard>
+        <img src="../assets/img/bubbles.svg" alt="">
     </section>
     
         
@@ -99,6 +101,12 @@ import DesktopArticleCard from './icons/DesktopArticleCard.vue';
     display: flex;
     flex-direction: column;
     align-items: center;
+
+    img {
+        position: absolute;
+        top: 153rem;
+        left: 18rem;
+    }
 
 }
 
