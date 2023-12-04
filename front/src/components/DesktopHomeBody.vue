@@ -10,6 +10,7 @@ import IconX from './icons/IconX.vue';
 import IconInsta from './icons/IconInsta.vue';
 import IconFacebook from './icons/IconFacebook.vue';
 import IconDiscord from './icons/IconDiscord.vue';
+import DesktopArticleCard from './icons/DesktopArticleCard.vue';
 
 
 </script>
@@ -81,8 +82,8 @@ import IconDiscord from './icons/IconDiscord.vue';
             </div>
         </div>
     </section>
-    <section class="serction3">
-        
+    <section class="section3">
+        <DesktopArticleCard></DesktopArticleCard>
     </section>
     
         
@@ -92,6 +93,14 @@ import IconDiscord from './icons/IconDiscord.vue';
 
 <style lang="scss" scoped >
 @import '@/assets/main.scss';
+
+.section3 {
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
 
 .section2 {
     margin-top: 5rem;
