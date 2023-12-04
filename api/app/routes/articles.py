@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
-from app.models import db, Article
+from app.models import db, Article, Categorie_article, Category
+from sqlalchemy import func
 from app.utils import validate_api_key
 
 articles_bp = Blueprint('articles', __name__)
@@ -19,35 +20,41 @@ def check_api_key():
 # Route for get article by id
 @articles_bp.route('/<int:article_id>', methods=['GET'])
 def get_article(article_id):
-    article = Article.query.get(article_id)
+    article = db.session.query(Article.id, Article.title, Article.description, Article.content, Article.created_at, Article.preview_picture,
+                               func.group_concat(Categorie_article.id_category).label('category_ids'))\
+        .join(Categorie_article, Article.id == Categorie_article.id_article)\
+        .filter(Article.id == article_id)\
+        .group_by(Article.id)\
+        .first()
 
     if article:
         article_data = {
             'id': article.id,
             'title': article.title,
-            'author_id': article.author_id,
             'description': article.description,
             'content': article.content,
             'created_at': article.created_at,
+            'category_ids': [int(cat_id) for cat_id in article.category_ids.split(',')],  # Convert string to a list of integers
+            'preview_picture': article.preview_picture,
         }
         return jsonify(article_data)
     else:
         return jsonify({'message': 'Article not found'}), 404
-
 # Route for get all articles
 @articles_bp.route('', methods=['GET'])
 def get_all_articles():
-    articles = Article.query.all()
+    articles = db.session.query(Article, Categorie_article).join(Categorie_article, Article.categorie_id == Categorie_article.id)
     if articles:
         article_data = []
         for article in articles:
             article_data.append({
-                'id': article.id,
-                'title': article.title,
-                'author_id': article.author_id,
-                'description': article.description,
-                'content': article.content,
-                'created_at': article.created_at,
+                'id': article.Article.id,
+                'title': article.Article.title,
+                'author_id': article.Article.author_id,
+                'description': article.Article.description,
+                'content': article.Article.content,
+                'created_at': article.Article.created_at,
+                'categorie': article.Categorie_article.name
             })
         return jsonify(article_data)
     else:

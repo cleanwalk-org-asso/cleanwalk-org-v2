@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Oct 31, 2023 at 09:52 AM
+-- Generation Time: Nov 05, 2023 at 10:14 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.0.1
 
@@ -35,9 +35,16 @@ CREATE TABLE `articles` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `description` text NOT NULL,
   `published` tinyint(1) NOT NULL,
-  `preview_picture` varchar(255) NOT NULL,
-  `categorie_id` int(11) NOT NULL
+  `preview_picture` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `articles`
+--
+
+INSERT INTO `articles` (`id`, `title`, `author_id`, `content`, `created_at`, `description`, `published`, `preview_picture`) VALUES
+(3, 'Ma super cleanwalk', 15, '[{\"article\": \"Dune\", \"content\": \"Dune is a science fiction novel written by Frank Herbert and published in 1965.\"}]', '2023-11-05 19:32:01', 'lalalallala', 0, 'zqrsetdyfguhjilk'),
+(4, 'cleanwalk éclatax', 12, '[{\"article\": \"cleanwal eclatax\", \"content\": \"cette cleanwalk était la pire de toute mon existence déja il pleuvait donc ...\"}]', '2023-11-05 19:32:01', 'drayftcjeqklr;j', 0, 'EAZQRETDYTUI');
 
 -- --------------------------------------------------------
 
@@ -50,6 +57,14 @@ CREATE TABLE `categories` (
   `category` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Dumping data for table `categories`
+--
+
+INSERT INTO `categories` (`id`, `category`) VALUES
+(1, 'cleanwalk'),
+(2, 'nature');
+
 -- --------------------------------------------------------
 
 --
@@ -60,6 +75,14 @@ CREATE TABLE `categories_article` (
   `id_category` int(11) NOT NULL,
   `id_article` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `categories_article`
+--
+
+INSERT INTO `categories_article` (`id_category`, `id_article`) VALUES
+(1, 4),
+(2, 4);
 
 -- --------------------------------------------------------
 
@@ -135,6 +158,14 @@ CREATE TABLE `users` (
   `role_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `firstname`, `lastname`, `email`, `password`, `created_at`, `profile_picture`, `salt`, `role_id`) VALUES
+(12, 'Paul', 'Menard', 'paul.menard@gmail.com', 'f87711778e50eb1cbf55f0c7f00a645befc98cc512c162b8048bbb7f1d14ceef', '2023-11-01 18:40:46', 'efsfsegvfsgsg', 0x07dd409ca6fc9fa14a1f9cb245deeb6c, 1),
+(15, 'Arthur', 'FRIN', 'frin.arthur@gmail.com', 'de48f28220e15a41ec4917f5020b87c23ba5d86952ac3d88eb87af9f9812088d', '2023-11-01 18:40:31', 'zefkhfdsqfdsfdsqfdsusegu', 0x89067073d5e7bbee4553af9a0b13f231, 2);
+
 -- --------------------------------------------------------
 
 --
@@ -157,8 +188,7 @@ CREATE TABLE `user_cleanwalk` (
 --
 ALTER TABLE `articles`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `author_id` (`author_id`),
-  ADD KEY `categorie_id` (`categorie_id`);
+  ADD KEY `author_id` (`author_id`);
 
 --
 -- Indexes for table `categories`
@@ -215,13 +245,13 @@ ALTER TABLE `user_cleanwalk`
 -- AUTO_INCREMENT for table `articles`
 --
 ALTER TABLE `articles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `cities`
@@ -239,13 +269,13 @@ ALTER TABLE `cleanwalks`
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- Constraints for dumped tables
