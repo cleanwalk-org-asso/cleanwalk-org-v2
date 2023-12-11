@@ -82,7 +82,8 @@ import IconLogoCleanwalk from './icons/IconLogoCleanwalk.vue';
 .back-footer {
 
     background-color: $surfaceVariant;
-    
+    position: relative;
+    z-index: 1;    
     }
 
   

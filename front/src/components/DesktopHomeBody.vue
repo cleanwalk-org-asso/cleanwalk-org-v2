@@ -84,7 +84,7 @@ import DesktopArticleCard from './icons/DesktopArticleCard.vue';
         </div>
     </section>
     <section class="section3">
-        <DesktopArticleCard></DesktopArticleCard>
+        <DesktopArticleCard class="cards"></DesktopArticleCard>
         <img src="../assets/img/bubbles.svg" alt="">
     </section>
     
@@ -97,15 +97,22 @@ import DesktopArticleCard from './icons/DesktopArticleCard.vue';
 @import '@/assets/main.scss';
 
 .section3 {
+    position: relative;
     background-color: #fff;
     display: flex;
     flex-direction: column;
     align-items: center;
 
+    .cards {
+        z-index: 1;
+    }
+
     img {
         position: absolute;
-        top: 153rem;
-        left: 18rem;
+        z-index: 0;
+        top: -5rem;
+        left: 30rem;
+        width: 100rem;
     }
 
 }
