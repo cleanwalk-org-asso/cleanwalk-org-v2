@@ -38,4 +38,4 @@ const CleanwalkCreationStore = useCleanwalkCreationStore();
         margin: 0;
     }
 
-</style>
+</style>@/stores/CleanwalkStore

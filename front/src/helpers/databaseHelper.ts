@@ -1,127 +1,82 @@
-import type { Cleanwalk } from '@/interfaces/cleanwalkInterface';
-import type { User } from '@/interfaces/userInterface';
-import axios from 'axios';
+import ky from 'ky';
 
-const apiUrl = '/api';
+const apiUrl = '/api'; // Proxi in vite.config
 
-const usersBaseRoute = '/users';
-const cleanwalkBaseRoute = '/cleanwalks';
-const loginRoute = '/users/login';
-const articleRoute = '/articles';
-
-const buildUserRoute = (userId: string) : string => usersBaseRoute + '/' + userId;
-const buildCleanwalkRoute = (cleanwalkId: string) : string => cleanwalkBaseRoute + '/' + cleanwalkId;
-const buildArticleRoute = (articleId: string) : string => articleRoute + '/' + articleId;
-
-
-/** 
- * Get queries
- * @param route The route to send a request to the api
- * @returns the data in the response, or undefined if error
- */
-const get = async (route: string): Promise<any|undefined> => {
+const kyGet = async (route: string) => {
     try {
-        const response = await axios.get(apiUrl + route);
-        return response.data;
+        const response = await ky.get(apiUrl + route, {
+            headers: {
+                'X-API-Key': import.meta.env.VITE_API_KEY,
+                // Autres en-têtes personnalisés si nécessaire
+            },
+        }).json();
+
+        return response;
     } catch (error) {
         console.error('Error fetching data:', error);
         return undefined;
     }
-}
+};
 
-const getUser = async (userId: string): Promise<User | undefined> => get(buildUserRoute(userId));
-
-const getAllCleanwalks = async (): Promise<Array<Cleanwalk> | undefined> => get(cleanwalkBaseRoute);
-
-const getCleanwalk = async (cleanwalkId: string): Promise<Cleanwalk | undefined> => get(buildCleanwalkRoute(cleanwalkId));
-
-const getArticle = async (article: any): Promise<any | undefined> => get(buildArticleRoute(article));
-
-
-/**
- * Send data to json object to api, used to insert data in the database
- * @param route The route to send a request to the api
- * @param data The data to insert
- */
-const post = async (route: string, data: any) => {
+const kyPost = async (route: string, data: any, access_token: string) => {
     try {
-        await axios.post(apiUrl + route, data);
-        return true;
-    } catch (error) {
-        console.error('Error sending data:', error);
-        return false;
-    }
-}
+        const response = await ky.post(apiUrl + route, {
+            json: data,
+            headers: {
+                'X-API-Key': import.meta.env.VITE_API_KEY,
+                'Authorization': 'Bearer ' + access_token,
+                // Autres en-têtes personnalisés si nécessaire
+            },
+        }).json();
 
-const postWithResponse = async (route: string, data: any) => {
-    try {
-        const response = await axios.post(apiUrl + route, data);
-        return response.data;
+        return response;
     } catch (error) {
         console.error('Error sending data:', error);
         return undefined;
     }
-}
+};
 
-const createUser = async (user: User) => post(usersBaseRoute, user);
-
-const createCleanwalk = async (cleanwalk: Cleanwalk) => post(cleanwalkBaseRoute, cleanwalk);
-
-const loginWithEmailPassword = async (email: string, password: string) => postWithResponse(loginRoute, {'email': email, 'password': password});
-
-const loginWithToken = async (token: string) => postWithResponse(loginRoute, {'token': token});
-
-
-/**
- * Update an object in the database
- * @param route The route to send the request to the api, it must contains the id of the object
- * @param data The updated data
- */
-const put = async (route: string, data: any) => {
+const kyPostWithoutToken = async (route: string, data: any) => {
     try {
-        await axios.put(apiUrl + route, data);
+        const response = await ky.post(apiUrl + route, {
+            json: data,
+            headers: {
+                'X-API-Key': import.meta.env.VITE_API_KEY,
+                // Autres en-têtes personnalisés si nécessaire
+            },
+        }).json();
+
+        return response;
+    } catch (error) {
+        console.error('Error sending data:', error);
+        return undefined;
+    }
+};
+
+const kyPut = async (route: string, data: any) => {
+    try {
+        await ky.put(apiUrl + route, { json: data });
         return true;
     } catch (error) {
         console.error('Error updating data:', error);
         return false;
     }
-}
+};
 
-const updateUser = async (user: User) => put(buildUserRoute(user.id.toString()), user);
-
-const updateCleanwalk = async (cleanwalk: Cleanwalk) => put(buildCleanwalkRoute(cleanwalk.id!.toString()), cleanwalk);
-
-// the word 'delete' is already used by javascript
-/**
- * Delete an object in the database
- * @param route The route to send the request to the api, it must contains the id of the object
- */
-const deleteData = async (route: string) => {
+const kyDelete = async (route: string) => {
     try {
-        await axios.delete(apiUrl + route);
+        await ky.delete(apiUrl + route);
         return true;
     } catch (error) {
         console.error('Error deleting data:', error);
         return false;
     }
-}
-
-const deletUser = async (userId: string) => deleteData(buildUserRoute(userId));
-
-const deleteCleanwalk = async (cleanwalkId: string) => deleteData(buildCleanwalkRoute(cleanwalkId));
-
+};
 
 export default {
-    getUser,
-    getAllCleanwalks,
-    getCleanwalk,
-    getArticle,
-    createUser,
-    createCleanwalk,
-    updateUser,
-    updateCleanwalk,
-    deletUser,
-    deleteCleanwalk,
-    loginWithEmailPassword,
-    loginWithToken,
-}
+    kyGet,
+    kyPost,
+    kyPut,
+    kyDelete,
+    kyPostWithoutToken,
+};
