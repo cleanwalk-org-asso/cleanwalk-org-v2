@@ -3,54 +3,22 @@ import {ref, watch} from 'vue';
 import type { Cleanwalk } from '@/interfaces/cleanwalkInterface';
 import dateHelper from '@/helpers/dateHelper';
 import nominatimHelper from '@/helpers/NominatimHelper';
+import { useCleanwalkStore } from '@/stores/CleanwalkStore';
+import { onMounted } from '@vue/runtime-core';
+const cleanwalkStore = useCleanwalkStore();
 
-
-const prop = defineProps({
-    cleanwalk: {
-        type: Object as () => Cleanwalk,
-        default: {
-            id: -1,
-            name: 'cleanwalk',
-            description: 'description',
-            date_begin: '',
-            duration: 10,
-            pos_lat: 5,
-            pos_long: 3,
-        },
-        
-    },
-    showDescription: {
-        type: Boolean,
-        default: false,
-    },
-    moreButton: {
-        type: Boolean,
-        default: false,
-    },
-    coloredBackground: {
-        type: Boolean,
-        default: false,
-    }
-})
-
-watch(() => prop.cleanwalk, (newValue, oldValue)=> {
-    if(newValue.pos_lat != oldValue.pos_lat || newValue.pos_long != oldValue.pos_long){
-        nominatimHelper.nominatimReverseWrittenAddress(prop.cleanwalk.pos_lat, prop.cleanwalk.pos_long).then((result) => {
-            location.value = result;
-        }); 
-    }
+onMounted(() => {
+    cleanwalkStore.getAllCleanwalks();
 });
+
 
 const location = ref('');
 
-nominatimHelper.nominatimReverseWrittenAddress(prop.cleanwalk.pos_lat, prop.cleanwalk.pos_long).then((result) => {
-    location.value = result;
-});
 
 </script>
 
 <template>
-    <article class="card" :class="{'primaryContainer-Background': coloredBackground }">
+    <!-- <article class="card" :class="{'primaryContainer-Background': coloredBackground }">
         <div class="main-information">
             <div>
                 <p class="cleanwalk-name">{{cleanwalk.name}}</p>
@@ -67,7 +35,7 @@ nominatimHelper.nominatimReverseWrittenAddress(prop.cleanwalk.pos_lat, prop.clea
 
         <p v-if="showDescription" class="cleanwalk-description">{{cleanwalk.description}}</p>
         <button v-if="moreButton" class="primary-button more-button" @click="$emit('moreButtonAction')">En savoir plus</button>
-    </article>
+    </article> -->
 </template>
 
 <style lang="scss" scoped>

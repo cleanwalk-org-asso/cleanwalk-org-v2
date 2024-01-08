@@ -10,7 +10,7 @@ import IconX from './icons/IconX.vue';
 import IconInsta from './icons/IconInsta.vue';
 import IconFacebook from './icons/IconFacebook.vue';
 import IconDiscord from './icons/IconDiscord.vue';
-import DesktopArticleCard from './icons/DesktopArticleCard.vue';
+import DesktopArticleCard from './DesktopArticleCard.vue';
 
 
 </script>

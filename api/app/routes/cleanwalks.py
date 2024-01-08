@@ -54,7 +54,6 @@ def get_all_cleanwalks():
                 'date_begin': cleanwalk.date_begin,
                 'duration': cleanwalk.duration,
                 'description': cleanwalk.description,
-                'author_id': cleanwalk.author_id,
                 'city_id': cleanwalk.city_id,
                 'address': cleanwalk.address
             })
