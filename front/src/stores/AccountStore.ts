@@ -12,14 +12,15 @@ export const useAccountStore = defineStore('account', () => {
     const $cookies = inject<VueCookies>('$cookies'); 
     const tokenCookieName = 'access_token';
     const tokenCookieExpireTime = '30d'; // 3m => 3 months (d => days, m => months, y => years)
-    const user: Ref<User|undefined> = ref();
-    const isLoggedIn = ref(false);
+    let CurrentUser: Ref<User|undefined> = ref();
+    let isLoggedIn = ref(false);
+    let token: string|undefined = undefined;
 
     async function login(email: string, password: string): Promise<boolean> {
         const result = await databaseHelper.kyPostWithoutToken('/users/login', {"email":email,"password": password} );
         if(result != undefined && result as User != undefined) {
-            user.value = result as User;
-            $cookies!.set(tokenCookieName, user.value.access_token, tokenCookieExpireTime, '', '', true);
+            CurrentUser.value = result as User;
+            $cookies!.set(tokenCookieName, CurrentUser.value.access_token, tokenCookieExpireTime, '', '', true);
             // need to create a cookie token
             isLoggedIn.value = true;
         }
@@ -30,13 +31,13 @@ export const useAccountStore = defineStore('account', () => {
         console.log($cookies!.get(tokenCookieName));
     }
     function printUser() {
-        console.log(user.value);
+        console.log(CurrentUser.value);
     }
 
     async function logout() {
         isLoggedIn.value = false;
         $cookies!.remove(tokenCookieName);
-        user.value = undefined;
+        CurrentUser.value = undefined;
         router.push({name: 'login'});
     }
 
@@ -45,7 +46,7 @@ export const useAccountStore = defineStore('account', () => {
         if(token != undefined) {
             const result = await databaseHelper.kyPost('/users/token-login', {}, token);
             if(result != undefined && result as User != undefined) {
-                user.value = result as User;
+                CurrentUser.value = result as User;
                 isLoggedIn.value = true;
             } else {
                 isLoggedIn.value = false;

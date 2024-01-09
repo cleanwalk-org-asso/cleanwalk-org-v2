@@ -7,7 +7,6 @@ const kyGet = async (route: string) => {
         const response = await ky.get(apiUrl + route, {
             headers: {
                 'X-API-Key': import.meta.env.VITE_API_KEY,
-                // Autres en-têtes personnalisés si nécessaire
             },
         }).json();
 
@@ -25,7 +24,6 @@ const kyPost = async (route: string, data: any, access_token: string) => {
             headers: {
                 'X-API-Key': import.meta.env.VITE_API_KEY,
                 'Authorization': 'Bearer ' + access_token,
-                // Autres en-têtes personnalisés si nécessaire
             },
         }).json();
 
@@ -42,7 +40,6 @@ const kyPostWithoutToken = async (route: string, data: any) => {
             json: data,
             headers: {
                 'X-API-Key': import.meta.env.VITE_API_KEY,
-                // Autres en-têtes personnalisés si nécessaire
             },
         }).json();
 
@@ -53,23 +50,35 @@ const kyPostWithoutToken = async (route: string, data: any) => {
     }
 };
 
-const kyPut = async (route: string, data: any) => {
+const kyPut = async (route: string, data: any, access_token:string) => {
     try {
-        await ky.put(apiUrl + route, { json: data });
-        return true;
+        const response = await ky.put(apiUrl + route, {
+            json: data,
+            headers: {
+                'X-API-Key': import.meta.env.VITE_API_KEY,
+                'Authorization': 'Bearer ' + access_token,
+            },
+        }).json();
+        return response;
     } catch (error) {
         console.error('Error updating data:', error);
-        return false;
+        return undefined;
     }
 };
 
-const kyDelete = async (route: string) => {
+const kyDelete = async (route: string, access_token: string) => {
     try {
-        await ky.delete(apiUrl + route);
-        return true;
+        const response = await ky.delete(apiUrl + route, {
+            headers: {
+                'X-API-Key': import.meta.env.VITE_API_KEY,
+                'Authorization': 'Bearer ' + access_token,
+            },
+        }).json();
+
+        return response;
     } catch (error) {
         console.error('Error deleting data:', error);
-        return false;
+        return undefined;
     }
 };
 
