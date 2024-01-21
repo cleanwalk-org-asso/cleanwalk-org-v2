@@ -6,6 +6,7 @@
 
 # Python
 .venv
+venv
 *.pyc
 __pycache__/
 
@@ -26,7 +27,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # Others
-.env
+*.env
 /cypress/videos/
 /cypress/screenshots/
 *.suo

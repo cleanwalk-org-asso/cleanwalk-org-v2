@@ -1,3 +1,7 @@
+#!/bin/bash
+
+# Script to dump database
+
 echo 'Creating dump directory...'
 docker exec -it db bash -c 'mkdir /dump'
 
