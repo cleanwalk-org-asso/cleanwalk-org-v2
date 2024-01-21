@@ -1,23 +1,35 @@
+# Cleanwalk V2 API
 
-# cleanwalk-v2-api
+## Installation
 
-## Install:
-require python3
-pip install -r requirements.txt
+Require python3
 
-## Launch the API:
-py app.py
-or use the Python extension and play on app.py
+```shell
+python3 -m pip install -r requirements.txt
+```
 
-## Test the API:
-Go to the routes /cleanwalks or /users
+## How to launch
 
-# API Routes Documentation - Users
+You can launch the app via command line :
 
-## Authentication
+```shell
+python3 app.py
+```
 
-### 1. [POST] Login
+or you can use your integrated python extension in your IDE.
+
+## Tests
+
+Go to your-domain/cleanwalks or your-domain/users
+
+## API Routes Documentation - Users
+
+### Authentication
+
+#### 1. [POST] Login
+
 - **Route:**
+
 ```bash
 /users/login
 ```
@@ -25,6 +37,7 @@ Go to the routes /cleanwalks or /users
 - **Description:** Log in by providing a valid email and password.
 
 - **Example:**
+
 ```json
 {
   "email": "frin.arthur@gmail.com",
@@ -32,19 +45,23 @@ Go to the routes /cleanwalks or /users
 }
 ```
 
-### 2. [POST] Token Login
+#### 2. [POST] Token Login
+
 - **Route:**
+
 ```bash
 /users/token-login
 ```
 
 - **Description:** Log in using a valid JWT token (obtained from the login route).
-- **Note:** Requires adding the JWT token to the request headers (bearer token). 
+- **Note:** Requires adding the JWT token to the request headers (bearer token).
 
-## Users
+### Users
 
-### 3. [GET] Get User by ID
+#### 3. [GET] Get User by ID
+
 - **Route:**
+
 ```bash
 /users/:user_id
 ```
@@ -52,22 +69,29 @@ Go to the routes /cleanwalks or /users
 - **Description:** Retrieve details of a specific user by providing their ID.
 - **Note:** Requires adding the JWT token to the request headers to access this route.
 
-### 4. [GET] Get All Users
+#### 4. [GET] Get All Users
+
 - **Route:**
+
 ```bash
 /users
 ```
+
 - **Description:** Retrieve all registered users.
 - **Note:** Requires adding the JWT token to the request headers to access this route.
 
-### 5. [POST] User Creation
+#### 5. [POST] User Creation
+
 - **Route:**
+
 ```bash
 /users
 ```
+
 - **Description:** Create a new user by providing the required information.
 - **Example:**
 - **Note:** role_id: 1 == user | 2 == organisation
+
 ```json
 {
   "firstname": "Arthur",
@@ -79,21 +103,28 @@ Go to the routes /cleanwalks or /users
 }
 ```
 
-### 6. [DELETE] Delete User by ID
+#### 6. [DELETE] Delete User by ID
+
 - **Route:**
+
 ```bash
 /users/:user_id
 ```
+
 - **Description:** Delete a specific user by providing their ID.
 - **Note:** Requires adding the JWT token to the request headers to access this route.
 
-### 7. [PUT] Update User by ID
+#### 7. [PUT] Update User by ID
+
 - **Route:**
+
 ```bash
 /users/:user_id
 ```
+
 - **Description:** Update information for a specific user by providing their ID.
 - **Example:**
+
 ```json
 {
   "firstname": "New first name",
@@ -102,13 +133,15 @@ Go to the routes /cleanwalks or /users
   "profile_picture": "new_image_url"
 }
 ```
-# API Routes Documentation - Cleanwalks
 
-## Cleanwalks
+## API Routes Documentation - Cleanwalks
 
-### 1. [GET] Get Cleanwalk by ID
+### Cleanwalks
+
+#### 1. [GET] Get Cleanwalk by ID
 
 - **Route:**
+
   ```bash
   /cleanwalks/<int:cleanwalk_id>
   ```
@@ -116,9 +149,10 @@ Go to the routes /cleanwalks or /users
 - **Description:** Retrieve details of a specific Cleanwalk by providing its ID.
 - **Note:** Requires adding a valid API key to the request headers.
 
-### 2. [GET] Get All Cleanwalks
+#### 2. [GET] Get All Cleanwalks
 
 - **Route:**
+
   ```bash
   /cleanwalks
   ```
@@ -126,15 +160,17 @@ Go to the routes /cleanwalks or /users
 - **Description:** Retrieve information for all registered Cleanwalks.
 - **Note:** Requires adding a valid API key to the request headers.
 
-### 3. [POST] Create Cleanwalk
+#### 3. [POST] Create Cleanwalk
 
 - **Route:**
+
   ```bash
   /cleanwalks
   ```
 
 - **Description:** Create a new Cleanwalk by providing the required information.
 - **Example:**
+
   ```json
   {
     "name": "City Cleanup",
@@ -148,15 +184,17 @@ Go to the routes /cleanwalks or /users
   }
   ```
 
-### 4. [PUT] Update Cleanwalk by ID
+#### 4. [PUT] Update Cleanwalk by ID
 
 - **Route:**
+
   ```bash
   /cleanwalks/<int:cleanwalk_id>
   ```
 
 - **Description:** Update information for a specific Cleanwalk by providing its ID.
 - **Example:**
+
   ```json
   {
     "name": "Updated Cleanup",
@@ -169,11 +207,13 @@ Go to the routes /cleanwalks or /users
     "address": "456 Main St"
   }
   ```
+
   Requires adding a valid API key to the request headers.
 
-### 5. [DELETE] Delete Cleanwalk by ID
+#### 5. [DELETE] Delete Cleanwalk by ID
 
 - **Route:**
+
   ```bash
   /cleanwalks/<int:cleanwalk_id>
   ```
@@ -183,11 +223,12 @@ Go to the routes /cleanwalks or /users
 
 ---
 
-## Cities
+### Cities
 
-### 1. [GET] Get City by ID
+#### 1. [GET] Get City by ID
 
 - **Route:**
+
   ```bash
   /cities/<int:city_id>
   ```
@@ -195,9 +236,10 @@ Go to the routes /cleanwalks or /users
 - **Description:** Retrieve details of a specific city by providing its ID.
 - **Note:** Requires adding a valid API key to the request headers.
 
-### 2. [GET] Get All Cities
+#### 2. [GET] Get All Cities
 
 - **Route:**
+
   ```bash
   /cities
   ```
@@ -205,40 +247,46 @@ Go to the routes /cleanwalks or /users
 - **Description:** Retrieve information for all registered cities.
 - **Note:** Requires adding a valid API key to the request headers.
 
-### 3. [POST] Create City
+#### 3. [POST] Create City
 
 - **Route:**
+
   ```bash
   /cities
   ```
 
 - **Description:** Create a new city by providing the required information.
 - **Example:**
+
   ```json
   {
     "name": "New City"
   }
   ```
 
-### 4. [PUT] Update City by ID
+#### 4. [PUT] Update City by ID
 
 - **Route:**
+
   ```bash
   /cities/<int:city_id>
   ```
 
 - **Description:** Update information for a specific city by providing its ID.
 - **Example:**
+
   ```json
   {
     "name": "Updated City"
   }
   ```
+  
   Requires adding a valid API key to the request headers.
 
-### 5. [DELETE] Delete City by ID
+#### 5. [DELETE] Delete City by ID
 
 - **Route:**
+
   ```bash
   /cities/<int:city_id>
   ```
@@ -248,11 +296,12 @@ Go to the routes /cleanwalks or /users
 
 ---
 
-## Articles
+### Articles
 
-### 1. [GET] Get Article by ID
+#### 1. [GET] Get Article by ID
 
 - **Route:**
+
   ```bash
   /articles/<int:article_id>
   ```
@@ -260,9 +309,10 @@ Go to the routes /cleanwalks or /users
 - **Description:** Retrieve details of a specific article by providing its ID.
 - **Note:** Requires adding a valid API key to the request headers.
 
-### 2. [GET] Get All Articles
+#### 2. [GET] Get All Articles
 
 - **Route:**
+
   ```bash
   /articles
   ```
@@ -270,15 +320,17 @@ Go to the routes /cleanwalks or /users
 - **Description:** Retrieve information for all registered articles.
 - **Note:** Requires adding a valid API key to the request headers.
 
-### 3. [POST] Create Article
+#### 3. [POST] Create Article
 
 - **Route:**
+
   ```bash
   /articles
   ```
 
 - **Description:** Create a new article by providing the required information.
 - **Example:**
+
   ```json
   {
     "title": "New Article",
@@ -288,15 +340,17 @@ Go to the routes /cleanwalks or /users
   }
   ```
 
-### 4. [PUT] Update Article by ID
+#### 4. [PUT] Update Article by ID
 
 - **Route:**
+
   ```bash
   /articles/<int:article_id>
   ```
 
 - **Description:** Update information for a specific article by providing its ID.
 - **Example:**
+
   ```json
   {
     "title": "Updated Article",
@@ -304,11 +358,13 @@ Go to the routes /cleanwalks or /users
     "content": "Updated article content"
   }
   ```
+
   Requires adding a valid API key to the request headers.
 
-### 5. [DELETE] Delete Article by ID
+#### 5. [DELETE] Delete Article by ID
 
 - **Route:**
+
   ```bash
   /articles/<int:article_id>
   ```
