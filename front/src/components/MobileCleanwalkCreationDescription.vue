@@ -45,4 +45,4 @@ const onInput = () => {
         font-size: 0.75rem;
     }
 
-</style>
+</style>@/stores/CleanwalkStore

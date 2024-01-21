@@ -73,4 +73,4 @@ const CleanwalkCreationStore = useCleanwalkCreationStore();
         font-weight: 500;
         margin: 2rem 0;
     }
-</style>
+</style>@/stores/CleanwalkStore

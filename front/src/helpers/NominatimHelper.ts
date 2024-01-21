@@ -1,14 +1,14 @@
-import axios from 'axios';
+import ky from 'ky';
 
 const nominatimUrl = 'http://localhost:5173/nominatim';
 
 // countries in which nominatim searches
-const countryCodesArray =  ['fr', 'be'];
+const countryCodesArray = ['fr', 'be'];
 
 // the language nominatim returns for the places names
 const accept_language = ['fr'];
 
-const nominatimRequest = async (url: URL, params: any) => {
+const nominatimRequest = async (url: string, params: Record<string, any>) => {
     // the output format
     params.format = 'json';
 
@@ -20,35 +20,36 @@ const nominatimRequest = async (url: URL, params: any) => {
         params['accept-language'] = params.accept_language;
     }
 
-    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+    const searchParams = new URLSearchParams(params as Record<string, string>);
+    const fullUrl = `${url}?${searchParams.toString()}`;
 
-    console.log(url.toJSON());
+    console.log(fullUrl);
 
-    try{
-        const res = await axios.get(url.toJSON());
-        return res.data;
-    } catch(error) {
+    try {
+        const res = await ky.get(fullUrl).json<any>();
+        return res;
+    } catch (error) {
         console.log('Nominatim error: ' + error);
         return undefined;
     }
-}
+};
 
 /**
  * Get the GPS coordinates of a place
  * @param searchString The place to look for (state, city, road...)
  * @returns The data of the response
  */
-const nominatimSearch = async (searchString: String) => {
-    const params: any = {
+const nominatimSearch = async (searchString: string) => {
+    const params = {
         q: searchString,
         countryCodesArray: countryCodesArray,
         accept_language: accept_language,
     };
 
-    const url = new URL(nominatimUrl + '/search');
+    const url = `${nominatimUrl}/search`;
 
     return nominatimRequest(url, params);
-}
+};
 
 /**
  * Get the name of the GPS coordinates (country, state, city, road...)
@@ -57,50 +58,49 @@ const nominatimSearch = async (searchString: String) => {
  * @returns The data of the response
  */
 const nominatimReverse = async (lat: number, lon: number) => {
-    const params: any = {
+    const params = {
         lat: lat,
         lon: lon,
         countryCodesArray: countryCodesArray,
         accept_language: accept_language,
-      };
+    };
 
-    const url = new URL(nominatimUrl + '/reverse');
+    const url = `${nominatimUrl}/reverse`;
 
     return nominatimRequest(url, params);
-}
+};
 
 /**
- * 
+ *
  * @param lat The latitude
  * @param lon The longitude
  * @returns The formatted address of the GPS coordinates: road, city
  */
-const nominatimReverseWrittenAddress = async (lat: number, lon: number) : Promise<string> => {
+const nominatimReverseWrittenAddress = async (lat: number, lon: number) => {
     let location = '';
-    const result = await nominatimReverse(lat, lon)
-                    .catch(error => {
-                        console.log(error);
-                    });
+    const result = await nominatimReverse(lat, lon).catch((error) => {
+        console.log(error);
+    });
 
-    if(result == null){
+    if (result == null) {
         return 'Address not found';
     }
 
-    if(result.address.road != undefined) {
+    if (result.address.road != undefined) {
         location = result.address.road + ', ';
     }
 
-    if(result.address.city != undefined) {
+    if (result.address.city != undefined) {
         location += result.address.city;
     } else {
         location += result.address.municipality;
     }
 
     return location;
-}
+};
 
 export default {
     nominatimSearch,
     nominatimReverse,
     nominatimReverseWrittenAddress,
-}
+};

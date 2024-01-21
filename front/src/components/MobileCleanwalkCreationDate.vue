@@ -91,4 +91,4 @@ const datePlaceholder = new Date(new Date().setMonth(new Date().getMonth() + 2))
         margin-top: 1rem;
     }
 
-</style>
+</style>@/stores/CleanwalkStore

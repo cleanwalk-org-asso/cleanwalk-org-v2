@@ -44,4 +44,4 @@ const CleanwalkCreationStore = useCleanwalkCreationStore();
         gap: 1rem;
     }
 
-</style>
+</style>@/stores/CleanwalkStore
