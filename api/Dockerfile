@@ -1,13 +1,22 @@
 FROM python:3-alpine
 
-WORKDIR /usr/src/api
+RUN addgroup -S flask && adduser -S flask -G flask
 
-COPY requirements.txt .
+RUN mkdir -p /home/flask/app && chown -R flask:flask /home/flask/app
 
-RUN pip install --no-cache-dir -r requirements.txt
+WORKDIR /home/flask/app
 
-COPY . .
+COPY requirements*.txt ./
+
+USER flask
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip3 install -r requirements.txt
+
+COPY --chown=flask:flask . .
 
 EXPOSE 5000
 
-CMD [ "python", "./app.py" ]
+ENTRYPOINT [ "python" ]
+
+CMD [ "app.py" ]
