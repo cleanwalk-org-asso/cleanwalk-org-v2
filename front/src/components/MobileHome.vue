@@ -1,3 +1,11 @@
+<script setup lang="ts">
+
+</script>
+
+
 <template>
-    <h1>lalallla</h1>
+    <main>
+        <h1>Mobile Home</h1>
+    </main>
+
 </template>
