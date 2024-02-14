@@ -54,6 +54,8 @@ const navigateTo = (page: string) => {
         width: 100%;
         font-size: 12px;
         font-weight: 500;
+        z-index: 999;
+        background-color: var(--color-nav-bg);
 
         .container {
             display: flex;
