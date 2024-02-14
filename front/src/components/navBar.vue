@@ -16,7 +16,7 @@ const navigateTo = (page: string) => {
 </script>
 <template>
     <nav class="nav">
-        <ul class="container">
+        <ul class="container" :class="{ 'shadow': currentPage !== 'carte'}">
             <li :class="{ 'active': currentPage === 'carte'}">
                 <button @click="navigateTo('carte')" >
                     <iconMap />
@@ -35,10 +35,10 @@ const navigateTo = (page: string) => {
                     <div>Articles</div>
                 </button>
             </li>
-            <li :class="{ 'active': currentPage === 'profile'}">
+            <li :class="{ 'active': currentPage === 'profile'}" >
                 <button @click="navigateTo('profile')" >
                     <iconProfile />
-                    <Div>Profile</Div>
+                    <div>Profile</div>
                 </button>
             </li>
         </ul>
@@ -61,7 +61,10 @@ const navigateTo = (page: string) => {
             display: flex;
             justify-content: space-around;
             padding: 0.5rem;
-            box-shadow: 0px -10px 100px rgba(194, 194, 194, 0.2); 
+
+            &.shadow {
+                box-shadow: 0px -10px 100px rgba(194, 194, 194, 0.2);
+            }
 
             li {
                 list-style: none;
