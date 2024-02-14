@@ -58,23 +58,34 @@ const navigateTo = (page: string) => {
         .container {
             display: flex;
             justify-content: space-around;
-            padding: 1rem;
+            padding: 0.5rem;
+            box-shadow: 0px -10px 100px rgba(194, 194, 194, 0.2); 
 
             li {
                 list-style: none;
-                stroke: var(--text-color-secondary);
+                stroke: var(--text-color-nav);
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 flex-direction: column;
-                a {
+                color: var(--text-color-nav);
+                width: 100%;
+                button {
+                    padding: 0.3rem 0;
+                    border-radius: 12px;
                     text-decoration: none;
-                    color: var(--text-color-secondary);
+                    color: inherit;
+                    width: 100%;
                     
                 }
 
                 &.active {
-                    stroke: red
+                    stroke: var(--text-color-nav-active);
+                    color: var(--text-color-nav-active);
+                    
+                    button {
+                        background-color: var(--color-primary);
+                    }
                 }
             }
         }
