@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useCleanwalkStore } from '@/stores/CleanwalkStore';
+
+const cleanwalkStore = useCleanwalkStore()
 
 const draggableCard = ref<HTMLElement | null>(null);
 
 onMounted(() => {
+  console.log(cleanwalkStore.cleanwalkIsSelect.valueOf())
   const card = draggableCard.value;
   if (!card) return;
 
@@ -37,23 +41,28 @@ onMounted(() => {
 </script>
 
 <template>
-    <main>
-      <div ref="draggableCard" class="draggable-card">
-        <div class="card-handle">
-            <svg width="43" height="3" viewBox="0 0 43 3" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="43" height="3" rx="1.5" fill="#373646"/>
-            </svg>
-        </div>
-        <div class="card-content">
-          <h3>Je netoie la Nature</h3>
-          <div>Date et heure de L’évènement</div>
-          <div>Localité, France</div>
-        </div>
+  <main>
+    <div ref="draggableCard" class="draggable-card">
+      <div class="card-handle">
+        <svg width="43" height="3" viewBox="0 0 43 3" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="43" height="3" rx="1.5" fill="#373646" />
+        </svg>
       </div>
-    </main>
-  </template>
+      <div class="card-content" v-if="cleanwalkStore.cleanwalkIsSelect">
+        <h3>Je nettoie la Nature</h3>
+        <div>Date et heure de l’évènement</div>
+        <div>Localité, France</div>
+      </div>
+      <div class="card-content" v-else>
+        <h3>Contenu alternatif</h3>
+        <div>Autre information pertinente ici.</div>
+        <div>fqfbqifbqsfb</div>
+      </div>
+    </div>
+  </main>
+</template>
   
-  <style scoped lang="scss">
+<style scoped lang="scss">
 .draggable-card {
   position: fixed;
   bottom: -10px;
@@ -64,7 +73,9 @@ onMounted(() => {
   border-top-right-radius: 16px;
   z-index: 998;
   transition: bottom 0.3s ease;
-  touch-action: none; /* Pour améliorer les performances des événements touch */
+  touch-action: none;
+
+  /* Pour améliorer les performances des événements touch */
   .card-handle {
     width: 100%;
     height: 20px;
@@ -79,7 +90,5 @@ onMounted(() => {
     }
   }
 }
-
-
 </style>
 
