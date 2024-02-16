@@ -12,7 +12,9 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
 
     const route:string = 'cleanwalks';
 
-    let cleanwalksTab: Ref<Cleanwalk[]|undefined> = ref();
+    let cleanwalksTab: Ref<Cleanwalk[]|undefined> = ref([]);
+
+
 
 
     async function getAllCleanwalks(): Promise<Cleanwalk[]|undefined> {
