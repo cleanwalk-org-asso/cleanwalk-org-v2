@@ -2,12 +2,14 @@
 import "leaflet/dist/leaflet.css";
 import { LMap, LTileLayer, LMarker, LIcon } from "@vue-leaflet/vue-leaflet";
 import L, { LatLng, LatLngBounds, Map, type PointExpression } from "leaflet";
-import { ref, type Ref, onMounted } from "vue";
-
+import { ref, type Ref, onMounted, nextTick } from "vue";
+import iconLeftArrow from "@/components/icons/icon-left-arrow.vue";
+import iconSearch from "@/components/icons/icon-search.vue";
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
 import iconClock from './icons/icon-clock.vue';
 import iconMiniMap from './icons/icon-mini-map.vue';
 import router from "@/router";
+import { max } from "date-fns";
 
 const cleanwalkStore = useCleanwalkStore()
 
@@ -19,6 +21,7 @@ let center: Ref<PointExpression> = ref([48.866667, 2.333333]);
 let point1: Ref<LatLng> = ref(L.latLng(48.866667, 2.333333));
 let mapInstance: Ref<Map | null> = ref(null);
 let cardListBool = ref(false);
+const cleanwalkListContainer =  ref<HTMLElement | null>(null);
 
 const testCleanwalkList = ref([
     {
@@ -26,6 +29,55 @@ const testCleanwalkList = ref([
         title: "Cleanwalk 1",
         lat: 42.866667,
         lng: 2.333333,
+        isAsso: true
+    },
+    {
+        id: 1,
+        title: "Cleanwalk 2",
+        lat: 45.866667,
+        lng: 1.333333,
+        isAsso: false
+    },
+    {
+        id: 1,
+        title: "Cleanwalk 3",
+        lat: 48.866667,
+        lng: 4.333333,
+        isAsso: false
+    },
+    {
+        id: 1,
+        title: "Cleanwalk 4",
+        lat: 49.866667,
+        lng: 3.333333,
+        isAsso: true
+    },
+    {
+        id: 1,
+        title: "Cleanwalk 1",
+        lat: 42.866667,
+        lng: 2.333333,
+        isAsso: true
+    },
+    {
+        id: 1,
+        title: "Cleanwalk 2",
+        lat: 45.866667,
+        lng: 1.333333,
+        isAsso: false
+    },
+    {
+        id: 1,
+        title: "Cleanwalk 3",
+        lat: 48.866667,
+        lng: 4.333333,
+        isAsso: false
+    },
+    {
+        id: 1,
+        title: "Cleanwalk 4",
+        lat: 49.866667,
+        lng: 3.333333,
         isAsso: true
     },
     {
@@ -65,9 +117,14 @@ onMounted(() => {
 
     let startY = 0;
     let initialBottom = -10;
-    const maxHeight = 65 // Limite de hauteur en px
+    let maxHeight = -10 // Limite de hauteur en px
 
     const onTouchStart = (e: TouchEvent) => {
+        if (cleanwalkStore.cleanwalkIsSelect) {
+            maxHeight = 65;
+        } else {
+            maxHeight = -10;
+        }
         startY = e.touches[0].clientY;
         initialBottom = parseInt(window.getComputedStyle(card).bottom, 10);
         document.addEventListener('touchmove', onTouchMove, { passive: false });
@@ -78,12 +135,12 @@ onMounted(() => {
         e.preventDefault(); // Prévenir le scroll de la page
         const diffY = startY - e.touches[0].clientY;
         let newBottom = initialBottom + diffY;
+        if (!cleanwalkStore.cleanwalkIsSelect) {
+            setCleanwalkList();
+        }
         if (newBottom > maxHeight) {
             newBottom = maxHeight; // Appliquer la limite de hauteur
             // Vérifier si la card est à son maximum et logger l'événement
-            if (newBottom === maxHeight && !cleanwalkStore.cleanwalkIsSelect) {
-                setCleanwalkList()
-            }
         }
         if (newBottom < 0) newBottom = -10; // Empêcher la card de descendre sous le niveau initial
         card.style.bottom = `${newBottom}px`;
@@ -112,6 +169,16 @@ function slideDown() {
 
 function setCleanwalkList() {
     cardListBool.value = true;
+    slideDown();
+}
+
+function hideCleanwalkList() {
+    cardListBool.value = true;
+    nextTick(() => {
+        if (cleanwalkListContainer.value) {
+            cleanwalkListContainer.value.scrollTop = 0;
+        }
+    });
 }
 
 
@@ -159,7 +226,15 @@ function mapClick() {
                     </l-marker>
                 </div>
             </l-map>
-            <div class=""></div>
+        </div>
+        <div class="search-bar">
+            <button @click="cardListBool = false">
+                <iconLeftArrow />
+            </button>
+            <input @click="hideCleanwalkList()" name="search" type="text" placeholder="Rechercher une cleanwalk" />
+            <label for="search">
+                <iconSearch />
+            </label>
         </div>
         <div ref="draggableCard" class="draggable-card">
             <div class="card-handle">
@@ -191,37 +266,26 @@ function mapClick() {
             </div>
         </div>
         <div class="cleanwalk-list" :class="{ 'active': cardListBool === false }">
-            <div v-for="cleanwalk in testCleanwalkList" :key="cleanwalk.id" class="container">
-                <div class="title">{{ cleanwalk.title }}</div>
-                <div class="flex">
-                    <icon-clock />
-                    <div>Date et heure de l’évènement</div>
-                </div>
-                <div class="flex">
-                    <iconMiniMap />
-                    <div>Localité, France</div>
+            <div class="container" ref="cleanwalkListContainer">
+                <div v-for="cleanwalk in testCleanwalkList" :key="cleanwalk.id" class="cleanwalk">
+                    <div class="title">{{ cleanwalk.title }}</div>
+                    <div class="flex">
+                        <icon-clock />
+                        <div>Date et heure de l’évènement</div>
+                    </div>
+                    <div class="flex">
+                        <iconMiniMap />
+                        <div>Localité, France</div>
+                    </div>
                 </div>
             </div>
 
 
         </div>
     </main>
-    <button @click="printCo" class="test">
-        lalla
-    </button>
 </template>
 
 <style scoped>
-.test {
-    position: absolute;
-    z-index: 999;
-    top: 0;
-    right: 0;
-    background-color: rebeccapurple;
-    padding: 10px;
-    color: white;
-}
-
 
 html,
 body,
@@ -230,6 +294,45 @@ main {
     padding: 0;
     height: 100%;
     width: 100vw;
+
+    .search-bar {
+        position: fixed;
+        top: 50px;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: white;
+        z-index: 9999;
+        border-radius: 12px;
+        border: 1px solid #CBD5E1;
+        stroke: #CBD5E1;
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            font-weight: 500;
+            color: #373646;
+            background-color: white;
+            padding: 15px 0;
+        }
+        label {
+            padding-top: 8px;
+            padding-right: 10px;
+        }
+
+        svg {
+            width: 20px;
+            height: 20px;
+            stroke: #373646;
+        }
+        
+    }
 
     .map-container {
         height: 100vh;
@@ -244,37 +347,41 @@ main {
         background-color: rgba(128, 128, 128, 0.5); /* Semi-transparent */
         backdrop-filter: blur(5px); /* Appliquer l'effet de flou */
         z-index: 999;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 15px;
         stroke: black;
-        overflow: auto;
-        padding-top: 300px;
-
         &.active {
             display: none;
         }
         .container {
-            border: 2px solid rgb(155, 155, 155);
-            border-radius: 12px;
-            padding: 10px;
-            background-color: white;
-            width: 90%;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 73px;
+            padding-top: 15px;
+            gap: 10px;
+            overflow: auto;
 
-            .title {
-                font-size: 16px;
-                font-style: normal;
-                font-weight: 500;
-            }
+            .cleanwalk {
+                border: 2px solid rgb(155, 155, 155);
+                border-radius: 12px;
+                padding: 10px;
+                background-color: white;
+                width: 90%;
     
-            .flex {
-                display: flex;
-                align-items: center;
-                gap: 10px;
+                .title {
+                    font-size: 16px;
+                    font-style: normal;
+                    font-weight: 500;
+                }
+        
+                .flex {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+    
             }
-
         }
 
     }

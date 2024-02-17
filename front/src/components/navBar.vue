@@ -6,7 +6,7 @@ import iconProfile from '@/components/icons/icon-profile.vue';
 
 import { ref, onMounted, onUnmounted } from 'vue';
 
-const currentPage = ref('');
+const currentPage = ref('carte');
 
 const navigateTo = (page: string) => {
     currentPage.value = page;
