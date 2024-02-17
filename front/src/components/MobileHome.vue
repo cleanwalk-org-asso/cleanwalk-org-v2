@@ -120,7 +120,7 @@ onMounted(() => {
     let maxHeight = -10 // Limite de hauteur en px
 
     const onTouchStart = (e: TouchEvent) => {
-        if (cleanwalkStore.cleanwalkIsSelect) {
+        if (cleanwalkStore.cleanwalkIsSelect) { //bloquer le slide si aucune cleanwalk sélectionnée
             maxHeight = 65;
         } else {
             maxHeight = -10;
@@ -135,7 +135,7 @@ onMounted(() => {
         e.preventDefault(); // Prévenir le scroll de la page
         const diffY = startY - e.touches[0].clientY;
         let newBottom = initialBottom + diffY;
-        if (!cleanwalkStore.cleanwalkIsSelect) {
+        if (!cleanwalkStore.cleanwalkIsSelect) { // si aucune cleanwalk n'est sélectionnée on affiche la liste
             setCleanwalkList();
         }
         if (newBottom > maxHeight) {
