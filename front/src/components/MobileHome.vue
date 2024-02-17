@@ -17,11 +17,9 @@ const draggableCard = ref<HTMLElement | null>(null);
 let zoom = ref(5);
 let centerMap = ref([48.866667, 2.333333]);
 let center: Ref<PointExpression> = ref([48.866667, 2.333333]);
-
-let point1: Ref<LatLng> = ref(L.latLng(48.866667, 2.333333));
 let mapInstance: Ref<Map | null> = ref(null);
-let cardListBool = ref(false);
-const cleanwalkListContainer =  ref<HTMLElement | null>(null);
+let cardListBool = ref(false);  //to display or not the cleanwalk list
+const cleanwalkListContainer =  ref<HTMLElement | null>(null); //ref to the html cleanwalk list container
 
 const testCleanwalkList = ref([
     {
@@ -136,7 +134,7 @@ onMounted(() => {
         const diffY = startY - e.touches[0].clientY;
         let newBottom = initialBottom + diffY;
         if (!cleanwalkStore.cleanwalkIsSelect) { // si aucune cleanwalk n'est sélectionnée on affiche la liste
-            setCleanwalkList();
+            showCleanwalkList();
         }
         if (newBottom > maxHeight) {
             newBottom = maxHeight; // Appliquer la limite de hauteur
@@ -166,8 +164,7 @@ function slideDown() {
         draggableCard.value.style.bottom = '-10px';
     }
 }
-
-function setCleanwalkList() {
+function showCleanwalkList() {
     cardListBool.value = true;
     slideDown();
 }
@@ -187,22 +184,16 @@ function isPointVisible(lat: number, lng: number): boolean {
         console.error("Map instance is not available");
         return false;
     }
-    // Obtenir les limites actuelles de la carte
+    // get current map limit
     const bounds: LatLngBounds = mapInstance.value.getBounds();
 
-    // Créer un point Leaflet avec les coordonnées
+    // create leaflet point whith coordinates
     const point: LatLng = L.latLng(lat, lng);
 
-    // Vérifier si le point est dans les limites
+    // verif if the point is on limit
     return bounds.contains(point);
 }
 
-const printCo = () => {
-    console.log(zoom.value);
-    if (mapInstance.value) {
-        console.log(isPointVisible(point1.value.lat, point1.value.lng));
-    }
-};
 function mapClick() {
     slideDown()
 }
@@ -227,8 +218,18 @@ function mapClick() {
                 </div>
             </l-map>
         </div>
-        <div class="search-bar">
-            <button @click="cardListBool = false">
+        <div class="info-logo" :class="{ 'onSearch': cardListBool === true }">
+            <div class="mini-logo">
+                <img src="../assets/mini-logo.svg" alt="mini-logo" v-if="cardListBool === false">
+                <img src="../assets/logo.svg" alt="mini-logo" v-else>
+
+            </div>
+            <div class="info">
+                <img src="../assets/info.svg" alt="get-infos">
+            </div>
+        </div>
+        <div class="search-bar" :class="{ 'onSearch': cardListBool === true }">
+            <button @click="cardListBool = false" :class="{ 'active': cardListBool === false }">
                 <iconLeftArrow />
             </button>
             <input @click="hideCleanwalkList()" name="search" type="text" placeholder="Rechercher une cleanwalk" />
@@ -265,7 +266,7 @@ function mapClick() {
                 <h3>10 cleanwalks à proximité</h3>
             </div>
         </div>
-        <div class="cleanwalk-list" :class="{ 'active': cardListBool === false }">
+        <div class="cleanwalk-list" :class="{'active': cardListBool === false }">
             <div class="container" ref="cleanwalkListContainer">
                 <div v-for="cleanwalk in testCleanwalkList" :key="cleanwalk.id" class="cleanwalk">
                     <div class="title">{{ cleanwalk.title }}</div>
@@ -295,9 +296,41 @@ main {
     height: 100%;
     width: 100vw;
 
+    .info-logo {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+        width: 100vw;
+        display: flex;
+        justify-content: space-between;
+
+        &.onSearch {
+            background-color: var(--color-primary);
+            padding-bottom: 1px;
+        }
+        
+        div {
+            background-color: var(--color-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+        }
+
+        .info {
+            border-bottom-left-radius: 12px;        
+            padding: 4px 5px 4px 7px;
+        }
+        .mini-logo {
+            padding-left: 5px;
+            border-bottom-right-radius: 12px;        
+        }
+    }
+
     .search-bar {
         position: fixed;
-        top: 50px;
+        top: 60px;
         left: 50%;
         transform: translate(-50%, -50%);
         width: 90%;
@@ -305,10 +338,23 @@ main {
         justify-content: space-between;
         align-items: center;
         background-color: white;
-        z-index: 9999;
+        z-index: 9998;
         border-radius: 12px;
         border: 1px solid #CBD5E1;
         stroke: #CBD5E1;
+
+        &.onSearch {
+            width: 100%;
+            border-radius: 0;
+        }
+
+        button {
+            padding: 10px 5px 10px 10px;
+            &.active {
+                opacity: 0;
+
+            }
+        }
 
         input {
             width: 100%;
@@ -357,7 +403,7 @@ main {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 73px;
+            margin-top: 80px;
             padding-top: 15px;
             gap: 10px;
             overflow: auto;
@@ -398,7 +444,6 @@ main {
         transition: bottom 0.3s ease;
         touch-action: none;
 
-        /* Pour améliorer les performances des événements touch */
         .card-handle {
             width: 100%;
             height: 20px;
