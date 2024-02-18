@@ -238,7 +238,7 @@ function mapClick() {
             </label>
         </div>
         <div ref="draggableCard" class="draggable-card">
-            <div class="card-handle">
+            <div class="card-handle" @click="!cleanwalkStore.cleanwalkIsSelect && (cardListBool = true);">
                 <svg width="43" height="3" viewBox="0 0 43 3" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect width="43" height="3" rx="1.5" fill="#373646" />
                 </svg>
