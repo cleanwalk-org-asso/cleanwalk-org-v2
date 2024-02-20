@@ -286,7 +286,7 @@ function mapClick() {
     </main>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 
 html,
 body,
