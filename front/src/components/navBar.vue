@@ -5,41 +5,45 @@ import iconMap from '@/components/icons/icon-map.vue';
 import iconProfile from '@/components/icons/icon-profile.vue';
 
 import { ref, onMounted, onUnmounted } from 'vue';
+import { useRoute } from 'vue-router';
 
-const currentPage = ref('carte');
+const currentPage = ref('');
+const route = useRoute();
 
-const navigateTo = (page: string) => {
-    currentPage.value = page;
-};
+onMounted(() => {
+    currentPage.value = route.name as string;
+    console.log('mounted', currentPage.value);
+
+});
 
 
 </script>
 <template>
     <nav class="nav">
-        <ul class="container" :class="{ 'shadow': currentPage !== 'carte'}">
-            <li :class="{ 'active': currentPage === 'carte'}">
-                <button @click="navigateTo('carte')" >
+        <ul class="container" :class="{ 'shadow': currentPage !== 'home'}">
+            <li :class="{ 'active': currentPage === 'home' || currentPage === 'cleanwalk'}">
+                <router-link to="/" class="redirect">
                     <iconMap />
                     <div>Carte</div>
-                </button>
+                </router-link>
             </li>
             <li :class="{ 'active': currentPage === 'add'}">
-                <button @click="navigateTo('add')" >
+                <router-link to="/add" class="redirect">
                     <iconAdd />
                     <div>Ajouter</div>
-                </button>
+                </router-link>
             </li>
             <li :class="{ 'active': currentPage === 'article'}">
-                <button @click="navigateTo('article')" >
+                <router-link to="/article" class="redirect">
                     <iconArticle />
                     <div>Articles</div>
-                </button>
+                </router-link>
             </li>
             <li :class="{ 'active': currentPage === 'profile'}" >
-                <button @click="navigateTo('profile')" >
+                <router-link to='profile' class="redirect">
                     <iconProfile />
                     <div>Profile</div>
-                </button>
+                </router-link>
             </li>
         </ul>
     </nav>
@@ -76,13 +80,17 @@ const navigateTo = (page: string) => {
                 color: var(--text-color-nav);
                 width: 100%;
                 
-                button {
+                .redirect {
                     background: none;
                     padding: 0.3rem 0;
                     border-radius: 12px;
                     text-decoration: none;
                     color: inherit;
                     width: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
                     
                 }
 
@@ -90,7 +98,7 @@ const navigateTo = (page: string) => {
                     stroke: var(--text-color-nav-active);
                     color: var(--text-color-nav-active);
                     
-                    button {
+                    .redirect {
                         background-color: var(--color-primary);
                     }
                 }

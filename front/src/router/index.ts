@@ -21,7 +21,22 @@ const router = createRouter({
       path: '/cleanwalk',
       name: 'cleanwalk',
       component: () => import('../views/SingleCleanwalkView.vue')
-    }
+    },
+    {
+      path: '/add',
+      name: 'add',
+      component: () => import('../views/AddView.vue')
+    },
+    {
+      path: '/article',
+      name: 'article',
+      component: () => import('../views/ArticleView.vue')
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('../views/ProfileView.vue')
+    },
   ]
 })
 
