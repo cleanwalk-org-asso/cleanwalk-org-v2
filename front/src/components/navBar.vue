@@ -75,7 +75,9 @@ const navigateTo = (page: string) => {
                 flex-direction: column;
                 color: var(--text-color-nav);
                 width: 100%;
+                
                 button {
+                    background: none;
                     padding: 0.3rem 0;
                     border-radius: 12px;
                     text-decoration: none;

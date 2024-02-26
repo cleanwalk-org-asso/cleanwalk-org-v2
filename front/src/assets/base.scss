@@ -2,6 +2,7 @@
 :root {
   --bg-color : #fff;
   --color-primary : #132778;
+  --color-secondary : #E1F4F8;
 
   --text-color-primary : #111111;
   --text-color-secondary : #373646;
@@ -54,8 +55,8 @@ body {
   color: var(--color-text);
   background: var(--color-background);
   transition:
-    color 0.5s,
-    background-color 0.5s;
+  color 0.5s,
+  background-color 0.5s;
   line-height: 1.6;
   font-family: "Roboto", sans-serif;
   font-size: 16px;
@@ -70,7 +71,6 @@ h1, h2, h3, h4, h5, h6, p, ul, ol, li, figure, figcaption, blockquote, dl, dd, d
   padding: 0;
 }
 button {
-  background: none;
   border: none;
   cursor: pointer;
   padding: 0;

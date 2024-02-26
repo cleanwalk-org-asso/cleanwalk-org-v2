@@ -239,7 +239,7 @@ function mapClick() {
             </div>
             <div class="card-content" v-if="cleanwalkStore.cleanwalkIsSelect">
                 <h3>Je nettoie la Nature</h3>
-                <div class="flex-container">
+                <router-link to="/cleanwalk" class="flex-container">
                     <div class="left">
                         <div class="top">
                             <icon-clock />
@@ -251,10 +251,10 @@ function mapClick() {
                         </div>
                     </div>
                     <div class="right">
-                        <img src="../assets/defaultprofile.jpg" alt="profile_picture">
+                        <img src="../assets/defaultprofile.png" alt="profile_picture">
                         <div>username</div>
                     </div>
-                </div>
+                </router-link>
             </div>
             <div class="card-nb-cw" v-else>
                 <h3>10 cleanwalks à proximité</h3>
@@ -262,7 +262,7 @@ function mapClick() {
         </div>
         <div class="cleanwalk-list" :class="{ 'active': cardListBool === false }">
             <div class="container" ref="cleanwalkListContainer">
-                <div v-for="cleanwalk in testCleanwalkList" :key="cleanwalk.id" class="cleanwalk">
+                <router-link to="/cleanwalk" v-for="cleanwalk in testCleanwalkList" :key="cleanwalk.id" class="cleanwalk">
                     <div class="title">{{ cleanwalk.title }}</div>
                     <div class="flex">
                         <icon-clock />
@@ -272,7 +272,7 @@ function mapClick() {
                         <iconMiniMap />
                         <div>Localité, France</div>
                     </div>
-                </div>
+                </router-link>
             </div>
 
 
@@ -364,6 +364,7 @@ main {
 
                 button {
                     padding: 0px 5px 0px 10px;
+                    background: none;
                 }
 
                 input {
