@@ -3,6 +3,7 @@ import type { Cleanwalk } from '@/interfaces/cleanwalkInterface'
 import iconClock from './icons/icon-clock.vue';
 import iconMiniMap from './icons/icon-mini-map.vue';
 import iconLeftArrow from './icons/icon-left-arrow.vue';
+import iconInfo from './icons/icon-info.vue';
 
 const currentCleanwalk = {
   id: 1,
@@ -16,11 +17,13 @@ const currentCleanwalk = {
 
 <template>
   <div class="top-bar">
-    
-    <router-link to="/">
+    <router-link class="back" to="/">
       <iconLeftArrow />
     </router-link>
     <img src="../assets/logo.svg" alt="logo">
+    <button class="info">
+      <iconInfo />
+    </button>
   </div>
   <main>
     <div>
@@ -52,7 +55,10 @@ const currentCleanwalk = {
         Je participe
       </button>
       <p>
-        lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam cursus vestibulum interdum. Phasellus libero nibh, tincidunt sed massa dictum, feugiat interdum mi. Pellentesque finibus cursus quam ut efficitur. Integer lobortis tortor velit, at suscipit justo scelerisque et. Integer lobortis tortor velit, at suscipit justo scelerisque et. Integer lobortis tortor velit, at suscipit justo
+        lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam cursus vestibulum interdum. Phasellus libero
+        nibh, tincidunt sed massa dictum, feugiat interdum mi. Pellentesque finibus cursus quam ut efficitur. Integer
+        lobortis tortor velit, at suscipit justo scelerisque et. Integer lobortis tortor velit, at suscipit justo
+        scelerisque et. Integer lobortis tortor velit, at suscipit justo
       </p>
     </div>
 
@@ -66,6 +72,7 @@ const currentCleanwalk = {
 main {
   overflow: scroll;
 }
+
 .top-bar {
   position: sticky;
   top: 0;
@@ -75,23 +82,36 @@ main {
   background-color: var(--color-primary);
   stroke: #fff;
   display: flex;
-  padding: 20px 0;
+  padding: 20px;
   flex-direction: center;
-  justify-content: center;
+  justify-content: space-between;
+
+  .back {
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    padding-bottom: 5px;
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
 
   img {
     width: 104px;
     margin-top: 10px;
   }
 
-  svg {
-    position: absolute;
-    left: 20px;
-    top: 25px;
-    width: 24px;
-    height: 24px;
+  .info {
+    background-color: #fff;
+    border-radius: 8px;
+    border: 1px solid #CBD5E1;
+    width: 38px;
+    height: 38px;
+    stroke: #94A3B8;
   }
-  
+
+
 }
 
 .cover {
@@ -115,24 +135,23 @@ main {
 
   .date-location {
     display: flex;
-    display: flex;
-    stroke: black;
+    stroke: var(--text-color-primary);
     flex-direction: column;
     padding-bottom: 20px;
     font-size: 12px;
-  
+
     .top {
       display: flex;
       align-items: center;
       gap: 10px;
     }
-  
+
     .bot {
       margin-top: 5px;
       display: flex;
       align-items: center;
       gap: 10px;
-  
+
     }
   }
 
@@ -143,6 +162,7 @@ main {
     border-radius: 8px;
     padding: 11px 20px 4px 14px;
     margin-bottom: 20px;
+
     .left {
       display: flex;
       flex-direction: column;
@@ -179,5 +199,4 @@ main {
     text-align: left;
   }
 
-}
-</style>
+}</style>
