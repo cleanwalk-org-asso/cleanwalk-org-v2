@@ -102,6 +102,13 @@ const testCleanwalkList = ref([
     },
 ]);
 
+const searchInput = ref("");
+
+const backButton = () => {
+    cardListBool.value = false
+    searchInput.value = "" //reset the search input
+};
+
 
 // Fonction pour initialiser les écouteurs d'événements de la carte
 const setMapEvents = (map: Map) => {
@@ -219,10 +226,10 @@ function mapClick() {
         <div class="top-bar">
             <img src="../assets/logo.svg" alt="logo" v-if="!cardListBool">
             <div class="search-bar" :class="{ 'active': cardListBool, 'base': !cardListBool }">
-                <button @click="cardListBool = false">
+                <button @click="backButton()">
                     <iconLeftArrow />
                 </button>
-                <input @click="hideCleanwalkList()" name="search" type="text" placeholder="Rechercher une cleanwalk" />
+                <input @click="hideCleanwalkList()" name="search" type="text" placeholder="Rechercher une cleanwalk" v-model="searchInput" />
                 <label for="search" @click="cardListBool = true">
                     <iconSearch />
                 </label>
