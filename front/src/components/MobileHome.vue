@@ -334,10 +334,15 @@ main {
                 input {
                     opacity: 0;
                     position: absolute;
-                    width: 1px;
+                    width: 44px;
+                    height: 44px;
                 }
                 button {
                     display: none;
+                }
+
+                label {
+                    padding: 0 10px;
                 }
 
                 background-color: #fff;
