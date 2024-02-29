@@ -11,6 +11,7 @@ COPY requirements*.txt ./
 USER flask
 
 RUN --mount=type=cache,target=/root/.cache/pip \
+    pip3 install --upgrade pip && \
     pip3 install -r requirements.txt
 
 COPY --chown=flask:flask . .
