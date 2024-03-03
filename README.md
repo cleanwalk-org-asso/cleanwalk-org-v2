@@ -27,6 +27,8 @@ You only need Docker to launch the app.
 
 ## How to launch
 
+Copy the `stash.env.example` file to `stash.env` and fill the required fields, same with `api/.env.example` to `api/.env`.
+
 ### Developement
 
 To launch the app on dev environnement, use the docker compose tool at the root directory of the project.
