@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue';
 import type {Ref} from 'vue';
 import type {User} from '@/interfaces/userInterface';
-import databaseHelper from '@/helpers/databaseHelper';
+import apiHelper from '@/helpers/apiHelper';
 import router from '@/router';
 import { inject } from 'vue';
 import type {VueCookies} from 'vue-cookies';
@@ -17,7 +17,7 @@ export const useAccountStore = defineStore('account', () => {
     let token: string|undefined = undefined;
 
     async function login(email: string, password: string): Promise<boolean> {
-        const result = await databaseHelper.kyPostWithoutToken('/users/login', {"email":email,"password": password} );
+        const result = await apiHelper.kyPostWithoutToken('/users/login', {"email":email,"password": password} );
         if(result != undefined && result as User != undefined) {
             CurrentUser.value = result as User;
             $cookies!.set(tokenCookieName, CurrentUser.value.access_token, tokenCookieExpireTime, '', '', true);
@@ -44,7 +44,7 @@ export const useAccountStore = defineStore('account', () => {
     async function tokenLogin(): Promise<boolean> {
         const token = $cookies!.get(tokenCookieName);
         if(token != undefined) {
-            const result = await databaseHelper.kyPost('/users/token-login', {}, token);
+            const result = await apiHelper.kyPost('/users/token-login', {}, token);
             if(result != undefined && result as User != undefined) {
                 CurrentUser.value = result as User;
                 isLoggedIn.value = true;

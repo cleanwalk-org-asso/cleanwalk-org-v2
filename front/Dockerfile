@@ -1,4 +1,4 @@
-FROM node:18-alpine AS pre-prod
+FROM node:20-alpine AS pre-prod
 
 RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
 
