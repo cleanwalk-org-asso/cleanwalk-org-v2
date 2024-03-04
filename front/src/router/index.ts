@@ -1,66 +1,43 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '@/views/DesktopHomeView.vue'
+import HomeView from '../views/HomeView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-
   routes: [
     {
       path: '/',
       name: 'home',
-      component: HomeView,
+      component: HomeView
     },
     {
-      path: '/signup',
-      name: 'signup',
-
-      component: () => import('@/views/GlobalSignupView.vue')
+      path: '/test',
+      name: 'test',
+      // route level code-splitting
+      // this generates a separate chunk (About.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import('../views/TestView.vue')
     },
     {
-      path:'/login',
-      name:'login',
-
-      component: () => import('@/views/GlobalLoginView.vue')
-    },
-
-    // mobile routes
-    {
-      path: '/mobile/',
-      name: 'mobile-home',
-
-      component: () => import('@/views/MobileHomeView.vue')
+      path: '/cleanwalk',
+      name: 'cleanwalk',
+      component: () => import('../views/SingleCleanwalkView.vue')
     },
     {
-      path: '/mobile/create-cleanwalk',
-      name: 'mobile-create-cleanwalk',
-
-      component: () => import('@/views/MobileCreateCleanwalk.vue')
+      path: '/add',
+      name: 'add',
+      component: () => import('../views/AddView.vue')
     },
     {
-      path: '/faq',
-      name: 'faq',
-
-      component: () => import('@/views/GlobalFAQView.vue')
+      path: '/article',
+      name: 'article',
+      component: () => import('../views/ArticleView.vue')
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('../views/ProfileView.vue')
     },
   ]
-})
-
-
-// this catchs every route before navigating to them
-// return false => cancel
-// return '/route'
-// return { name: 'route-name' }
-// https://router.vuejs.org/guide/advanced/navigation-guards.html
-router.beforeEach((to, from) => {
-
-  if(window.screen.availWidth <= 640 && !to.path.startsWith('/mobile/')){
-      switch(to.name){
-        case 'home':
-          return {name: 'mobile-home'};
-      }
-  }
-
-  return true
 })
 
 export default router

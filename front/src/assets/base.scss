@@ -1,0 +1,99 @@
+/* color palette from <https://github.com/vuejs/theme> */
+:root {
+  --bg-color : #fff;
+  --color-primary : #132778;
+  --color-secondary : #E1F4F8;
+
+  --text-color-primary : #111111;
+  --text-color-secondary : #373646;
+  --text-color-tertiary : #94A3B8;
+
+  /*nav bar*/
+  --color-nav-bg : #fff;
+  --text-color-nav : #373646;
+  --text-color-nav-active : #fff;
+  
+  .dark {
+    --bg-color : #000;
+    --color-primary : #fff;
+    --text-color-primary : #fff;
+    --text-color-secondary : #94A3B8;
+    --text-color-tertiary : #94A3B8;
+    --color-nav-bg : #000;
+    --text-color-nav : #94A3B8;
+    --text-color-nav-active : #fff;
+  }
+}
+
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color : #000;
+
+  }
+} */
+
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+
+.leaflet-control-attribution {
+  display: none;
+}
+.leaflet-control-zoom {
+  display: none;
+}
+
+
+
+body {
+  min-height: 100vh;
+  color: var(--color-text);
+  background: var(--color-background);
+  transition:
+  color 0.5s,
+  background-color 0.5s;
+  line-height: 1.6;
+  font-family: "Roboto", sans-serif;
+  font-size: 16px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* reset */
+h1, h2, h3, h4, h5, h6, p, ul, ol, li, figure, figcaption, blockquote, dl, dd, dt {
+  margin: 0;
+  padding: 0;
+}
+button {
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+ul {
+  list-style: none;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+}

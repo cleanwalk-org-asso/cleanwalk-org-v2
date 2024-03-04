@@ -12,6 +12,7 @@ class User(db.Model):
     salt = db.Column(db.BINARY(16), nullable=True)
     created_at = db.Column(db.TIMESTAMP, nullable=False)
     profile_picture = db.Column(db.String(255), nullable=True)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
 
 class Cleanwalk(db.Model):
     __tablename__ = 'cleanwalks'
@@ -22,26 +23,43 @@ class Cleanwalk(db.Model):
     date_begin = db.Column(db.TIMESTAMP, nullable=False)
     duration = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String(255), nullable = False)
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    city_id = db.Column(db.Integer, db.ForeignKey('cities.id'), nullable=False)
     address = db.Column(db.String(255), nullable=False)
+    city_id = db.Column(db.Integer, db.ForeignKey('cities.id'), nullable=False)
 
 class CleanwalkUser(db.Model):
     __tablename__ = 'user_cleanwalk'
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
     cleanwalk_id = db.Column(db.String(255), db.ForeignKey('cleanwalks.id'), primary_key=True)
     nb_person = db.Column(db.Integer, nullable=False)
+    is_host = db.Column(db.Boolean, nullable=False)
 
 class Article(db.Model):
     __tablename__ = 'articles'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
-    description = db.Column(db.Text, nullable = False)
     author_id = db.Column(db.String(255), nullable=False)
     content = db.Column(db.JSON, nullable=False)
     created_at = db.Column(db.TIMESTAMP, nullable=False)
+    description = db.Column(db.Text, nullable = False)
+    published = db.Column(db.Boolean, nullable=False)
+    preview_picture = db.Column(db.String(255), nullable=True)
 
 class City(db.Model):
     __tablename__ = 'cities'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
+
+class Role(db.Model):
+    __tablename__ = 'roles'
+    id = db.Column(db.Integer, primary_key=True)
+    role = db.Column(db.String(255), nullable=False)
+
+class Category(db.Model):
+    __tablename__ = 'categories'
+    id = db.Column(db.Integer, primary_key=True)
+    category = db.Column(db.String(255), nullable=False)
+
+class Categorie_article(db.Model):
+    __tablename__ = 'categories_article'
+    id_category = db.Column(db.Integer,db.ForeignKey('categories.id'), primary_key=True)
+    id_article = db.Column(db.Integer,db.ForeignKey('users.id'), primary_key=True)

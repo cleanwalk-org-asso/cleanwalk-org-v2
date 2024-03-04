@@ -1,0 +1,16 @@
+.vscode
+.idea
+.DS_Store
+
+node_modules
+npm-debug.log
+
+.venv
+*.pyc
+__pycache__/
+
+Dockerfile
+.dockerignore
+
+.git
+.gitignore

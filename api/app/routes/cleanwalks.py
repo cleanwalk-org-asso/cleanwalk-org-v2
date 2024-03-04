@@ -31,7 +31,6 @@ def get_cleanwalk(cleanwalk_id):
             'date_begin': cleanwalk.date_begin,
             'duration': cleanwalk.duration,
             'description': cleanwalk.description,
-            'author_id': cleanwalk.author_id,
             'city_id': cleanwalk.city_id,
             'address': cleanwalk.address
         }
@@ -54,8 +53,6 @@ def get_all_cleanwalks():
                 'date_begin': cleanwalk.date_begin,
                 'duration': cleanwalk.duration,
                 'description': cleanwalk.description,
-                'author_id': cleanwalk.author_id,
-                'city_id': cleanwalk.city_id,
                 'address': cleanwalk.address
             })
         return jsonify(cleanwalk_data)
@@ -75,7 +72,6 @@ def create_cleanwalk():
         date_begin=new_cleanwalk_data['date_begin'],
         duration=new_cleanwalk_data['duration'],
         description=new_cleanwalk_data['description'],
-        author_id=new_cleanwalk_data['author_id'],
         city_id=new_cleanwalk_data['city_id'],
         address=new_cleanwalk_data['address']
     )
@@ -98,7 +94,6 @@ def update_cleanwalk(cleanwalk_id):
         cleanwalk.date_begin = updated_cleanwalk_data['date_begin']
         cleanwalk.duration = updated_cleanwalk_data['duration']
         cleanwalk.description = updated_cleanwalk_data['description']
-        cleanwalk.author_id = updated_cleanwalk_data['author_id']
         cleanwalk.city_id = updated_cleanwalk_data['city_id']
         cleanwalk.address = updated_cleanwalk_data['address']
         db.session.commit()
@@ -119,3 +114,4 @@ def delete_cleanwalk(cleanwalk_id):
         return jsonify({'message': 'Cleanwalk deleted successfully'}), 200
     else:
         return jsonify({'message': 'Cleanwalk not found'}), 404
+

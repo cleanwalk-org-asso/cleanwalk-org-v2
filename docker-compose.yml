@@ -6,15 +6,16 @@ services:
         build:
             context: ./front
             dockerfile: Dockerfile
+            target: prod
         restart: unless-stopped
         depends_on:
             - api
             - db
         ports:
-            - "80:5173"
+            - "80:80"
         networks:
             - frontend
-            
+
     api:
         hostname: api
         container_name: api
@@ -25,28 +26,24 @@ services:
         restart: unless-stopped
         depends_on:
             - db
-        ports:
-            - "5000:5000"
         env_file:
-            - .env
+            - stash.env
         networks:
             - frontend
             - backend
-            
+
     db:
         hostname: db
         container_name: db
         image: mysql:latest
         restart: unless-stopped
-        ports:
-            - "3306:3306"
         env_file:
-            - .env
+            - stash.env
         volumes:
             - db:/var/lib/mysql
         networks:
             - backend
-            
+
     adminer:
         container_name: adminer
         image: adminer:latest
@@ -56,20 +53,8 @@ services:
         ports:
             - "8080:8080"
         env_file:
-            - .env
+            - stash.env
         networks:
-            - backend
-
-    homepage:
-        image: ghcr.io/gethomepage/homepage:latest
-        container_name: homepage
-        ports:
-            - "3000:3000"
-        volumes:
-            - /usr/src/cleanwalk-org/homepage-config:/app/config
-            - /var/run/docker.sock:/var/run/docker.sock
-        networks:
-            - frontend
             - backend
 
 volumes:
@@ -78,4 +63,3 @@ volumes:
 networks:
     frontend:
     backend:
-    

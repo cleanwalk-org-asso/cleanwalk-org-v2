@@ -1,9 +1,10 @@
 # users_bp.py (ou le nom de votre Blueprint)
 
 from flask import Blueprint, jsonify, request
-from app.models import db, User
+from app.models import db, User, Role
 from app.utils import validate_api_key, hash_password
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, get_jwt
+from sqlalchemy.exc import IntegrityError
 
 import os
 
@@ -24,16 +25,17 @@ def check_api_key():
 # route for get user by id
 @users_bp.route('/<string:user_id>', methods=['GET'])
 def get_user(user_id):
-    user = User.query.get(user_id)
+    user = db.session.query(User, Role).join(Role, User.role_id == Role.id).filter(User.id == user_id).first()
 
     if user:
         user_data = {
-            'id': user.id,
-            'firstname': user.firstname,
-            'lastname': user.lastname,
-            'email': user.email,
-            'created_at': user.created_at,
-            'profile_picture': user.profile_picture,
+            'id': user.User.id,
+            'firstname': user.User.firstname,
+            'lastname': user.User.lastname,
+            'email': user.User.email,
+            'created_at': user.User.created_at,
+            'profile_picture': user.User.profile_picture,
+            'role': user.Role.role
         }
         return jsonify(user_data)
     else:
@@ -42,17 +44,18 @@ def get_user(user_id):
 # route for get all users
 @users_bp.route('', methods=['GET'])
 def get_all_users():
-    users = User.query.all()
+    users = db.session.query(User, Role).join(Role, User.role_id == Role.id)
     if users:
         user_data = []
         for user in users:
             user_data.append({
-                'id': user.id,
-                'firstname': user.firstname,
-                'lastname': user.lastname,
-                'email': user.email,
-                'created_at': user.created_at,
-                'profile_picture': user.profile_picture,
+                'id': user.User.id,
+                'firstname': user.User.firstname,
+                'lastname': user.User.lastname,
+                'email': user.User.email,
+                'created_at': user.User.created_at,
+                'profile_picture': user.User.profile_picture,
+                'role': user.Role.role
             })
         return jsonify(user_data)
     else:
@@ -79,15 +82,22 @@ def login():
     data = request.get_json()  # Obtenir les données JSON de la requête
 
     email = data.get('email')
-    user = User.query.filter_by(email=email).first()
-    if user:
-        if user.password == hash_password(data.get('password'), user.salt):
-            access_token = create_access_token(identity=user.id, additional_claims={'role': 'user'})
-            return jsonify({'message': 'Successful connection', 'id': user.id, 'email': email, 'firstname': user.firstname, 'profile_picture': user.profile_picture, 'access_token': access_token}), 200
+    res = db.session.query(User, Role).join(Role, User.role_id == Role.id).filter(User.email == email).first()
+    if res:
+        if res.User.password == hash_password(data.get('password'), res.User.salt):
+            access_token = create_access_token(identity=res.User.id, additional_claims={'role': res.Role.role})
+            return jsonify({
+                'message': 'Successful connection', 
+                'id': res.User.id, 'email': email, 
+                'firstname': res.User.firstname, 
+                'profile_picture': res.User.profile_picture, 
+                'access_token': access_token,
+                'role': res.Role.role
+            }), 200
         else:
             return jsonify({'message': 'Username or password incorrect'}), 401
     else:
-        return jsonify({'message': 'Unknown email address'}), 401
+        return jsonify({'message': 'Unknown email address'}), 404
     
     
 #login with token route
@@ -98,8 +108,16 @@ def tokenLogin():
     claims = get_jwt()
 
     if current_user:
-        user = User.query.get(current_user)
-        return jsonify({'message': 'Successful connection', 'id': user.id, 'email': user.email, 'firstname': user.firstname, 'profile_picture': user.profile_picture, "role":claims["role"]}), 200
+        res = db.session.query(User, Role).join(Role, User.role_id == Role.id).filter(User.id == current_user).first()
+        return jsonify({
+            'message': 'Successful connection', 
+            'id': res.User.id, 
+            'email': res.User.email, 
+            'firstname': res.User.firstname,
+            'lastname': res.User.lastname, 
+            'profile_picture': res.User.profile_picture, 
+            "role":claims["role"]
+        }), 200
     else:
         return jsonify({'message': 'invalide token'}), 401
 
@@ -116,20 +134,30 @@ def create_user():
     profile_picture = data.get('profile_picture')
     salt = os.urandom(16)
     password = hash_password(data.get('password'), salt)
+    role_id = data.get('role_id')
 
-    # Create a new User object and add it to the database
-    new_user = User(
-        firstname=firstname,
-        lastname=lastname,
-        email=email,
-        profile_picture=profile_picture,
-        password=password,
-        salt=salt
-    )
-    db.session.add(new_user)
-    db.session.commit()
+    try:
+        # Essayez de créer le nouvel utilisateur
+        new_user = User(
+            firstname=firstname,
+            lastname=lastname,
+            email=email,
+            profile_picture=profile_picture,
+            password=password,
+            salt=salt,
+            role_id=role_id
+        )
+        db.session.add(new_user)
+        db.session.commit()
 
-    return jsonify({'message': 'User created successfully', 'user_id': new_user.id}), 201
+        return jsonify({'message': 'User created successfully', 'user_id': new_user.id}), 201
+
+    except IntegrityError as e:
+        # Gérez l'erreur d'intégrité (adresse e-mail en double)
+        db.session.rollback()  # Annuler la transaction
+        return jsonify({'message': 'Email address already in use'}), 400
+
+# ...
 
 #------------------------------------PUT------------------------------------#
 # route for updating user by id
