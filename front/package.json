@@ -16,11 +16,14 @@
   "dependencies": {
     "@vue-leaflet/vue-leaflet": "^0.10.1",
     "date-fns": "^3.3.1",
+    "filepond": "^4.30.6",
+    "filepond-plugin-image-preview": "^4.6.12",
     "ky": "^1.2.0",
     "leaflet": "^1.9.4",
     "pinia": "^2.1.7",
     "vue": "^3.4.15",
     "vue-cookies": "^1.8.3",
+    "vue-filepond": "^7.0.4",
     "vue-router": "^4.2.5"
   },
   "devDependencies": {
