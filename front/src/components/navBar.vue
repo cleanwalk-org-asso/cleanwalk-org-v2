@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import iconAdd from '@/components/icons/icon-add.vue';
-import iconArticle from '@/components/icons/icon-article.vue';
+import iconDiscover from '@/components/icons/icon-discover.vue';
 import iconMap from '@/components/icons/icon-map.vue';
 import iconProfile from '@/components/icons/icon-profile.vue';
 
@@ -33,10 +33,10 @@ onMounted(() => {
                     <div>Ajouter</div>
                 </router-link>
             </li>
-            <li :class="{ 'active': currentPage === 'article'}">
-                <router-link to="/article" class="redirect">
-                    <iconArticle />
-                    <div>Articles</div>
+            <li :class="{ 'active': currentPage === 'discover'}">
+                <router-link to="/discover" class="redirect">
+                    <iconDiscover />
+                    <div>Découvrir</div>
                 </router-link>
             </li>
             <li :class="{ 'active': currentPage === 'profile'}" >
@@ -78,6 +78,7 @@ onMounted(() => {
                 justify-content: center;
                 flex-direction: column;
                 color: var(--text-color-nav);
+                
                 width: 100%;
                 
                 .redirect {
@@ -96,6 +97,7 @@ onMounted(() => {
 
                 &.active {
                     stroke: var(--text-color-nav-active);
+                    fill: var(--text-color-nav-active);
                     color: var(--text-color-nav-active);
                     
                     .redirect {

@@ -217,7 +217,7 @@ function mapClick() {
                 <div v-for="cleanwalk in testCleanwalkList">
                     <l-marker @click="slideUp()" :lat-lng="L.latLng(cleanwalk.lat, cleanwalk.lng)">
                         <l-icon :icon-size="[25, 41]" :icon-anchor="[12, 41]"
-                            :iconUrl="cleanwalk.isAsso ? 'https://i.ibb.co/XkyvQmm/blue-map.png' : 'https://i.ibb.co/zZjWfnp/green-map.png'">
+                            :iconUrl="cleanwalk.isAsso ? 'https://firebasestorage.googleapis.com/v0/b/horrorfire-88d56.appspot.com/o/cw%2FGroup%20172.svg?alt=media&token=2b337af1-bed2-4491-834c-c2aeaf8be593' : 'https://firebasestorage.googleapis.com/v0/b/horrorfire-88d56.appspot.com/o/cw%2FGroup%20173.svg?alt=media&token=2c75133b-e73f-4cac-95fb-277e4516dfb7'">
                         </l-icon>
                     </l-marker>
                 </div>

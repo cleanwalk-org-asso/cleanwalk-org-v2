@@ -2,6 +2,6 @@
 import navBar from '@/components/navBar.vue';
 </script>
 <template>
-    Article page
+    discover view
     <navBar />
 </template>
