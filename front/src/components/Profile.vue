@@ -11,13 +11,8 @@ onMounted(() => {
 
 </script>
 <template>
-    <file-pond
-            name="test"
-            ref="pond"
-            class-name="my-pond"
-            label-idle="Drop files here..."
-            allow-multiple="false"
-        />
+    <img src="../" alt="">
+
 </template>
 <style scoped lang="scss">
 

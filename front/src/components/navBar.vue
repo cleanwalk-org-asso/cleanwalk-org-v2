@@ -33,8 +33,8 @@ onMounted(() => {
                     <div>Ajouter</div>
                 </router-link>
             </li>
-            <li :class="{ 'active': currentPage === 'discover'}">
-                <router-link to="/discover" class="redirect">
+            <li :class="{ 'active': currentPage === 'articles' || currentPage === 'associations'}">
+                <router-link to="/articles" class="redirect">
                     <iconDiscover />
                     <div>Découvrir</div>
                 </router-link>
@@ -92,7 +92,6 @@ onMounted(() => {
                     flex-direction: column;
                     align-items: center;
                     justify-content: center;
-                    
                 }
 
                 &.active {
