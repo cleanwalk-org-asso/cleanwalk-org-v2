@@ -24,9 +24,9 @@ const props = defineProps({
 @import '@/assets/base.scss';
 
 .top-bar {
-  position: sticky;
-  top: 0;
+  position: fixed;
   left: 0;
+  top: 0;
   width: 100vw;
   z-index: 999;
   background-color: var(--color-primary);

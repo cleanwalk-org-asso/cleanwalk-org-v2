@@ -23,6 +23,7 @@ const props = defineProps({
     position: fixed;
     width: 100%;
     left: 0;
+    top: 78px;
     display: flex;
     box-shadow: 0px 10px 100px rgba(194, 194, 194, 0.2);
 

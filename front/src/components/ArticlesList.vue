@@ -78,13 +78,12 @@ const articles: Article[] = [
 <style scoped lang="scss">
 
 .container{
-  padding-top: 3.5rem;
+  padding-top: 8rem;
   overflow: auto;
   display: flex;
   flex-direction: column;
   .card {
       display: flex;
-      width: 100%;
       padding: 25px 0px;
       margin: 0 30px;
       border-bottom: 1px solid #CBD5E1;
