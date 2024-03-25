@@ -2,7 +2,7 @@
 import iconAdd from '@/components/icons/icon-add.vue';
 import iconDiscover from '@/components/icons/icon-discover.vue';
 import iconMap from '@/components/icons/icon-map.vue';
-import iconProfile from '@/components/icons/icon-profile.vue';
+import iconBurger from '@/components/icons/icon-burger.vue';
 
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
@@ -39,10 +39,10 @@ onMounted(() => {
                     <div>Découvrir</div>
                 </router-link>
             </li>
-            <li :class="{ 'active': currentPage === 'profile'}" >
-                <router-link to='profile' class="redirect">
-                    <iconProfile />
-                    <div>Profile</div>
+            <li :class="{ 'active': currentPage === 'menu'}" >
+                <router-link to='menu' class="redirect">
+                    <iconBurger />
+                    <div>Menu</div>
                 </router-link>
             </li>
         </ul>
@@ -92,6 +92,7 @@ onMounted(() => {
                     flex-direction: column;
                     align-items: center;
                     justify-content: center;
+                    height: 100%;
                 }
 
                 &.active {

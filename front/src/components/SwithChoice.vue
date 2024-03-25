@@ -4,14 +4,19 @@ const props = defineProps({
     categorie2: String,
     activeCategory: Boolean,
 });
+
+// cause router-link doesn't have a scrollToTop method
+const scrollToTop = () => {
+    window.scrollTo(0, 0);
+};
 </script>
 
 <template>
     <div class="container">
-        <router-link class="router-link" :to="'/' + categorie1" :class="{ active: activeCategory === true }">
+        <router-link class="router-link" @click="scrollToTop" :to="'/' + categorie1" :class="{ active: activeCategory === true }">
             {{ categorie1 }}
         </router-link>
-        <router-link class="router-link" :to="'/' + categorie2" :class="{ active: activeCategory === false }">
+        <router-link class="router-link" @click="scrollToTop" :to="'/' + categorie2" :class="{ active: activeCategory === false }">
             {{ categorie2 }}
         </router-link>
     </div>
@@ -21,6 +26,7 @@ const props = defineProps({
 
 .container {
     position: fixed;
+    z-index: 888;
     width: 100%;
     left: 0;
     top: 78px;
