@@ -39,7 +39,7 @@ onMounted(() => {
                     <div>Découvrir</div>
                 </router-link>
             </li>
-            <li :class="{ 'active': currentPage === 'menu'}" >
+            <li :class="{ 'active': currentPage === 'menu' || currentPage === 'profile'}" >
                 <router-link to='menu' class="redirect">
                     <iconBurger />
                     <div>Menu</div>

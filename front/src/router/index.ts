@@ -51,7 +51,12 @@ const router = createRouter({
       path: '/logout',
       name: 'logout',
       component: () => import('../views/SignupView.vue')
+    },{
+      path: '/profile',
+      name: 'profile',
+      component: () => import('../views/ProfileView.vue')
     },
+
   ]
 })
 

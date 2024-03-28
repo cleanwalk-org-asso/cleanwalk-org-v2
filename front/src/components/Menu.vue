@@ -6,17 +6,16 @@ import iconBackTime from '@/components/icons/icon-back-time.vue';
 import iconFile from '@/components/icons/icon-file.vue';
 import iconPaperPlane from '@/components/icons/icon-paper-plane.vue';
 import iconLogout from '@/components/icons/icon-logout.vue';
-import type { clamp } from 'date-fns';
-import { Class } from 'leaflet';
+
 </script>
 
 <template>
     <section class="container">
-        <div class="profil">
+        <router-link to="/profile" class="profil">
             <img class="img" src="https://cdn2.thecatapi.com/images/tv8tNeYaU.jpg" alt="">
             <h3>Mon Profil</h3>
             <iconRightArrow />
-        </div>
+        </router-link>
         <ul class="list">
             <li>
                 <iconCalendar />
