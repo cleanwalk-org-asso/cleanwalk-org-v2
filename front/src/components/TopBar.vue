@@ -4,6 +4,7 @@ import iconInfo from './icons/icon-info.vue';
 
 const props = defineProps({
   backUrl: String,
+  pageName: String
 })
 
 </script>
@@ -13,20 +14,15 @@ const props = defineProps({
     <router-link class="back" :to="backUrl" v-if="backUrl">
       <iconLeftArrow />
     </router-link>
-    <img src="../assets/logo.svg" alt="logo">
-    <button class="info">
-      <iconInfo />
-    </button>
+    <h2>{{ pageName }}</h2>
   </div>
 </template>
 
 <style scoped lang="scss">
-@import '@/assets/base.scss';
-
 .top-bar {
-  position: fixed;
-  left: 0;
+  position: absolute;
   top: 0;
+  left: 0;
   width: 100vw;
   z-index: 999;
   background-color: var(--color-primary);
@@ -35,30 +31,29 @@ const props = defineProps({
   padding: 20px;
   flex-direction: center;
   justify-content: space-between;
+  height: 78px;
 
   .back {
-    display: flex;
-    flex-direction: column;
-    justify-content: end;
-    padding-bottom: 5px;
+    position: absolute;
+    top: 34px;
+    left: 20px;
+
     svg {
       width: 24px;
       height: 24px;
     }
   }
 
-  img {
-    width: 104px;
-    margin-top: 10px;
+  h2 {
+    color: #FFF;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 700;
+    padding-top: 1rem;
+    text-align: center;
+    width: 100%;
   }
 
-  .info {
-    background-color: #fff;
-    border-radius: 8px;
-    border: 1px solid #CBD5E1;
-    width: 38px;
-    height: 38px;
-    stroke: #94A3B8;
-  }
+
 }
 </style>

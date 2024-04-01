@@ -49,9 +49,6 @@ onMounted(() => {
             </form>
             <button class="danger-button">Cloturer mon compte</button>
         </div>
-
-
-
     </section>
 
 </template>

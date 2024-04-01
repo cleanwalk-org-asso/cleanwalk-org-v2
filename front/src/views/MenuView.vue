@@ -5,7 +5,7 @@ import TopBar from '@/components/TopBar.vue';
 </script>
 
 <template>
-    <TopBar />
+    <TopBar page-name="Menu" />
     <Menus />
     <navBar />
 </template>

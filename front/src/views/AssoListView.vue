@@ -5,7 +5,7 @@ import SwithChoice from '@/components/SwithChoice.vue';
 import AssoList from '@/components/AssoList.vue';
 </script>
 <template>
-    <TopBar />
+    <TopBar pageName="Associations"/>
     <SwithChoice categorie1="articles" categorie2="associations" :activeCategory="false" />
     <AssoList />
     <navBar />

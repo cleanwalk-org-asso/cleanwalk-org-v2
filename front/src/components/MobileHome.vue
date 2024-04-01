@@ -304,14 +304,14 @@ main {
         z-index: 9998;
         background-color: var(--color-primary);
         display: flex;
-        padding: 30px 19px 20px;
+        padding: 20px 19px 20px;
         justify-content: end;
 
         img {
             position: absolute;
             left: 31px;
             width: 104px;
-            margin-top: 8px;
+            margin-top: 10px;
         }
 
         .info {

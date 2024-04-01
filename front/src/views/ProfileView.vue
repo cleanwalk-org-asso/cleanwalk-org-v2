@@ -4,7 +4,7 @@ import Profile from '@/components/Profile.vue';
 import TopBar from '@/components/TopBar.vue';
 </script>
 <template>
-    <TopBar />
+    <TopBar page-name="Profile" />
     <navBar />
     <Profile />
 </template>
