@@ -26,6 +26,10 @@ const router = createRouter({
       path: '/add',
       name: 'add',
       component: () => import('../views/AddView.vue')
+    },{
+      path: '/add/cleanwalk',
+      name: 'addCleanwalk',
+      component: () => import('../views/AddCleanwalkView.vue')
     },
     {
       path: '/articles',
@@ -56,6 +60,7 @@ const router = createRouter({
       name: 'profile',
       component: () => import('../views/ProfileView.vue')
     },
+
 
   ]
 })

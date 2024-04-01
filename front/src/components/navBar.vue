@@ -60,6 +60,7 @@ onMounted(() => {
         font-weight: 500;
         z-index: 999;
         background-color: var(--color-nav-bg);
+        font-family: "Roboto", sans-serif;
 
         .container {
             display: flex;
