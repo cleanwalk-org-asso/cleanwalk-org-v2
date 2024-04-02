@@ -1,8 +1,240 @@
 <script setup lang="ts">
 import iconLeftArrow from './icons/icon-left-arrow.vue';
 import iconInfo from './icons/icon-info.vue';
+import { ref, type Ref } from 'vue';
+import type { Cleanwalk } from '@/interfaces/cleanwalkInterface';
+import router from '@/router';
+
+const progress = ref(1);
+
+let newCleanwalk: Ref<Cleanwalk> = ref({
+    name: "",
+    description: "",
+    date_begin: new Date(),
+    duration: 0,
+    pos_lat: 0,
+    pos_long: 0,
+    address: "",
+});
+
+const dateCleanwalk = ref(
+    {
+        dateDay: new Date(),
+        hourBegin: 12,
+        hourEnd: 12
+    }
+);
+
+const setDate = () => {
+    // Créez un nouvel objet Date à partir de la date sélectionnée
+    let startDate = new Date(dateCleanwalk.value.dateDay);
+
+    // Définissez l'heure de début
+    startDate.setHours(dateCleanwalk.value.hourBegin);
+
+    // Calculez la durée en heures
+    let duration = dateCleanwalk.value.hourEnd - dateCleanwalk.value.hourBegin;
+
+    // Mettez à jour les propriétés de newCleanwalk
+    newCleanwalk.value.date_begin = startDate;
+    newCleanwalk.value.duration = duration;
+}
+
+const nextBtn = () => {
+    if (progress.value ===3) {
+        setDate();
+        console.log(newCleanwalk.value);
+    }
+
+    progress.value += 1;
+}
+
+const backBtn = () => {
+    if (progress.value === 1) {
+        router.push('/add');
+        return;
+    }
+    progress.value -= 1;
+}
+
+const getConseil = () => {
+    if (progress.value < 6) {
+        return conseils.value[0];
+    } else {
+        return conseils.value[1];
+    }
+}
+
+const titles = ref([
+    'Nom de votre évènement',
+    'Lieu de votre évènement',
+    'Date et horaire',
+    'Description de votre évènement ',
+    'Ajouter une image',
+    'Aperçu de votre cleanwalk'
+]);
+
+const conseils = ref([
+    'Avant de lancer votre ramassage, pensez à consulter le guide du ramasseur pour connaître les règles d’or d’une bonne organisation.',
+    'L’ajout d’une photo est optionnel'
+]);
 
 </script>
 <template>
-   
+    <section class="section">
+        <div class="progression-bar">
+            <div class="progression-bar-inner" :style="{ width: progress * 100 / 6 + '%' }"></div>
+        </div>
+        <div class="container">
+            <div class="top">
+
+                <h1>
+                    {{ titles[progress - 1] }}
+                </h1>
+
+                <input v-model="newCleanwalk.name" v-if="progress === 1" type="text" placeholder="Saisissez le nom de votre évènement">
+                <input v-model="newCleanwalk.address" v-if="progress === 2" type="text" placeholder="Saisissez l’adresse">
+                <input v-model="dateCleanwalk.dateDay" v-if="progress === 3" type="date">
+                <input v-model="dateCleanwalk.hourBegin" v-if="progress === 3" type="time">
+                <input v-model="dateCleanwalk.hourEnd" v-if="progress === 3" type="time">
+
+            </div>
+            <div class="bottom">
+                <div class="conseil">
+                    <h3>Notre conseil</h3>
+                    <p>{{ getConseil()}}</p>
+                </div>
+                <div class="button-container">
+                    <button @click="backBtn()" class="secondary-button">Précédant {{ progress }}</button>
+                    <button @click="nextBtn()" class="button-primary">Suivant</button>
+
+                </div>
+            </div>
+
+        </div>
+
+
+
+    </section>
+
 </template>
+
+<style scoped lang="scss">
+.section {
+    padding: 78px 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.progression-bar {
+    width: 100%;
+    background-color: #CBD5E1;
+
+    .progression-bar-inner {
+        height: 13px;
+        background-color: #72BDA3;
+        transition: width 0.5s ease-in-out;
+    }
+
+}
+
+.container {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+
+    .top {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+
+        h1 {
+            color: var(#373646);
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            width: 100%;
+        }
+
+        input {
+            border: 1px solid #94A3B8;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 0.5rem;
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 500;
+            width: 90%;
+
+            &::placeholder {
+                color: #94A3B8;
+            }
+
+            &:focus {
+                outline: none;
+            }
+        }
+    }
+
+    .bottom {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+
+        .conseil {
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            gap: 0.5rem;
+            background-color: var(--color-secondary);
+            padding: 0.5rem;
+            border-radius: 8px;
+            width: 100%;
+
+            h3 {
+                color: #373646;
+                font-size: 16px;
+                font-weight: 700;
+            }
+
+            p {
+                color: #94A3B8;
+                font-size: 14px;
+                font-weight: 500;
+            }
+        }
+
+        .button-container {
+            display: flex;
+            width: 100%;
+            gap: 1rem;
+            padding-top: 1.5rem;
+
+            button {
+                flex: 1;
+            }
+
+            .button-primary {
+                padding: 0.5rem 0;
+                flex-grow: 0.5;
+            }
+
+            .secondary-button {
+                color: #132778;
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 500;
+                padding: 0.5rem 0;
+                border: 1px solid #132778;
+                border-radius: 8px;
+                flex-grow: 0.5;
+
+            }
+        }
+    }
+}
+</style>

@@ -20,7 +20,7 @@ const props = defineProps({
 
 <style scoped lang="scss">
 .top-bar {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100vw;

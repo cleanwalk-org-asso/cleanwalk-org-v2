@@ -142,6 +142,9 @@ onMounted(() => {
                 &::placeholder {
                     color: #94A3B8;
                 }
+                &:focus {
+                    outline: none;
+                }
             }
     
             .action-button {
