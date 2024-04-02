@@ -4,6 +4,8 @@ import iconInfo from './icons/icon-info.vue';
 import { ref, type Ref } from 'vue';
 import type { Cleanwalk } from '@/interfaces/cleanwalkInterface';
 import router from '@/router';
+import { differenceInHours, set, parse, differenceInMinutes } from 'date-fns';
+
 
 const progress = ref(1);
 
@@ -17,23 +19,31 @@ let newCleanwalk: Ref<Cleanwalk> = ref({
     address: "",
 });
 
-const dateCleanwalk = ref(
-    {
-        dateDay: new Date(),
-        hourBegin: 12,
-        hourEnd: 12
-    }
-);
+const dateCleanwalk = ref({
+    dateDay: undefined, // Initialise la date à undefined
+    hourBegin: '',
+    hourEnd: ''
+});
+
 
 const setDate = () => {
-    // Créez un nouvel objet Date à partir de la date sélectionnée
-    let startDate = new Date(dateCleanwalk.value.dateDay);
+    // Parsez la date et l'heure de début en un objet Date
+    if (!dateCleanwalk.value.dateDay || !dateCleanwalk.value.hourBegin || !dateCleanwalk.value.hourEnd) {
+        return;
+    }
+    let startDate = set(parse(dateCleanwalk.value.dateDay, 'yyyy-MM-dd', new Date()), {
+        hours: parseInt(dateCleanwalk.value.hourBegin.split(':')[0]),
+        minutes: parseInt(dateCleanwalk.value.hourBegin.split(':')[1]),
+    });
 
-    // Définissez l'heure de début
-    startDate.setHours(dateCleanwalk.value.hourBegin);
+    // Parsez la date et l'heure de fin en un objet Date
+    let endDate = set(parse(dateCleanwalk.value.dateDay, 'yyyy-MM-dd', new Date()), {
+        hours: parseInt(dateCleanwalk.value.hourEnd.split(':')[0]),
+        minutes: parseInt(dateCleanwalk.value.hourEnd.split(':')[1]),
+    });
 
     // Calculez la durée en heures
-    let duration = dateCleanwalk.value.hourEnd - dateCleanwalk.value.hourBegin;
+    let duration = differenceInMinutes(endDate, startDate);
 
     // Mettez à jour les propriétés de newCleanwalk
     newCleanwalk.value.date_begin = startDate;
@@ -44,6 +54,10 @@ const nextBtn = () => {
     if (progress.value ===3) {
         setDate();
         console.log(newCleanwalk.value);
+        if(!newCleanwalk.value.date_begin || !newCleanwalk.value.duration) {
+            alert('Veuillez remplir tous les champs');
+            return;
+        }
     }
 
     progress.value += 1;
@@ -94,9 +108,12 @@ const conseils = ref([
 
                 <input v-model="newCleanwalk.name" v-if="progress === 1" type="text" placeholder="Saisissez le nom de votre évènement">
                 <input v-model="newCleanwalk.address" v-if="progress === 2" type="text" placeholder="Saisissez l’adresse">
-                <input v-model="dateCleanwalk.dateDay" v-if="progress === 3" type="date">
-                <input v-model="dateCleanwalk.hourBegin" v-if="progress === 3" type="time">
-                <input v-model="dateCleanwalk.hourEnd" v-if="progress === 3" type="time">
+                <label v-if="progress === 3" class="label" for="date">date de l'évènement</label>
+                <input id="date" v-model="dateCleanwalk.dateDay" v-if="progress === 3" type="date">
+                <label v-if="progress === 3"  class="label" for="hourBegin">heure de début</label>
+                <input id="hourBegin" v-model="dateCleanwalk.hourBegin" v-if="progress === 3" type="time">
+                <label v-if="progress === 3" class="label" for="hourEnd">heure de fin</label>
+                <input id="hourEnd" v-model="dateCleanwalk.hourEnd" v-if="progress === 3" type="time">
 
             </div>
             <div class="bottom">
@@ -149,8 +166,9 @@ const conseils = ref([
 
     .top {
         display: flex;
-        align-items: center;
+        align-items: left;
         flex-direction: column;
+        padding: 0 1rem;
 
         h1 {
             color: var(#373646);
@@ -168,7 +186,7 @@ const conseils = ref([
             font-size: 14px;
             font-style: normal;
             font-weight: 500;
-            width: 90%;
+            width: 100%;
 
             &::placeholder {
                 color: #94A3B8;
@@ -178,6 +196,17 @@ const conseils = ref([
                 outline: none;
             }
         }
+        .label {
+                font-size: 12px;
+                font-weight: 500;
+                position: relative;
+                margin-bottom: -18px;
+                background-color: #fff;
+                width: fit-content;
+                margin-left: 13px;
+                margin-top: 5px;         
+    
+            }
     }
 
     .bottom {
