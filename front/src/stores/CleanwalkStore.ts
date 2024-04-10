@@ -10,7 +10,7 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
 
     let cleanwalkIsSelect = ref(false);
 
-    const route:string = 'cleanwalks';
+    const route:string = '/cleanwalks';
 
     let cleanwalksTab: Ref<Cleanwalk[]|undefined> = ref([]);
 
