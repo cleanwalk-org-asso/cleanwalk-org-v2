@@ -1,23 +1,20 @@
-FROM python:3-alpine
+# Utilisez une image Python comme image de base
+FROM python:3.8-alpine
 
-RUN addgroup -S flask && adduser -S flask -G flask
+# Définissez le répertoire de travail dans le conteneur
+WORKDIR /app
 
-RUN mkdir -p /home/flask/app && chown -R flask:flask /home/flask/app
+# Copiez les fichiers de dépendances dans le conteneur
+COPY requirements.txt .
 
-WORKDIR /home/flask/app
+# Installez les dépendances
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY requirements*.txt ./
+# Copiez le reste du code dans le conteneur
+COPY . .
 
-USER flask
-
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip3 install --upgrade pip && \
-    pip3 install -r requirements.txt
-
-COPY --chown=flask:flask . .
-
+# Exposez le port sur lequel l'API s'exécute
 EXPOSE 5000
 
-ENTRYPOINT [ "python" ]
-
-CMD [ "app.py" ]
+# Démarrez l'API
+CMD ["python3", "app.py"]

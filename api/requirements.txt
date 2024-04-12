@@ -1,5 +1,5 @@
 Flask
 Flask-SQLAlchemy
 Flask-JWT-Extended
-mysql-connector
+pymysql
 python-dotenv
