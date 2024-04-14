@@ -5,9 +5,13 @@ import { ref, type Ref } from 'vue';
 import type { Cleanwalk } from '@/interfaces/cleanwalkInterface';
 import router from '@/router';
 import { differenceInHours, set, parse, differenceInMinutes } from 'date-fns';
+import Toast from './Toast.vue'
+import nominatimHelper from '@/helpers/nominatimHelper';
+import type { Coordinate } from '@/interfaces/coordinateInterface';
+import iconPhoto from './icons/icon-photo.vue';
 
 
-const progress = ref(1);
+const progress = ref(5);
 
 let newCleanwalk: Ref<Cleanwalk> = ref({
     name: "",
@@ -17,8 +21,8 @@ let newCleanwalk: Ref<Cleanwalk> = ref({
     pos_lat: 0,
     pos_long: 0,
     address: "",
+    city: ""
 });
-
 const dateCleanwalk = ref({
     dateDay: undefined, // Initialise la date à undefined
     hourBegin: '',
@@ -50,14 +54,40 @@ const setDate = () => {
     newCleanwalk.value.duration = duration;
 }
 
-const nextBtn = () => {
-    if (progress.value ===3) {
-        setDate();
-        console.log(newCleanwalk.value);
-        if(!newCleanwalk.value.date_begin || !newCleanwalk.value.duration) {
-            alert('Veuillez remplir tous les champs');
+const nextBtn = async () => {
+    if (progress.value === 1 && !newCleanwalk.value.name) {
+        showErrorToast('Veuillez saisir un nom pour votre évènement');
+        return;
+    }
+    if(progress.value === 2) {
+        if (!newCleanwalk.value.address) {
+            showErrorToast('Veuillez saisir une adresse pour votre évènement');
             return;
         }
+
+        const newPos:Coordinate | undefined = await nominatimHelper.nominatimSearch(newCleanwalk.value.address!);
+
+        if (newPos === undefined) {
+            showErrorToast('Adresse invalide');
+            return;
+        }
+        newCleanwalk.value.pos_lat = newPos.pos_lat;
+        newCleanwalk.value.pos_long = newPos.pos_long;
+        newCleanwalk.value.address = newPos.address;
+        newCleanwalk.value.city = newPos.city;
+        console.log(newPos);
+
+    }
+    if (progress.value ===3) {
+        setDate();
+        if(!newCleanwalk.value.date_begin || !newCleanwalk.value.duration || newCleanwalk.value.duration < 0) {
+            showErrorToast('Veuillez saisir une date et une heure de début et de fin valide');
+            return;
+        }
+    }
+    if (progress.value === 4 && !newCleanwalk.value.description) {
+        showErrorToast('Veuillez saisir une description pour votre évènement');
+        return;
     }
 
     progress.value += 1;
@@ -93,8 +123,20 @@ const conseils = ref([
     'L’ajout d’une photo est optionnel'
 ]);
 
+const showErrorToast = (error:string) => {
+    isToastVisible.value = true;
+    errorMsg.value = error;
+    setTimeout(() => {
+        isToastVisible.value = false;
+    }, 3000);
+}
+
+let isToastVisible = ref(false);
+const errorMsg = ref('');
+
 </script>
 <template>
+    <Toast :is-success="false" :is-visible="isToastVisible" :message="errorMsg"  />
     <section class="section">
         <div class="progression-bar">
             <div class="progression-bar-inner" :style="{ width: progress * 100 / 6 + '%' }"></div>
@@ -114,6 +156,10 @@ const conseils = ref([
                 <input id="hourBegin" v-model="dateCleanwalk.hourBegin" v-if="progress === 3" type="time">
                 <label v-if="progress === 3" class="label" for="hourEnd">heure de fin</label>
                 <input id="hourEnd" v-model="dateCleanwalk.hourEnd" v-if="progress === 3" type="time">
+                <textarea v-if="progress === 4" v-model="newCleanwalk.description" name="description" id="description" cols="30" rows="10" placeholder="Saisissez une description précise de votre évènement"></textarea>
+                <div v-if="progress === 5">
+                    <iconPhoto />
+                </div>
 
             </div>
             <div class="bottom">
@@ -178,7 +224,7 @@ const conseils = ref([
             width: 100%;
         }
 
-        input {
+        input, textarea {
             border: 1px solid #94A3B8;
             border-radius: 8px;
             padding: 12px;

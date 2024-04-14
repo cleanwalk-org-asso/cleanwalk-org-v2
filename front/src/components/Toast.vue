@@ -1,0 +1,47 @@
+<script setup lang="ts">
+import { ref } from 'vue';
+
+const props = defineProps({
+    message: String,
+    isSuccess: Boolean,
+    isVisible: Boolean,
+});
+
+
+</script>
+
+<template>
+    <div class="toast" :class="{ 'toast-success': isSuccess, 'toast-error': !isSuccess, 'is-visible': isVisible }">
+        <p>{{ message }}</p>
+    </div>
+</template>
+
+<style scoped lang="scss">
+.toast {
+    &.is-visible {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    opacity: 0;
+    position: fixed;
+    transform: translateY(-100%);
+    top: 0;
+    right: 0;
+    padding: 5px 20px;
+    border-radius: 0 0 0 8px;
+    color: #fff;
+    font-weight: bold;
+    z-index: 1000;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; // Réduisez la durée et ajoutez opacity
+    pointer-events: none;
+
+    &.toast-success {
+        background-color: #3ee243;
+    }
+
+    &.toast-error {
+        background-color: #f44336;
+    }
+}
+</style>

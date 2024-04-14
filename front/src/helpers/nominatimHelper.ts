@@ -1,4 +1,7 @@
 import ky from 'ky';
+import type { Coordinate } from '@/interfaces/coordinateInterface'
+import { add } from 'date-fns';
+import { fi } from 'date-fns/locale';
 
 const nominatimUrl = 'http://localhost:5173/nominatim';
 
@@ -23,8 +26,6 @@ const nominatimRequest = async (url: string, params: Record<string, any>) => {
     const searchParams = new URLSearchParams(params as Record<string, string>);
     const fullUrl = `${url}?${searchParams.toString()}`;
 
-    console.log(fullUrl);
-
     try {
         const res = await ky.get(fullUrl).json<any>();
         return res;
@@ -39,16 +40,30 @@ const nominatimRequest = async (url: string, params: Record<string, any>) => {
  * @param searchString The place to look for (state, city, road...)
  * @returns The data of the response
  */
-const nominatimSearch = async (searchString: string) => {
+const nominatimSearch = async (searchString: string): Promise<Coordinate | undefined> => {
     const params = {
         q: searchString,
         countryCodesArray: countryCodesArray,
+        addressdetails: 1,
         accept_language: accept_language,
     };
 
     const url = `${nominatimUrl}/search`;
+    const result = await nominatimRequest(url, params);
 
-    return nominatimRequest(url, params);
+    if (result) {
+        const firstResult = result[0];
+        if (firstResult) {
+            return {
+                pos_lat: firstResult.lat,
+                pos_long: firstResult.lon,
+                address: firstResult.display_name,
+                city: firstResult.address.city ?? firstResult.address.village,
+            };
+        }
+    }
+
+    return undefined;
 };
 
 /**

@@ -7,4 +7,5 @@ export interface Cleanwalk {
     pos_lat: number,
     pos_long: number,
     address?: string,
+    city?: string,
 }
