@@ -9,9 +9,13 @@ import Toast from './Toast.vue'
 import nominatimHelper from '@/helpers/nominatimHelper';
 import type { Coordinate } from '@/interfaces/coordinateInterface';
 import iconPhoto from './icons/icon-photo.vue';
+import iconMiniMap from './icons/icon-mini-map.vue';
+import iconClock from './icons/icon-clock.vue';
+import dateHelper from '@/helpers/dateHelper';
+import { id } from 'date-fns/locale';
 
 
-const progress = ref(5);
+const progress = ref(1);
 
 let newCleanwalk: Ref<Cleanwalk> = ref({
     name: "",
@@ -56,19 +60,19 @@ const setDate = () => {
 
 const nextBtn = async () => {
     if (progress.value === 1 && !newCleanwalk.value.name) {
-        showErrorToast('Veuillez saisir un nom pour votre évènement');
+        showToast('Veuillez saisir un nom pour votre évènement', false);
         return;
     }
-    if(progress.value === 2) {
+    if (progress.value === 2) {
         if (!newCleanwalk.value.address) {
-            showErrorToast('Veuillez saisir une adresse pour votre évènement');
+            showToast('Veuillez saisir une adresse pour votre évènement', false);
             return;
         }
 
-        const newPos:Coordinate | undefined = await nominatimHelper.nominatimSearch(newCleanwalk.value.address!);
+        const newPos: Coordinate | undefined = await nominatimHelper.nominatimSearch(newCleanwalk.value.address!);
 
         if (newPos === undefined) {
-            showErrorToast('Adresse invalide');
+            showToast('Adresse invalide', false);
             return;
         }
         newCleanwalk.value.pos_lat = newPos.pos_lat;
@@ -78,16 +82,20 @@ const nextBtn = async () => {
         console.log(newPos);
 
     }
-    if (progress.value ===3) {
+    if (progress.value === 3) {
         setDate();
-        if(!newCleanwalk.value.date_begin || !newCleanwalk.value.duration || newCleanwalk.value.duration < 0) {
-            showErrorToast('Veuillez saisir une date et une heure de début et de fin valide');
+        if (!newCleanwalk.value.date_begin || !newCleanwalk.value.duration || newCleanwalk.value.duration < 0) {
+            showToast('Veuillez saisir une date et une heure de début et de fin valide', false);
             return;
         }
     }
     if (progress.value === 4 && !newCleanwalk.value.description) {
-        showErrorToast('Veuillez saisir une description pour votre évènement');
+        showToast('Veuillez saisir une description pour votre évènement', false);
         return;
+    }
+    if (progress.value === 6) {
+        showToast('Votre cleanwalk a bien été publiée', true);
+       return;
     }
 
     progress.value += 1;
@@ -123,8 +131,9 @@ const conseils = ref([
     'L’ajout d’une photo est optionnel'
 ]);
 
-const showErrorToast = (error:string) => {
+const showToast = (error: string, isSuccess: boolean) => {
     isToastVisible.value = true;
+     ToastIsSuccess.value = isSuccess;
     errorMsg.value = error;
     setTimeout(() => {
         isToastVisible.value = false;
@@ -132,11 +141,12 @@ const showErrorToast = (error:string) => {
 }
 
 let isToastVisible = ref(false);
+let ToastIsSuccess = ref(false);
 const errorMsg = ref('');
 
 </script>
 <template>
-    <Toast :is-success="false" :is-visible="isToastVisible" :message="errorMsg"  />
+    <Toast :is-success="ToastIsSuccess" :is-visible="isToastVisible" :message="errorMsg" />
     <section class="section">
         <div class="progression-bar">
             <div class="progression-bar-inner" :style="{ width: progress * 100 / 6 + '%' }"></div>
@@ -147,29 +157,48 @@ const errorMsg = ref('');
                 <h1>
                     {{ titles[progress - 1] }}
                 </h1>
-
-                <input v-model="newCleanwalk.name" v-if="progress === 1" type="text" placeholder="Saisissez le nom de votre évènement">
-                <input v-model="newCleanwalk.address" v-if="progress === 2" type="text" placeholder="Saisissez l’adresse">
+                <input v-model="newCleanwalk.name" v-if="progress === 1" type="text"
+                    placeholder="Saisissez le nom de votre évènement">
+                <input v-model="newCleanwalk.address" v-if="progress === 2" type="text"
+                    placeholder="Saisissez l’adresse">
                 <label v-if="progress === 3" class="label" for="date">date de l'évènement</label>
                 <input id="date" v-model="dateCleanwalk.dateDay" v-if="progress === 3" type="date">
-                <label v-if="progress === 3"  class="label" for="hourBegin">heure de début</label>
+                <label v-if="progress === 3" class="label" for="hourBegin">heure de début</label>
                 <input id="hourBegin" v-model="dateCleanwalk.hourBegin" v-if="progress === 3" type="time">
                 <label v-if="progress === 3" class="label" for="hourEnd">heure de fin</label>
                 <input id="hourEnd" v-model="dateCleanwalk.hourEnd" v-if="progress === 3" type="time">
-                <textarea v-if="progress === 4" v-model="newCleanwalk.description" name="description" id="description" cols="30" rows="10" placeholder="Saisissez une description précise de votre évènement"></textarea>
-                <div v-if="progress === 5">
+                <textarea v-if="progress === 4" v-model="newCleanwalk.description" name="description" id="description"
+                    cols="30" rows="10" placeholder="Saisissez une description précise de votre évènement"></textarea>
+                <div class="inputImg" v-if="progress === 5">
                     <iconPhoto />
+                </div>
+                <div v-if="progress === 6" class="preview">
+                    <img src="../assets/desert.png" alt="cw-img">
+                    <h3>{{ newCleanwalk.name }}</h3>
+                    <div class="date-locate">
+                        <div class="divtop">
+                            <iconClock />
+                            <div>{{ dateHelper.getCleanwalkWrittenDate(newCleanwalk.date_begin, newCleanwalk.duration) }}</div>
+                        </div>
+                        <div class="bot">
+                            <iconMiniMap />
+                            <div>{{ newCleanwalk.address }}</div>
+                        </div>
+                    </div>
+                    <p>{{ newCleanwalk.description }}</p>
                 </div>
 
             </div>
             <div class="bottom">
-                <div class="conseil">
+                <div v-if="progress < 6" class="conseil">
                     <h3>Notre conseil</h3>
-                    <p>{{ getConseil()}}</p>
+                    <p>{{ getConseil() }}</p>
                 </div>
                 <div class="button-container">
-                    <button @click="backBtn()" class="secondary-button">Précédant {{ progress }}</button>
-                    <button @click="nextBtn()" class="button-primary">Suivant</button>
+                    <button @click="backBtn()" class="secondary-button">{{ progress === 6 ? 'Modifier' : 'Précédant'
+                        }}</button>
+                    <button @click="nextBtn()" class="button-primary">{{ progress === 6 ? 'Publier':
+                        'Suivant'}}</button>
 
                 </div>
             </div>
@@ -224,7 +253,8 @@ const errorMsg = ref('');
             width: 100%;
         }
 
-        input, textarea {
+        input,
+        textarea {
             border: 1px solid #94A3B8;
             border-radius: 8px;
             padding: 12px;
@@ -242,17 +272,80 @@ const errorMsg = ref('');
                 outline: none;
             }
         }
+
         .label {
-                font-size: 12px;
-                font-weight: 500;
-                position: relative;
-                margin-bottom: -18px;
-                background-color: #fff;
-                width: fit-content;
-                margin-left: 13px;
-                margin-top: 5px;         
-    
+            font-size: 12px;
+            font-weight: 500;
+            position: relative;
+            margin-bottom: -18px;
+            background-color: #fff;
+            width: fit-content;
+            margin-left: 13px;
+            margin-top: 5px;
+
+        }
+
+        .inputImg {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--color-secondary);
+            aspect-ratio: 16/9;
+            border-radius: 8px;
+            height: 100%;
+            margin-top: 1rem;
+            stroke: var(--text-color-primary);
+
+            svg {
+                width: 50px;
+                height: 50px;
             }
+        }
+
+        .preview {
+            h3 {
+                font-size: 20px;
+                font-style: normal;
+                font-weight: 700;
+                line-height: normal;
+                padding-top: 1rem;
+            }
+
+            img {
+                width: 100%;
+                object-fit: cover;
+                aspect-ratio: 16/9;
+                border-radius: 8px;
+                margin-top: 1rem;
+            }
+
+            .date-locate {
+                padding-top: 2rem;
+                display: flex;
+                stroke: black;
+                flex-direction: column;
+
+                .divtop {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+
+                .bot {
+                    margin-top: 10px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+
+                }
+            }
+
+            p {
+                padding-top: 2rem;
+                font-size: 14px;
+                word-wrap: break-word;
+            }
+        }
     }
 
     .bottom {
