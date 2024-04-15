@@ -1,5 +1,6 @@
 # users_bp.py (ou le nom de votre Blueprint)
 
+import datetime
 from flask import Blueprint, jsonify, request
 from app.models import db, User, Role
 from app.utils import validate_api_key, hash_password
@@ -125,7 +126,14 @@ def tokenLogin():
 # route for creating a new user
 @users_bp.route('', methods=['POST'])
 def create_user():
-    data = request.get_json()
+    data = request.get_json(silent=True) # Get JSON data from the request
+    print(data)
+    if not data:
+        return jsonify({'message': 'Request body is empty or not a valid JSON'}), 400
+
+    required_keys = ['firstname', 'lastname', 'email', 'password', 'role_id']
+    if not all(key in data for key in required_keys):
+        return jsonify({'message': 'Request body is incomplete'}), 400
 
     # Extract user data from the request JSON
     firstname = data.get('firstname')
@@ -135,6 +143,7 @@ def create_user():
     salt = os.urandom(16)
     password = hash_password(data.get('password'), salt)
     role_id = data.get('role_id')
+    
 
     try:
         # Essayez de créer le nouvel utilisateur
@@ -145,7 +154,8 @@ def create_user():
             profile_picture=profile_picture,
             password=password,
             salt=salt,
-            role_id=role_id
+            role_id=role_id,
+            created_at=datetime.datetime.now()
         )
         db.session.add(new_user)
         db.session.commit()
@@ -153,6 +163,7 @@ def create_user():
         return jsonify({'message': 'User created successfully', 'user_id': new_user.id}), 201
 
     except IntegrityError as e:
+        print(e, "ErrorIntegrity")
         # Gérez l'erreur d'intégrité (adresse e-mail en double)
         db.session.rollback()  # Annuler la transaction
         return jsonify({'message': 'Email address already in use'}), 400

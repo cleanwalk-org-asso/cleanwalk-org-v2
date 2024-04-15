@@ -1,9 +1,18 @@
-<script setup>
-const callback = (response) => {
+<script setup lang="ts">
+import { ref } from 'vue';
+
+const callback = (response:any) => {
     // This callback will be triggered when the user selects or login to
     // his Google account from the popup
     console.log("Handle the response", response)
 }
+
+const login = ( ) => {
+    console.log("Login");
+}
+
+const email = ref("");
+const password = ref("");
 </script>
 
 <template>
@@ -18,13 +27,16 @@ const callback = (response) => {
             <span>ou</span>
             <div class="line"></div>
         </div>
-        <form @submit.prevent="changePassword()">
+        <form @submit.prevent="login()">
             <label class="label" for="email">Email</label>
             <input v-model="email" class="input" name="mdp" type="email" placeholder="user@domain.fr">
             <label class="label" for="mdp">Mot de passe</label>
             <input v-model="password" class="input" name="mdp" type="password" placeholder="Votre mot de passe">
             <button class="action-button" type="submit">Se connecter</button>
         </form>
+        <router-link to="/signup" class="go-signup">
+            Vous êtes nouveau chez cleanwalk.org : <span>Inscrivez-vous</span>
+        </router-link>
         </section>
 </template>
 
@@ -41,6 +53,22 @@ const callback = (response) => {
             font-size: 24px;
             font-weight: 500;
             margin-bottom: 1rem;
+        }
+    }
+
+    .go-signup {
+        color: var(--text-color-secondary);
+        font-size: 12px;
+        width: 100%;
+        text-align: left;
+        padding-top: 2rem;
+
+        span {
+            color: var(--text-color-primary);
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: underline;
+        
         }
     }
     .or {

@@ -14,7 +14,6 @@ app = Flask(__name__)
 
 #configure the SQLAlchemy database using environment variables
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
-print("hellllllllllllllllllllllllo")
 print(os.getenv('DATABASE_URI'))
 app.config['API_KEY'] = os.getenv('API_KEY')
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')

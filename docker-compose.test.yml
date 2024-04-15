@@ -11,6 +11,7 @@ services:
 
   api:
     build: ./api # Chemin vers le dossier contenant le Dockerfile de l'API
+    restart: always
     volumes:
       - ./api:/app # Montez le code de l'API dans le conteneur
     ports:
