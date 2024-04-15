@@ -6,7 +6,7 @@ const kyGet = async (route: string) => {
     try {
         const response = await ky.get(apiUrl + route, {
             headers: {
-                'X-API-Key': import.meta.env.VITE_API_KEY,
+                'X-API-Key': (import.meta as any).env.VITE_API_KEY,
             },
         }).json();
 
@@ -22,7 +22,7 @@ const kyPost = async (route: string, data: any, access_token: string) => {
         const response = await ky.post(apiUrl + route, {
             json: data,
             headers: {
-                'X-API-Key': import.meta.env.VITE_API_KEY,
+                'X-API-Key': (import.meta as any).VITE_API_KEY,
                 'Authorization': 'Bearer ' + access_token,
             },
         }).json();
@@ -39,7 +39,7 @@ const kyPostWithoutToken = async (route: string, data: any) => {
         const response = await ky.post(apiUrl + route, {
             json: data,
             headers: {
-                'X-API-Key': import.meta.env.VITE_API_KEY,
+                'X-API-Key': (import.meta as any).VITE_API_KEY,
             },
         }).json();
 
@@ -55,7 +55,7 @@ const kyPut = async (route: string, data: any, access_token:string) => {
         const response = await ky.put(apiUrl + route, {
             json: data,
             headers: {
-                'X-API-Key': import.meta.env.VITE_API_KEY,
+                'X-API-Key': (import.meta as any).VITE_API_KEY,
                 'Authorization': 'Bearer ' + access_token,
             },
         }).json();
@@ -70,7 +70,7 @@ const kyDelete = async (route: string, access_token: string) => {
     try {
         const response = await ky.delete(apiUrl + route, {
             headers: {
-                'X-API-Key': import.meta.env.VITE_API_KEY,
+                'X-API-Key': (import.meta as any).VITE_API_KEY,
                 'Authorization': 'Bearer ' + access_token,
             },
         }).json();

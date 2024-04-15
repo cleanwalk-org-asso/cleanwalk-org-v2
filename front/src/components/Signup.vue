@@ -10,7 +10,7 @@ const callback = (response) => {
     <section class="container">
 
         <h1>
-            Se connecter
+            Bienvenue sur la plateforme Cleanwalk.org
         </h1>
         <GoogleLogin :callback="callback" />
         <div class="or">
