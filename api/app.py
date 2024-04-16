@@ -8,7 +8,7 @@ from datetime import timedelta
 # load environement variables from .env file
 load_dotenv()
 
-ACCESS_EXPIRES = timedelta(minutes=1)
+ACCESS_EXPIRES = timedelta(days=30)
 
 app = Flask(__name__)
 

@@ -123,7 +123,6 @@ def tokenLogin():
     else:
         return jsonify({'message': 'invalide token'}), 401
 
-
 # route for creating a new user
 @users_bp.route('', methods=['POST'])
 def create_user():
