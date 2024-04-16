@@ -46,8 +46,12 @@ const signup = async ( ) => {
         showToast("Veuillez renseigner votre email", false);
         return;
     }
-    if(!password.value || !confirmPassword.value || password.value !== confirmPassword.value) {
+    if(!password.value || !confirmPassword.value) {
         showToast("Veuillez renseigner votre mot de passe", false);
+        return;
+    }
+    if(password.value !== confirmPassword.value) {
+        showToast("Les mots de passe ne correspondent pas", false);
         return;
     }
     const response:ApiResponse = await apiHelper.kyPostWithoutToken( "/users", {

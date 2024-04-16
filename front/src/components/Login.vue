@@ -1,5 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import Toast from '@/components/Toast.vue';
+import apiHelper from '@/helpers/apiHelper';
+import { useAccountStore } from '@/stores/AccountStore';
+import type { User } from '@/interfaces/userInterface';
+
+const accountStore = useAccountStore();
 
 const callback = (response:any) => {
     // This callback will be triggered when the user selects or login to
@@ -7,15 +13,62 @@ const callback = (response:any) => {
     console.log("Handle the response", response)
 }
 
-const login = ( ) => {
-    console.log("Login");
-}
+const isToastVisible = ref(false);
+const ToastIsSuccess = ref(false);
+const errorMsg = ref(""); 
 
+
+const showToast = (error: string, isSuccess: boolean, ) => {
+    isToastVisible.value = true;
+    ToastIsSuccess.value = isSuccess;
+    errorMsg.value = error;
+    setTimeout(() => {
+        isToastVisible.value = false;
+    }, 3000);
+}
 const email = ref("");
 const password = ref("");
+
+const login = async ( ) => {
+    console.log("Login");
+    if(!email.value) {
+        showToast("Veuillez renseigner votre email", false);
+        return;
+    }
+    if(!password.value) {
+        showToast("Veuillez renseigner votre mot de passe", false);
+        return;
+    }
+
+    // Call the login API
+    const response = await apiHelper.kyPostWithoutToken( "/users/login", {
+        email: email.value,
+        password: password.value
+    });
+    if(response.success === false) {
+        showToast('Email ou mot de passe incorrect', false);
+        return;
+    }
+    console.log("Response", response);
+    const user:User = {
+        email: response.data.email as string,
+        firstname: response.data.firstname as string,
+        lastname: response.data.lastname as string,
+        id: response.data.id as number,
+        role: response.data.role as string,
+    }
+    accountStore.CurrentUser = user;
+    console.log("User", user);
+    showToast("Vous êtes connecté", true);
+    accountStore.setToken(response.data.access_token as string);
+
+}
+
+
 </script>
 
 <template>
+    <Toast :is-success="ToastIsSuccess" :is-visible="isToastVisible" :message="errorMsg" />
     <section class="container">
 
         <h1>

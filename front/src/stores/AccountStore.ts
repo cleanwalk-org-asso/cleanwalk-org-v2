@@ -6,6 +6,7 @@ import apiHelper from '@/helpers/apiHelper';
 import router from '@/router';
 import { inject } from 'vue';
 import type {VueCookies} from 'vue-cookies';
+import type { ApiResponse } from '@/interfaces/apiResponseInterface';
 
 
 export const useAccountStore = defineStore('account', () => {
@@ -16,20 +17,14 @@ export const useAccountStore = defineStore('account', () => {
     let isLoggedIn = ref(false);
     let token: string|undefined = undefined;
 
-    async function login(email: string, password: string): Promise<boolean> {
-        const result = await apiHelper.kyPostWithoutToken('/users/login', {"email":email,"password": password} );
-        if(result != undefined && result as User != undefined) {
-            CurrentUser.value = result as User;
-            $cookies!.set(tokenCookieName, CurrentUser.value.access_token, tokenCookieExpireTime, '', '', true);
-            // need to create a cookie token
-            isLoggedIn.value = true;
-        }
-        return isLoggedIn.value;
+
+    const setToken = (token: string) => {
+        console.log('setTokenCalled', token);
+        $cookies!.remove(tokenCookieName);
+        $cookies!.set(tokenCookieName, token, tokenCookieExpireTime);
     }
 
-    function printToken() {
-        console.log($cookies!.get(tokenCookieName));
-    }
+
     function printUser() {
         console.log(CurrentUser.value);
     }
@@ -42,20 +37,30 @@ export const useAccountStore = defineStore('account', () => {
     }
 
     async function tokenLogin(): Promise<boolean> {
-        const token = $cookies!.get(tokenCookieName);
+        console.log('tokenLoginCalled');
+        const token:string = $cookies!.get(tokenCookieName);
         if(token != undefined) {
-            const result = await apiHelper.kyPost('/users/token-login', {}, token);
-            if(result != undefined && result as User != undefined) {
-                CurrentUser.value = result as User;
+            const response:ApiResponse = await apiHelper.kyPost('/users/token-login', {}, token);
+            if(response.success === true) {
                 isLoggedIn.value = true;
+                const user:User = {
+                    email: response.data.email as string,
+                    firstname: response.data.firstname as string,
+                    lastname: response.data.lastname as string,
+                    id: response.data.id as number,
+                    role: response.data.role as string,
+                }
+                CurrentUser.value = user;
+                console.log('CurrentUser', CurrentUser.value);
             } else {
                 isLoggedIn.value = false;
             }
         } else {
+            
             isLoggedIn.value = false;
         }
         return isLoggedIn.value;
     }
 
-    return {login, printToken, printUser, logout, isLoggedIn, tokenLogin}
+    return { setToken, printUser, logout, isLoggedIn, tokenLogin, CurrentUser}
 })

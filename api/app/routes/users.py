@@ -90,7 +90,8 @@ def login():
             return jsonify({
                 'message': 'Successful connection', 
                 'id': res.User.id, 'email': email, 
-                'firstname': res.User.firstname, 
+                'firstname': res.User.firstname,
+                'lastname': res.User.lastname,
                 'profile_picture': res.User.profile_picture, 
                 'access_token': access_token,
                 'role': res.Role.role

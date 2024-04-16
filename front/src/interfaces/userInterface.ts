@@ -3,7 +3,6 @@ export interface User {
     firstname: string,
     lastname: string,
     email: string,
-    password: string,
-    token?: string,
-    role_id: number,
+    password?: string,
+    role: string,
 }
