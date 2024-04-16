@@ -4,6 +4,8 @@ import Toast from '@/components/Toast.vue';
 import apiHelper from '@/helpers/apiHelper';
 import { useAccountStore } from '@/stores/AccountStore';
 import type { User } from '@/interfaces/userInterface';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 const accountStore = useAccountStore();
 
@@ -59,7 +61,7 @@ const login = async ( ) => {
     }
     accountStore.CurrentUser = user;
     console.log("User", user);
-    showToast("Vous êtes connecté", true);
+    router.push({ path: '/' });
     accountStore.setToken(response.data.access_token as string);
 
 }

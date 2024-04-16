@@ -6,6 +6,10 @@ import iconBackTime from '@/components/icons/icon-back-time.vue';
 import iconFile from '@/components/icons/icon-file.vue';
 import iconPaperPlane from '@/components/icons/icon-paper-plane.vue';
 import iconLogout from '@/components/icons/icon-logout.vue';
+import { useAccountStore } from '@/stores/AccountStore';
+const accountStore = useAccountStore();
+
+const currentUser = accountStore.CurrentUser!;
 
 </script>
 
@@ -13,7 +17,7 @@ import iconLogout from '@/components/icons/icon-logout.vue';
     <section class="container">
         <router-link to="/profile" class="profil">
             <img class="img" src="https://cdn2.thecatapi.com/images/tv8tNeYaU.jpg" alt="">
-            <h3>Mon Profil</h3>
+            <h3>{{ currentUser.firstname }} {{ currentUser.lastname }}</h3>
             <iconRightArrow />
         </router-link>
         <ul class="list">
@@ -44,11 +48,11 @@ import iconLogout from '@/components/icons/icon-logout.vue';
             </li>
         </ul>
 
-        <div class="logout">
+        <button @click="accountStore.logout()" class="logout">
             <iconLogout />
             <h3>Se Déconnecter</h3>
             <iconRightArrow class="arrow"/>
-        </div>
+        </button>
     </section>
 </template>
 
@@ -108,6 +112,7 @@ import iconLogout from '@/components/icons/icon-logout.vue';
 
     .logout {
         stroke: #FF5757;
+        background-color: transparent;
         border: 1px solid #CBD5E1;
         color: #FF5757;
         width: 100%;
