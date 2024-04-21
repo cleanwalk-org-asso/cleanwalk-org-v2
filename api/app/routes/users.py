@@ -3,7 +3,7 @@
 import datetime
 from flask import Blueprint, jsonify, request
 from app.models import db, User, Role
-from app.utils import validate_api_key, hash_password
+from app.utils import validate_api_key, hash_password, upload_img
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, get_jwt
 from sqlalchemy.exc import IntegrityError
 
@@ -184,7 +184,11 @@ def update_user(user_id):
         user.firstname = data.get('firstname', user.firstname)
         user.lastname = data.get('lastname', user.lastname)
         user.email = data.get('email', user.email)
-        user.profile_picture = data.get('profile_picture', user.profile_picture)
+
+        # Check if a new photo is provided
+        if 'photo' in request.files:
+            filename = upload_img(request.files['photo'])
+            user.profile_picture = filename
 
         db.session.commit()
         return jsonify({'message': 'User updated successfully'})

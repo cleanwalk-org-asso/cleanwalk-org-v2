@@ -4,6 +4,12 @@ from app.models import db
 from dotenv import load_dotenv
 import os
 from datetime import timedelta
+from flask_uploads import UploadSet, configure_uploads, IMAGES
+
+# Create an UploadSet for images
+photos = UploadSet('photos', IMAGES)
+
+
 
 # load environement variables from .env file
 load_dotenv()
@@ -12,6 +18,9 @@ ACCESS_EXPIRES = timedelta(days=30)
 
 app = Flask(__name__)
 
+# Configure the upload set
+app.config['UPLOADED_PHOTOS_DEST'] = 'static/img'
+configure_uploads(app, photos)
 #configure the SQLAlchemy database using environment variables
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
 print(os.getenv('DATABASE_URI'))
