@@ -4,29 +4,23 @@ from app.models import db
 from dotenv import load_dotenv
 import os
 from datetime import timedelta
-from flask_uploads import UploadSet, configure_uploads, IMAGES
-
-# Create an UploadSet for images
-photos = UploadSet('photos', IMAGES)
-
-
 
 # load environement variables from .env file
 load_dotenv()
 
 ACCESS_EXPIRES = timedelta(days=30)
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
 
-# Configure the upload set
-app.config['UPLOADED_PHOTOS_DEST'] = 'static/img'
-configure_uploads(app, photos)
 #configure the SQLAlchemy database using environment variables
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
 print(os.getenv('DATABASE_URI'))
 app.config['API_KEY'] = os.getenv('API_KEY')
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = ACCESS_EXPIRES
+app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER') or '../uploads'
+print("File to upload:", app.config['UPLOAD_FOLDER'])
 
 #Init the JWTManager extension
 jwt = JWTManager(app)
@@ -39,12 +33,15 @@ from app.routes.articles import articles_bp
 from app.routes.cleanwalks import cleanwalks_bp
 from app.routes.cities import cities_bp
 from app.routes.admin import admin_bp
+from app.routes.upload import upload_bp
 
 app.register_blueprint(users_bp , url_prefix='/users')
 app.register_blueprint(articles_bp , url_prefix='/articles')
 app.register_blueprint(cleanwalks_bp , url_prefix='/cleanwalks')
 app.register_blueprint(cities_bp , url_prefix='/cities')
 app.register_blueprint(admin_bp , url_prefix='/admin')
+app.register_blueprint(upload_bp , url_prefix='/upload')
+
 
 
 if __name__ == '__main__':

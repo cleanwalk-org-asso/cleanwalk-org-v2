@@ -1,8 +1,8 @@
 # utils.py
 import hashlib
 from flask import current_app
-from flask_uploads import UploadSet, IMAGES
-
+from werkzeug.utils import secure_filename
+import os
 
 def validate_api_key(api_key):
     # Get the API key from app.config
@@ -17,8 +17,13 @@ def hash_password(password, salt):
     hashed_password = hashlib.sha256(salted_password).hexdigest()
     return hashed_password
 
-photos = UploadSet('photos', IMAGES)
-
 def upload_img(image):
-    filename = photos.save(image)
-    return filename
+    # Check if the image is allowed
+    if '.' in image.filename and image.filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']:
+        filename = secure_filename(image.filename)
+        image.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+        return filename
+    else:
+        return None
+    
+

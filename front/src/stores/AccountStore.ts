@@ -62,5 +62,9 @@ export const useAccountStore = defineStore('account', () => {
         return isLoggedIn.value;
     }
 
-    return { setToken, printUser, logout, isLoggedIn, tokenLogin, CurrentUser}
+    const getAccessToken = ():string | undefined => {
+        return $cookies!.get(tokenCookieName);
+    }
+
+    return { setToken, printUser, logout, isLoggedIn, tokenLogin, CurrentUser, getAccessToken}
 })

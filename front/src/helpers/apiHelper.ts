@@ -21,7 +21,7 @@ const kyGet = async (route: string):Promise<ApiResponse> => {
     }
 };
 
-const kyPost = async (route: string, data: any, access_token: string) => {
+const kyPost = async (route: string, data:  Record<string, unknown>, access_token: string) => {
     try {
         const response:Record<string, unknown> = await ky.post(apiUrl + route, {
             json: data,
@@ -64,7 +64,7 @@ const kyPostWithoutToken = async (route: string, data: Record<string, unknown>):
     }
 };
 
-const kyPut = async (route: string, data: any, access_token:string):Promise<ApiResponse> => {
+const kyPut = async (route: string, data:Record<string, unknown>, access_token:string):Promise<ApiResponse> => {
     try {
         const response:Record<string, unknown> = await ky.put(apiUrl + route, {
             json: data,
@@ -96,10 +96,30 @@ const kyDelete = async (route: string, access_token: string):Promise<ApiResponse
     }
 };
 
+async function uploadFile(file: File, token: string): Promise<ApiResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const response:Record<string, unknown> = await ky.post(apiUrl + '/upload', {
+            body: formData,
+            headers: {
+                'X-API-Key': import.meta.env.VITE_API_KEY,
+                'Authorization': 'Bearer ' + token,
+            },
+        }).json();
+
+        return { success: true, data: response };
+    } catch (error) {
+        console.error('Error uploading file:', error);
+        return { success: false, data: { message: 'An unknown error occurred' } };
+    }
+}
 export default {
     kyGet,
     kyPost,
     kyPut,
     kyDelete,
     kyPostWithoutToken,
+    uploadFile
 };

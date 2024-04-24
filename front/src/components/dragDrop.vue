@@ -5,13 +5,20 @@
     <icon-photo class="icon-photo" v-if="!imageSrc"/>
 
     <img v-if="imageSrc" :src="imageSrc" alt="Preview" class="preview" />
+    <button v-if="imageSrc" @click.stop="removeImage()" class="cross">X</button> 
   </div>
+  <button @click="handleUpload()">Upload</button>
+
 </template>
 
 <script lang="ts" setup>
 import { ref, type Ref } from 'vue';
 import iconPhoto from './icons/icon-photo.vue';
-import iconCross from './icons/icon-cross.vue';
+import { useAccountStore } from '@/stores/AccountStore';
+import apiHelper from '@/helpers/apiHelper';
+
+
+const accountStore = useAccountStore()
 
 const fileInput: Ref<HTMLInputElement | null> = ref(null);
 const imageSrc: Ref<string | null> = ref(null);
@@ -56,6 +63,18 @@ const processFile = (file: File): void => {
     alert("Seules les images de type JPEG ou PNG sont autorisées.");
   }
 };
+
+const handleUpload = async () => {
+  if (fileInput.value?.files) {
+    // Utilisez votre fonction d'aide pour uploader l'image
+   const token = accountStore.getAccessToken();
+   const Response = await apiHelper.uploadFile(fileInput.value.files[0], token!);
+  }
+};
+
+const removeImage = () => {
+  imageSrc.value = null;
+};
 </script>
 
 <style scoped lang="scss">
@@ -87,5 +106,25 @@ const processFile = (file: File): void => {
   width: 100%;
   aspect-ratio: 16/9;
   object-fit: cover;
+}
+
+.cross {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  padding: 0;
+  margin: 0;
+  z-index: 1;
 }
 </style>
