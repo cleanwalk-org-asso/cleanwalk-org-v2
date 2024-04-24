@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import dragDrop from '@/components/dragDrop.vue';
+import Test from '@/components/Test.vue';
 </script>
 
 <template>
-  <dragDrop />
+  <Test />
+ 
 </template>

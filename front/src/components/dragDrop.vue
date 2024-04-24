@@ -2,12 +2,12 @@
   <div class="drop-area" @dragover.prevent="dragOver" @dragleave.prevent="dragLeave" @drop.prevent="onFileDrop"
     @click="fileInputClick" :class="{ 'dragover': isDragOver }">
     <input type="file" ref="fileInput" @change="onFileChange" accept="image/jpeg, image/png" style="display: none" />
-    <icon-photo class="icon-photo" v-if="!imageSrc"/>
+    <icon-photo class="icon-photo" v-if="!imageSrc" />
 
     <img v-if="imageSrc" :src="imageSrc" alt="Preview" class="preview" />
-    <button v-if="imageSrc" @click.stop="removeImage()" class="cross">X</button> 
+    <button v-if="imageSrc" @click.stop="removeImage()" class="cross">X</button>
   </div>
-  <button @click="handleUpload()">Upload</button>
+  <!-- <button @click="handleUpload()">Upload1</button> -->
 
 </template>
 
@@ -16,10 +16,22 @@ import { ref, type Ref } from 'vue';
 import iconPhoto from './icons/icon-photo.vue';
 import { useAccountStore } from '@/stores/AccountStore';
 import apiHelper from '@/helpers/apiHelper';
+import type { ApiResponse } from '@/interfaces/apiResponseInterface';
 
+const props = defineProps({
+  format: {
+    validator: (value: string) => ['card', 'full', 'circle'].includes(value),
+    default: 'card',
+  },
+  autoUpload: {
+    type: Boolean,
+    default: true,
+  },
+  fileName: String,
+
+});
 
 const accountStore = useAccountStore()
-
 const fileInput: Ref<HTMLInputElement | null> = ref(null);
 const imageSrc: Ref<string | null> = ref(null);
 const isDragOver = ref(false);
@@ -47,6 +59,9 @@ const onFileChange = (): void => {
   if (fileInput.value?.files && fileInput.value.files.length > 0) {
     const file = fileInput.value.files[0];
     processFile(file);
+    if (props.autoUpload) {
+      handleUpload();
+    }
   }
 };
 
@@ -64,17 +79,22 @@ const processFile = (file: File): void => {
   }
 };
 
-const handleUpload = async () => {
+const handleUpload = async (): Promise<ApiResponse> => {
   if (fileInput.value?.files) {
     // Utilisez votre fonction d'aide pour uploader l'image
-   const token = accountStore.getAccessToken();
-   const Response = await apiHelper.uploadFile(fileInput.value.files[0], token!);
+    const token = accountStore.getAccessToken();
+    const Response: ApiResponse = await apiHelper.uploadFile(fileInput.value.files[0], token!);
+    return Response;
   }
+  return { success: false, data: { message: "No file selected" } };
 };
 
 const removeImage = () => {
   imageSrc.value = null;
+  fileInput.value!.value = '';
 };
+
+defineExpose({ handleUpload });
 </script>
 
 <style scoped lang="scss">
