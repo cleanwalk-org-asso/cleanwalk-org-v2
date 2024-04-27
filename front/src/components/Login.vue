@@ -5,9 +5,13 @@ import apiHelper from '@/helpers/apiHelper';
 import { useAccountStore } from '@/stores/AccountStore';
 import type { User } from '@/interfaces/userInterface';
 import { useRouter } from 'vue-router';
+import {useUtilsStore} from '@/stores/UtilsStore';
+
+
 const router = useRouter();
 
 const accountStore = useAccountStore();
+const showToast = useUtilsStore().showToast;
 
 const callback = (response:any) => {
     // This callback will be triggered when the user selects or login to
@@ -15,19 +19,6 @@ const callback = (response:any) => {
     console.log("Handle the response", response)
 }
 
-const isToastVisible = ref(false);
-const ToastIsSuccess = ref(false);
-const errorMsg = ref(""); 
-
-
-const showToast = (error: string, isSuccess: boolean, ) => {
-    isToastVisible.value = true;
-    ToastIsSuccess.value = isSuccess;
-    errorMsg.value = error;
-    setTimeout(() => {
-        isToastVisible.value = false;
-    }, 3000);
-}
 const email = ref("");
 const password = ref("");
 
@@ -70,7 +61,7 @@ const login = async ( ) => {
 </script>
 
 <template>
-    <Toast :is-success="ToastIsSuccess" :is-visible="isToastVisible" :message="errorMsg" />
+    <Toast />
     <section class="container">
 
         <h1>

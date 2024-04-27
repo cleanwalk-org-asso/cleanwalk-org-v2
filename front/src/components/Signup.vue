@@ -4,26 +4,14 @@ import Toast from './Toast.vue';
 import apiHelper from '@/helpers/apiHelper';
 import type { ApiResponse } from '@/interfaces/apiResponseInterface';
 
+import { useUtilsStore } from '@/stores/UtilsStore';
+
+const showToast = useUtilsStore().showToast;
 
 const callback = (response: any) => {
     // This callback will be triggered when the user selects or login to
     // his Google account from the popup
     console.log("Handle the response", response)
-}
-
-
-const isToastVisible = ref(false);
-const ToastIsSuccess = ref(false);
-const errorMsg = ref(""); 
-
-
-const showToast = (error: string, isSuccess: boolean, ) => {
-    isToastVisible.value = true;
-    ToastIsSuccess.value = isSuccess;
-    errorMsg.value = error;
-    setTimeout(() => {
-        isToastVisible.value = false;
-    }, 3000);
 }
 
 const email = ref("");
@@ -73,7 +61,7 @@ const signup = async ( ) => {
 </script>
 
 <template>
-    <Toast :is-success="ToastIsSuccess" :is-visible="isToastVisible" :message="errorMsg" />
+    <Toast />
     <section class="container">
 
         <h1>

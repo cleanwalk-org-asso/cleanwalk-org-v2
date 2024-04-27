@@ -1,18 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useUtilsStore } from '@/stores/UtilsStore';
 
-const props = defineProps({
-    message: String,
-    isSuccess: Boolean,
-    isVisible: Boolean,
-});
+const toast = useUtilsStore().toast;
 
 
 </script>
 
 <template>
-    <div class="toast" :class="{ 'toast-success': isSuccess, 'toast-error': !isSuccess, 'is-visible': isVisible }">
-        <p>{{ message }}</p>
+    <div class="toast" :class="{ 'toast-success': toast.isSuccess, 'toast-error': !toast.isSuccess, 'is-visible': toast.isVisible }">
+        <p>{{ toast.message }}</p>
     </div>
 </template>
 

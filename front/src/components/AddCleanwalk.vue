@@ -12,7 +12,9 @@ import iconPhoto from './icons/icon-photo.vue';
 import iconMiniMap from './icons/icon-mini-map.vue';
 import iconClock from './icons/icon-clock.vue';
 import dateHelper from '@/helpers/dateHelper';
-import { id } from 'date-fns/locale';
+import { useUtilsStore } from '@/stores/UtilsStore';
+
+const showToast = useUtilsStore().showToast;
 
 
 const progress = ref(1);
@@ -131,22 +133,9 @@ const conseils = ref([
     'L’ajout d’une photo est optionnel'
 ]);
 
-const showToast = (error: string, isSuccess: boolean) => {
-    isToastVisible.value = true;
-     ToastIsSuccess.value = isSuccess;
-    errorMsg.value = error;
-    setTimeout(() => {
-        isToastVisible.value = false;
-    }, 3000);
-}
-
-let isToastVisible = ref(false);
-let ToastIsSuccess = ref(false);
-const errorMsg = ref('');
-
 </script>
 <template>
-    <Toast :is-success="ToastIsSuccess" :is-visible="isToastVisible" :message="errorMsg" />
+    <Toast />
     <section class="section">
         <div class="progression-bar">
             <div class="progression-bar-inner" :style="{ width: progress * 100 / 6 + '%' }"></div>
