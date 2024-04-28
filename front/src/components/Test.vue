@@ -1,9 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import dragDrop from './dragDrop.vue';
 import type { ApiResponse } from '@/interfaces/apiResponseInterface';
+import { useCleanwalkStore } from '@/stores/CleanwalkStore';
+import { Console } from 'console';
+
+const cleanwalkStore = useCleanwalkStore();
 
 const dragDropRef = ref(null as any);
+
+onMounted (async() => {
+  console.log("Mounted");
+  console.log("test", await cleanwalkStore.getAllCleanwalks());
+});
 
 const triggerUpload = async() => {
   if (dragDropRef.value) {
