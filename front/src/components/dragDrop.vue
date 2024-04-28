@@ -1,13 +1,14 @@
 <template>
-  <div class="drop-area" @dragover.prevent="dragOver" @dragleave.prevent="dragLeave" @drop.prevent="onFileDrop"
-    @click="fileInputClick" :class="{ 'dragover': isDragOver }">
-    <input type="file" ref="fileInput" @change="onFileChange" accept="image/jpeg, image/png" style="display: none" />
-    <icon-photo class="icon-photo" v-if="!imageSrc" />
+  <div class="container">
+    <button v-if="imageSrc && !props.autoUpload" @click.stop="removeImage()" class="cross">X</button>
+    <div class="drop-area" @dragover.prevent="dragOver" @dragleave.prevent="dragLeave" @drop.prevent="onFileDrop"
+      @click="fileInputClick" :class="{ 'dragover': isDragOver }">
+      <input type="file" ref="fileInput" @change="onFileChange" accept="image/jpeg, image/png" style="display: none" />
+      <icon-photo class="icon-photo" v-if="!imageSrc" />
 
-    <img v-if="imageSrc" :src="imageSrc" alt="Preview" class="preview" />
-    <button v-if="imageSrc" @click.stop="removeImage()" class="cross">X</button>
+      <img v-if="imageSrc" :src="imageSrc" alt="Preview" class="preview" />
+    </div>
   </div>
-  <!-- <button @click="handleUpload()">Upload1</button> -->
 
 </template>
 
@@ -17,6 +18,9 @@ import iconPhoto from './icons/icon-photo.vue';
 import { useAccountStore } from '@/stores/AccountStore';
 import apiHelper from '@/helpers/apiHelper';
 import type { ApiResponse } from '@/interfaces/apiResponseInterface';
+import { useUtilsStore } from '@/stores/UtilsStore';
+
+const showToast = useUtilsStore().showToast;
 
 const props = defineProps({
   format: {
@@ -25,9 +29,8 @@ const props = defineProps({
   },
   autoUpload: {
     type: Boolean,
-    default: true,
-  },
-  fileName: String,
+    default: false,
+  }
 
 });
 
@@ -80,12 +83,20 @@ const processFile = (file: File): void => {
 };
 
 const handleUpload = async (): Promise<ApiResponse> => {
-  if (fileInput.value?.files) {
+  if (fileInput.value?.files?.length && fileInput.value) {
     // Utilisez votre fonction d'aide pour uploader l'image
     const token = accountStore.getAccessToken();
     const Response: ApiResponse = await apiHelper.uploadFile(fileInput.value.files[0], token!);
+    if (Response.success) {
+      showToast("Image uploaded successfully", true);
+      removeImage();
+    } else {
+      showToast(Response.data.message as string, false);
+    }
     return Response;
   }
+  showToast("No file selected", false);
+  removeImage();
   return { success: false, data: { message: "No file selected" } };
 };
 
@@ -98,9 +109,34 @@ defineExpose({ handleUpload });
 </script>
 
 <style scoped lang="scss">
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+
+  .cross {
+    position: absolute;
+    margin-right: -10px;
+    margin-top: -10px;
+    background-color: #000000;
+    color: #ffffff;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    z-index: 1;
+  }
+}
+
 .drop-area {
+  width: 100%;
   text-align: center;
-  margin: 20px;
   cursor: pointer;
   aspect-ratio: 16/9;
   display: flex;
@@ -126,25 +162,5 @@ defineExpose({ handleUpload });
   width: 100%;
   aspect-ratio: 16/9;
   object-fit: cover;
-}
-
-.cross {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: #000000;
-  color: #ffffff;
-  border: none;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 12px;
-  padding: 0;
-  margin: 0;
-  z-index: 1;
 }
 </style>

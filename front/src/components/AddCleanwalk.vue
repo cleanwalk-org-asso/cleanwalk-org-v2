@@ -13,11 +13,14 @@ import iconMiniMap from './icons/icon-mini-map.vue';
 import iconClock from './icons/icon-clock.vue';
 import dateHelper from '@/helpers/dateHelper';
 import { useUtilsStore } from '@/stores/UtilsStore';
+import dragDrop from './dragDrop.vue';
+import type { ApiResponse } from '@/interfaces/apiResponseInterface';
 
 const showToast = useUtilsStore().showToast;
 
 
-const progress = ref(1);
+const dragDropRef = ref(null as any);
+const progress = ref(5);
 
 let newCleanwalk: Ref<Cleanwalk> = ref({
     name: "",
@@ -34,6 +37,14 @@ const dateCleanwalk = ref({
     hourBegin: '',
     hourEnd: ''
 });
+
+
+const Upload = async() => {
+  if (dragDropRef.value) {
+    const response:ApiResponse = await dragDropRef.value.handleUpload(); // Appel de la méthode handleUpload du composant dragDrop
+    console.log(response);
+  }
+}
 
 
 const setDate = () => {
@@ -96,6 +107,7 @@ const nextBtn = async () => {
         return;
     }
     if (progress.value === 6) {
+        Upload();
         showToast('Votre cleanwalk a bien été publiée', true);
        return;
     }
@@ -158,11 +170,8 @@ const conseils = ref([
                 <input id="hourEnd" v-model="dateCleanwalk.hourEnd" v-if="progress === 3" type="time">
                 <textarea v-if="progress === 4" v-model="newCleanwalk.description" name="description" id="description"
                     cols="30" rows="10" placeholder="Saisissez une description précise de votre évènement"></textarea>
-                <div class="inputImg" v-if="progress === 5">
-                    <iconPhoto />
-                </div>
+                <dragDrop ref="dragDropRef" v-if="progress>= 5" :auto-upload="false" format="card" />
                 <div v-if="progress === 6" class="preview">
-                    <img src="../assets/desert.png" alt="cw-img">
                     <h3>{{ newCleanwalk.name }}</h3>
                     <div class="date-locate">
                         <div class="divtop">
@@ -274,22 +283,6 @@ const conseils = ref([
 
         }
 
-        .inputImg {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: var(--color-secondary);
-            aspect-ratio: 16/9;
-            border-radius: 8px;
-            height: 100%;
-            margin-top: 1rem;
-            stroke: var(--text-color-primary);
-
-            svg {
-                width: 50px;
-                height: 50px;
-            }
-        }
 
         .preview {
             h3 {
