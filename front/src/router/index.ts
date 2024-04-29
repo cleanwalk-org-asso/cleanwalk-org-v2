@@ -20,7 +20,7 @@ const router = createRouter({
       component: () => import('../views/TestView.vue')
     },
     {
-      path: '/cleanwalk',
+      path: '/cleanwalk/:id',
       name: 'cleanwalk',
       component: () => import('../views/SingleCleanwalkView.vue')
     },
@@ -67,6 +67,11 @@ const router = createRouter({
       name: 'profile',
       component: () => import('../views/ProfileView.vue')
     },
+    {
+      path: '/:catchAll(.*)',
+      name: 'NotFound',
+      component: () => import('../views/404.vue')
+    }
   ]
 
   

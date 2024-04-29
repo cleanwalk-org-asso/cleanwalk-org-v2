@@ -7,15 +7,32 @@ import iconInfo from './icons/icon-info.vue';
 import iconCross from './icons/icon-cross.vue';
 import iconAdd from './icons/icon-add.vue';
 import iconMinus from './icons/icon-minus.vue';
-import { ref } from 'vue';
+import { useCleanwalkStore } from '@/stores/CleanwalkStore';
+import { onMounted, ref, type Ref } from 'vue';
+import { useRoute } from 'vue-router';
+import router from '@/router';
+import dateHelper from '@/helpers/dateHelper';
 
-const currentCleanwalk = {
-  id: 1,
-  title: 'Cleanwalk 2',
-  addess: 'Rue de la paix',
-  isAsso: false,
-  organizer: "Qui nettoie si ce n’est Toi "
-}
+const cleanwalkStore = useCleanwalkStore();
+
+let currentCleanwalk:Ref<Cleanwalk | undefined >= ref(undefined);
+
+onMounted (async() => {
+  const id = +useRoute().params.id; // + to convert string to number
+  console.log("test",id);
+  console.log(id);
+
+  // id is NaN if it's not a number
+  if (isNaN(id)) {
+    router.push('/404');
+    return;
+  }
+  currentCleanwalk.value = await cleanwalkStore.getCleanwalkById(id);
+  console.log(currentCleanwalk.value);
+  if (!currentCleanwalk.value) {
+    router.push('/404');
+  }
+})
 
 let popupBool = ref(false);
 let counterParticipate = ref(1);
@@ -45,6 +62,12 @@ const cancel = () => {
   tooglePopup()
   counterParticipate.value = 1;
   isAnonyme.value = false;
+}
+
+const getDate = () => {
+  if (currentCleanwalk.value && currentCleanwalk.value.date_begin && currentCleanwalk.value.duration) {
+    return dateHelper.getCleanwalkWrittenDate(new Date(currentCleanwalk.value.date_begin), currentCleanwalk.value.duration);
+  }
 }
 
 </script>
@@ -95,34 +118,31 @@ const cancel = () => {
       <img class="cover" src="../assets/desert.png" alt="" />
     </div>
     <div class="container">
-      <h1>{{ currentCleanwalk.title }}</h1>
+      <h1>{{ currentCleanwalk?.name }}</h1>
       <div class="date-location">
         <div class="top">
           <icon-clock />
-          <div>Date et heure de l’évènement</div>
+          <div>{{ getDate() }}</div>
         </div>
         <div class="bot">
           <iconMiniMap />
-          <div>Localité, France</div>
+          <div>{{ currentCleanwalk?.address }}</div>
         </div>
       </div>
       <div class="orga">
         <div class="left">
           <div>organisé par:</div>
-          <h2> {{ currentCleanwalk.organizer }} </h2>
+          <h2> {{ currentCleanwalk?.host?.firstname }} {{ currentCleanwalk?.host?.lastname ?? '' }} </h2>
         </div>
         <div class="right">
-          <img src="../assets/defaultprofile.png" alt="profile-picture">
+          <img :src="currentCleanwalk?.host?.profile_picture" alt="profile-picture">
         </div>
       </div>
       <button class="button-primary" @click="participate()">
         Je participe
       </button>
       <p>
-        lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam cursus vestibulum interdum. Phasellus libero
-        nibh, tincidunt sed massa dictum, feugiat interdum mi. Pellentesque finibus cursus quam ut efficitur. Integer
-        lobortis tortor velit, at suscipit justo scelerisque et. Integer lobortis tortor velit, at suscipit justo
-        scelerisque et. Integer lobortis tortor velit, at suscipit justo
+        {{ currentCleanwalk?.description }}
       </p>
     </div>
 
@@ -241,6 +261,7 @@ main {
 
     .right {
       img {
+        border-radius: 9999px;
         width: 44px;
         height: 44px;
         object-fit: cover;

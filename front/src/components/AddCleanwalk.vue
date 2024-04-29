@@ -25,6 +25,7 @@ const progress = ref(5);
 let newCleanwalk: Ref<Cleanwalk> = ref({
     name: "",
     description: "",
+    img_url: "",
     date_begin: new Date(),
     duration: 0,
     pos_lat: 0,
@@ -42,7 +43,11 @@ const dateCleanwalk = ref({
 const Upload = async() => {
   if (dragDropRef.value) {
     const response:ApiResponse = await dragDropRef.value.handleUpload(); // Appel de la méthode handleUpload du composant dragDrop
-    console.log(response);
+    if (response.success) {
+        // newCleanwalk.value.img_url = response.data.;
+    } else {
+      showToast('Erreur lors de l\'upload de l\'image', false);
+    }
   }
 }
 

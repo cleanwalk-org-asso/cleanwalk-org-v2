@@ -8,8 +8,6 @@ import type {Ref} from 'vue';
 
 export const useCleanwalkStore = defineStore('cleanwalk', () => {
 
-    let cleanwalkIsSelect = ref(false);
-
     const route:string = '/cleanwalks';
 
     let cleanwalksTab: Ref<Cleanwalk[]> = ref([]);
@@ -37,7 +35,8 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
 
     async function getCleanwalkById(id: number): Promise<Cleanwalk|undefined> {
         const result = await apiHelper.kyGet(route + '/' + id);
-        if(result.data != undefined) {
+        console.log(result);
+        if(result.success && result.data) {
             return result.data as unknown as Cleanwalk;
         }
         return undefined;
@@ -59,6 +58,6 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
         return undefined;
     }
 
-    return {getAllCleanwalks, cleanwalksTab, cleanwalkIsSelect}
+    return {getAllCleanwalks, cleanwalksTab, getCleanwalkById}
    
 });
