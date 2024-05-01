@@ -1,16 +1,20 @@
 import NominatimHelper from '@/helpers/nominatimHelper';
 import apiHelper from '@/helpers/apiHelper';
-import type { Cleanwalk } from '@/interfaces/cleanwalkInterface';
+import type { Cleanwalk, CleanwalkCreation } from '@/interfaces/cleanwalkInterface';
 import router from '@/router';
 import { defineStore } from 'pinia'
 import {ref, computed} from 'vue';
 import type {Ref} from 'vue';
+import { useAccountStore } from './AccountStore';
+
 
 export const useCleanwalkStore = defineStore('cleanwalk', () => {
+    const getToken = useAccountStore().getAccessToken;
 
     const route:string = '/cleanwalks';
 
     let cleanwalksTab: Ref<Cleanwalk[]> = ref([]);
+
 
 
 
@@ -42,10 +46,15 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
         return undefined;
     }
 
-    async function createCleanwalk(cleanwalk: Cleanwalk, token:string): Promise<Cleanwalk|undefined> {
+    async function createCleanwalk(cleanwalk: CleanwalkCreation): Promise<CleanwalkCreation|undefined> {
+        const token = getToken();
+        if (token === undefined) {
+            router.push('/login');
+            return undefined;
+        }
         const result = await apiHelper.kyPost(route, cleanwalk as unknown as Record<string, unknown>, token);
         if(result != undefined) {
-            return result.data as unknown as Cleanwalk;
+            return result.data as unknown as CleanwalkCreation;
         }
         return undefined;
     }
@@ -58,6 +67,6 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
         return undefined;
     }
 
-    return {getAllCleanwalks, cleanwalksTab, getCleanwalkById}
+    return {getAllCleanwalks, cleanwalksTab, getCleanwalkById, createCleanwalk}
    
 });

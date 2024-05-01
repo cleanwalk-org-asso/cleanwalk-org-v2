@@ -17,3 +17,15 @@ export interface Cleanwalk {
         role_id: number,
     }
 }
+
+export interface CleanwalkCreation {
+    name: string,
+    description: string,
+    date_begin: Date,
+    duration: number,
+    pos_lat: number,
+    pos_long: number,
+    address: string,
+    img_url?: string,
+    user_id: number,
+}

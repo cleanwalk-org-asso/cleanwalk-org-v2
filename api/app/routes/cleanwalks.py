@@ -1,5 +1,6 @@
 import datetime
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
 from sqlalchemy import func, text
 from app.models import CleanwalkUser, User, db, Cleanwalk
 from app.utils import validate_api_key
@@ -122,6 +123,7 @@ def get_all_cleanwalks():
 
 # Route for create a new Cleanwalk
 @cleanwalks_bp.route('', methods=['POST'])
+@jwt_required()
 def create_cleanwalk():
     try:
         data = request.json

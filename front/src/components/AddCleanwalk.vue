@@ -2,7 +2,7 @@
 import iconLeftArrow from './icons/icon-left-arrow.vue';
 import iconInfo from './icons/icon-info.vue';
 import { ref, type Ref } from 'vue';
-import type { Cleanwalk } from '@/interfaces/cleanwalkInterface';
+import type { Cleanwalk, CleanwalkCreation } from '@/interfaces/cleanwalkInterface';
 import router from '@/router';
 import { differenceInHours, set, parse, differenceInMinutes } from 'date-fns';
 import Toast from './Toast.vue'
@@ -15,14 +15,17 @@ import dateHelper from '@/helpers/dateHelper';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import dragDrop from './dragDrop.vue';
 import type { ApiResponse } from '@/interfaces/apiResponseInterface';
+import { useCleanwalkStore } from '@/stores/CleanwalkStore';
+import { useAccountStore } from '@/stores/AccountStore';
 
 const showToast = useUtilsStore().showToast;
+const createCleanwalk = useCleanwalkStore().createCleanwalk;
 
 
 const dragDropRef = ref(null as any);
-const progress = ref(5);
+const progress = ref(1);
 
-let newCleanwalk: Ref<Cleanwalk> = ref({
+let newCleanwalk: Ref<CleanwalkCreation> = ref({
     name: "",
     description: "",
     img_url: "",
@@ -31,7 +34,7 @@ let newCleanwalk: Ref<Cleanwalk> = ref({
     pos_lat: 0,
     pos_long: 0,
     address: "",
-    city: ""
+    user_id: useAccountStore().CurrentUser?.id as number,
 });
 const dateCleanwalk = ref({
     dateDay: undefined, // Initialise la date à undefined
@@ -45,6 +48,7 @@ const Upload = async() => {
     const response:ApiResponse = await dragDropRef.value.handleUpload(); // Appel de la méthode handleUpload du composant dragDrop
     if (response.success) {
         // newCleanwalk.value.img_url = response.data.;
+        createCleanwalk(newCleanwalk.value);
     } else {
       showToast('Erreur lors de l\'upload de l\'image', false);
     }
@@ -96,7 +100,6 @@ const nextBtn = async () => {
         newCleanwalk.value.pos_lat = newPos.pos_lat;
         newCleanwalk.value.pos_long = newPos.pos_long;
         newCleanwalk.value.address = newPos.address;
-        newCleanwalk.value.city = newPos.city;
         console.log(newPos);
 
     }
