@@ -2,7 +2,7 @@ import datetime
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
 from sqlalchemy import func, text
-from app.models import CleanwalkUser, User, db, Cleanwalk
+from app.models import City, CleanwalkUser, User, db, Cleanwalk
 from app.utils import validate_api_key
 
 
@@ -127,6 +127,13 @@ def get_all_cleanwalks():
 def create_cleanwalk():
     try:
         data = request.json
+
+        city = City.query.filter_by(name=data['city']).one_or_none()
+        if not city:
+            city = City(name=data['city'])
+            db.session.add(city)
+            db.session.commit()
+
         new_cleanwalk = Cleanwalk(
             name=data['name'],
             pos_lat=data['pos_lat'],
@@ -134,7 +141,8 @@ def create_cleanwalk():
             date_begin=data['date_begin'],
             duration=data['duration'],
             description=data['description'],
-            address=data['address']
+            address=data['address'],
+            city_id=city.id
         )
         db.session.add(new_cleanwalk)
         db.session.commit()  # Commit here to get the cleanwalk_id
@@ -142,6 +150,7 @@ def create_cleanwalk():
         new_cleanwalk_user = CleanwalkUser(
             cleanwalk_id=new_cleanwalk.id,
             user_id=data['user_id'],  # This needs to be provided in the request
+            nb_person=1,
             is_host=True
         )
         db.session.add(new_cleanwalk_user)
