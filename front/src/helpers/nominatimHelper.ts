@@ -58,7 +58,7 @@ const nominatimSearch = async (searchString: string): Promise<Coordinate | undef
                 pos_lat: firstResult.lat,
                 pos_long: firstResult.lon,
                 address: firstResult.display_name,
-                city: firstResult.address.city ?? firstResult.address.village,
+                city: firstResult.address.city ?? firstResult.address.village ?? firstResult.address.town ?? firstResult.address.municipality,
             };
         }
     }
