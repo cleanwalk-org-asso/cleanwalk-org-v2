@@ -21,11 +21,12 @@ export interface Cleanwalk {
 export interface CleanwalkCreation {
     name: string,
     description: string,
-    date_begin: Date,
+    date_begin: string,
     duration: number,
     pos_lat: number,
     pos_long: number,
     address: string,
     img_url?: string,
     user_id: number,
+    city: string,
 }

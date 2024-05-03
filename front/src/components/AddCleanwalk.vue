@@ -17,6 +17,8 @@ import dragDrop from './dragDrop.vue';
 import type { ApiResponse } from '@/interfaces/apiResponseInterface';
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
 import { useAccountStore } from '@/stores/AccountStore';
+import { format } from 'date-fns';
+
 
 const showToast = useUtilsStore().showToast;
 const createCleanwalk = useCleanwalkStore().createCleanwalk;
@@ -28,12 +30,13 @@ const progress = ref(1);
 let newCleanwalk: Ref<CleanwalkCreation> = ref({
     name: "",
     description: "",
-    img_url: "",
-    date_begin: new Date(),
+    img_url: "test",
+    date_begin: "",
     duration: 0,
     pos_lat: 0,
     pos_long: 0,
     address: "",
+    city: "",
     user_id: useAccountStore().CurrentUser?.id as number,
 });
 const dateCleanwalk = ref({
@@ -48,6 +51,7 @@ const Upload = async() => {
     const response:ApiResponse = await dragDropRef.value.handleUpload(); // Appel de la méthode handleUpload du composant dragDrop
     if (response.success) {
         // newCleanwalk.value.img_url = response.data.;
+        console.log( "new cw",newCleanwalk.value);
         createCleanwalk(newCleanwalk.value);
     } else {
       showToast('Erreur lors de l\'upload de l\'image', false);
@@ -66,6 +70,8 @@ const setDate = () => {
         minutes: parseInt(dateCleanwalk.value.hourBegin.split(':')[1]),
     });
 
+    let formattedStartDate = format(startDate, 'yyyy-MM-dd HH:mm:ss');
+
     // Parsez la date et l'heure de fin en un objet Date
     let endDate = set(parse(dateCleanwalk.value.dateDay, 'yyyy-MM-dd', new Date()), {
         hours: parseInt(dateCleanwalk.value.hourEnd.split(':')[0]),
@@ -76,7 +82,7 @@ const setDate = () => {
     let duration = differenceInMinutes(endDate, startDate);
 
     // Mettez à jour les propriétés de newCleanwalk
-    newCleanwalk.value.date_begin = startDate;
+    newCleanwalk.value.date_begin = formattedStartDate;
     newCleanwalk.value.duration = duration;
 }
 
@@ -100,6 +106,7 @@ const nextBtn = async () => {
         newCleanwalk.value.pos_lat = newPos.pos_lat;
         newCleanwalk.value.pos_long = newPos.pos_long;
         newCleanwalk.value.address = newPos.address;
+        newCleanwalk.value.city = newPos.city;
         console.log(newPos);
 
     }
@@ -184,7 +191,7 @@ const conseils = ref([
                     <div class="date-locate">
                         <div class="divtop">
                             <iconClock />
-                            <div>{{ dateHelper.getCleanwalkWrittenDate(newCleanwalk.date_begin, newCleanwalk.duration) }}</div>
+                            <div>{{ dateHelper.getCleanwalkWrittenDate(new Date(newCleanwalk.date_begin), newCleanwalk.duration) }}</div>
                         </div>
                         <div class="bot">
                             <iconMiniMap />
