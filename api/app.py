@@ -4,6 +4,7 @@ from app.models import db
 from dotenv import load_dotenv
 import os
 from datetime import timedelta
+from flask_cors import CORS
 
 # load environement variables from .env file
 load_dotenv()
@@ -12,6 +13,7 @@ ACCESS_EXPIRES = timedelta(days=30)
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
+CORS(app)
 
 #configure the SQLAlchemy database using environment variables
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
@@ -35,12 +37,14 @@ from app.routes.cities import cities_bp
 from app.routes.admin import admin_bp
 from app.routes.upload import upload_bp
 
-app.register_blueprint(users_bp , url_prefix='/users')
+app.register_blueprint(users_bp , url_prefix='/users', )
 app.register_blueprint(articles_bp , url_prefix='/articles')
 app.register_blueprint(cleanwalks_bp , url_prefix='/cleanwalks')
 app.register_blueprint(cities_bp , url_prefix='/cities')
 app.register_blueprint(admin_bp , url_prefix='/admin')
 app.register_blueprint(upload_bp , url_prefix='/upload')
+
+
 
 
 

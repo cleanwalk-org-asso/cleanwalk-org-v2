@@ -1,34 +1,11 @@
-FROM node:20-alpine AS pre-prod
-
-RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
-
-WORKDIR /home/node/app
-
+FROM node:latest as build-stage
+WORKDIR /app
 COPY package*.json ./
-
-USER node
-
-RUN npm ci
-
-COPY --chown=node:node . .
-
-
-FROM pre-prod AS dev
-
-EXPOSE 5173
-
-CMD [ "npm", "run", "start" ]
-
-
-FROM pre-prod AS build
-
+RUN npm install
+COPY ./ .
 RUN npm run build
 
-
-FROM httpd:alpine AS prod
-
-COPY --from=build /home/node/app/dist /usr/local/apache2/htdocs/
-
-EXPOSE 80
-
-CMD ["httpd-foreground"]
+FROM nginx as production-stage
+RUN mkdir /app
+COPY --from=build-stage /app/dist /app
+COPY nginx.conf /etc/nginx/nginx.conf

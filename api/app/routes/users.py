@@ -2,6 +2,7 @@
 
 import datetime
 from flask import Blueprint, jsonify, request
+from flask_cors import CORS
 from app.models import db, User, Role
 from app.utils import validate_api_key, hash_password, upload_img
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, get_jwt
@@ -13,6 +14,9 @@ users_bp = Blueprint('users', __name__)
 
 @users_bp.before_request
 def check_api_key():
+    if request.method == 'OPTIONS': # Handle preflight requests to enable CORS
+        return
+    
     api_key = request.headers.get('X-API-Key')  # Get the api key from the header
     
     # Verify the api key

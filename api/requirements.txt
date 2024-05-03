@@ -4,3 +4,4 @@ Flask-JWT-Extended
 pymysql
 python-dotenv
 flask-uploads
+flask-cors

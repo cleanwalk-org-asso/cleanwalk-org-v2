@@ -2,7 +2,8 @@
 import ky from 'ky';
 import { HTTPError } from 'ky';
 
-const apiUrl = '/api'; // Proxi in vite.config
+// const apiUrl = '/api'; // This is the proxy defined in vite.config.ts
+const apiUrl = import.meta.env.VITE_API_URL;
 
 import type { ApiResponse } from '@/interfaces/apiResponseInterface';
 
