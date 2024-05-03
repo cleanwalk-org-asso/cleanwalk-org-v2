@@ -11,6 +11,27 @@ const countryCodesArray = ['fr', 'be'];
 // the language nominatim returns for the places names
 const accept_language = ['fr'];
 
+function formatAddressFromJson(addressData: any): string {
+    // On tente d'extraire les informations pertinentes en considérant différents champs possibles
+    const houseNumber = addressData.house_number || '';
+    const road = addressData.road || '';
+    // On ajoute les nouveaux champs pour plus de flexibilité
+    const city = addressData.city || '';
+    const municipality = addressData.municipality || addressData.village || '';
+    const village = addressData.village || '';
+    const highway = addressData.highway || '';
+    const square = addressData.square || '';
+  
+    // On choisit le niveau de détail le plus spécifique disponible pour la localité
+    const localDetail =  city || village || municipality || '';
+  
+    // On construit une liste avec les éléments non vides
+    const parts = [houseNumber, road,  highway, square, localDetail].filter(part => part !== '');
+  
+    // On joint les parties avec un espace pour former une adresse complète
+    return parts.join(' ').trim();
+  }
+
 const nominatimRequest = async (url: string, params: Record<string, any>) => {
     // the output format
     params.format = 'json';
@@ -53,11 +74,12 @@ const nominatimSearch = async (searchString: string): Promise<Coordinate | undef
 
     if (result) {
         const firstResult = result[0];
+        console.log(firstResult);
         if (firstResult) {
             return {
                 pos_lat: firstResult.lat,
                 pos_long: firstResult.lon,
-                address: firstResult.display_name,
+                address: formatAddressFromJson(firstResult.address),
                 city: firstResult.address.city ?? firstResult.address.village ?? firstResult.address.town ?? firstResult.address.municipality,
             };
         }
