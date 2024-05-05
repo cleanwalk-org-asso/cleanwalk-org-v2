@@ -18,6 +18,7 @@ import type { ApiResponse } from '@/interfaces/apiResponseInterface';
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
 import { useAccountStore } from '@/stores/AccountStore';
 import { format } from 'date-fns';
+import { tr } from 'date-fns/locale';
 
 
 const showToast = useUtilsStore().showToast;
@@ -30,7 +31,7 @@ const progress = ref(1);
 let newCleanwalk: Ref<CleanwalkCreation> = ref({
     name: "",
     description: "",
-    img_url: "test",
+    img_url: "",
     date_begin: "",
     duration: 0,
     pos_lat: 0,
@@ -47,16 +48,26 @@ const dateCleanwalk = ref({
 
 
 const Upload = async() => {
-  if (dragDropRef.value) {
-    const response:ApiResponse = await dragDropRef.value.handleUpload(); // Appel de la méthode handleUpload du composant dragDrop
-    if (response.success) {
-        // newCleanwalk.value.img_url = response.data.;
-        console.log( "new cw",newCleanwalk.value);
-        createCleanwalk(newCleanwalk.value);
-    } else {
-      showToast('Erreur lors de l\'upload de l\'image', false);
+    if (!dragDropRef.value) {
+        return;
     }
-  }
+    try {
+        const response:string | undefined = await dragDropRef.value.handleUpload();
+        if (response !== undefined) {
+            newCleanwalk.value.img_url = response;
+            const response_cw = await createCleanwalk(newCleanwalk.value);
+            if (response_cw) {
+                showToast('Votre cleanwalk a bien été publiée', true);
+            } else {
+                showToast('Erreur lors de l\'upload de l\'image', false);
+            }
+
+        } else {
+            showToast('Erreur lors de l\'upload de l\'image', false);
+        }
+    } catch (error) {
+        showToast('Erreur lors de l\'upload de l\'image', false);
+    }
 }
 
 

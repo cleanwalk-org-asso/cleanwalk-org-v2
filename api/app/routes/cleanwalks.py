@@ -145,6 +145,7 @@ def create_cleanwalk():
             date_begin=data['date_begin'],
             duration=data['duration'],
             description=data['description'],
+            img_url=data['img_url'],
             address=data['address'],
             city_id=city.id
         )

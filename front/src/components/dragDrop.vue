@@ -82,22 +82,22 @@ const processFile = (file: File): void => {
   }
 };
 
-const handleUpload = async (): Promise<ApiResponse> => {
+const handleUpload = async (): Promise<string | undefined> => {
   if (fileInput.value?.files?.length && fileInput.value) {
     // Utilisez votre fonction d'aide pour uploader l'image
     const token = accountStore.getAccessToken();
     const Response: ApiResponse = await apiHelper.uploadFile(fileInput.value.files[0], token!);
     if (Response.success) {
-      showToast("Image uploaded successfully", true);
+      // showToast("Image uploaded successfully", true);
       removeImage();
     } else {
       showToast(Response.data.message as string, false);
     }
-    return Response;
+    return "ia-game.online/uploads/" + Response.data.filename as string; //img name is in Response.data.filename
   }
   showToast("No file selected", false);
   removeImage();
-  return { success: false, data: { message: "No file selected" } };
+  return undefined;
 };
 
 const removeImage = () => {

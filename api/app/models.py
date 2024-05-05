@@ -21,6 +21,7 @@ class Cleanwalk(db.Model):
     pos_lat = db.Column(db.Float, nullable=False)
     pos_long = db.Column(db.Float, nullable=False)
     date_begin = db.Column(db.TIMESTAMP, nullable=False)
+    img_url = db.Column(db.String(255), nullable=True)
     duration = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String(255), nullable = False)
     address = db.Column(db.String(255), nullable=False)

@@ -48,6 +48,7 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
 
     async function createCleanwalk(cleanwalk: CleanwalkCreation): Promise<CleanwalkCreation|undefined> {
         const token = getToken();
+        console.log("cw: ", cleanwalk);
         if (token === undefined) {
             router.push('/login');
             return undefined;
