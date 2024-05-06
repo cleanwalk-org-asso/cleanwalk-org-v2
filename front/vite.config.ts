@@ -22,12 +22,12 @@ export default defineConfig({
       //   secure: false,
       //   rewrite: (path) => path.replace(/^\/api/, ''),
       // },
-      '/nominatim': {
-        target: 'https://nominatim.openstreetmap.org',
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/nominatim/, ''),
-      }
+      // '/nominatim': {
+      //   target: 'https://nominatim.openstreetmap.org',
+      //   changeOrigin: true,
+      //   secure: false,
+      //   rewrite: (path) => path.replace(/^\/nominatim/, ''),
+      // }
     },
     watch: {
       usePolling: true

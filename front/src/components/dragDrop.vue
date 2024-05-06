@@ -93,7 +93,7 @@ const handleUpload = async (): Promise<string | undefined> => {
     } else {
       showToast(Response.data.message as string, false);
     }
-    return "ia-game.online/uploads/" + Response.data.filename as string; //img name is in Response.data.filename
+    return Response.data.img_url as string; //img name is in Response.data.filename
   }
   showToast("No file selected", false);
   removeImage();

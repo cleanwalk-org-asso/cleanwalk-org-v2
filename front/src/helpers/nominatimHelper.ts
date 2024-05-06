@@ -3,7 +3,8 @@ import type { Coordinate } from '@/interfaces/coordinateInterface'
 import { add } from 'date-fns';
 import { fi } from 'date-fns/locale';
 
-const nominatimUrl = 'http://localhost:5173/nominatim';
+//const nominatimUrl = 'http://localhost:5173/nominatim';
+const nominatimUrl = 'https://nominatim.openstreetmap.org';
 
 // countries in which nominatim searches
 const countryCodesArray = ['fr', 'be'];
