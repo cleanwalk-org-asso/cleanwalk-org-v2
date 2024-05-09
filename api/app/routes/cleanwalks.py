@@ -2,7 +2,7 @@ import datetime
 from flask import Blueprint, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import jwt_required
-from sqlalchemy import func, text
+from sqlalchemy import func, text, and_
 from app.models import City, CleanwalkUser, User, db, Cleanwalk
 from app.utils import validate_api_key
 
@@ -26,7 +26,7 @@ def check_api_key():
 
 # Route for get Cleanwalk by id
 @cleanwalks_bp.route('/<int:cleanwalk_id>', methods=['GET'])
-def get_cleanwalk_by_id(cleanwalk_id):
+def get_cleanwalk_by_id(cleanwalk_id, user_id=None):
     cleanwalk = db.session.query(
         Cleanwalk.id.label('cleanwalk_id'),
         Cleanwalk.name.label('cleanwalk_name'),
@@ -48,9 +48,22 @@ def get_cleanwalk_by_id(cleanwalk_id):
     ).filter(
         Cleanwalk.id == cleanwalk_id,
         CleanwalkUser.is_host == True
-    ).one_or_none()  # Retrieves one or none object, which helps in case there are no records found or just one.
+    ).one_or_none()
 
     if cleanwalk:
+        # Get the number of participants
+        participant_count = db.session.query(CleanwalkUser).filter(
+            CleanwalkUser.cleanwalk_id == cleanwalk_id
+        ).count()
+
+        # Check if the user is already a participant
+        is_user_participant = False
+        if user_id:
+            user_participation = db.session.query(CleanwalkUser).filter(
+                and_(CleanwalkUser.cleanwalk_id == cleanwalk_id, CleanwalkUser.user_id == user_id)
+            ).first()
+            is_user_participant = user_participation is not None
+
         cleanwalk_data = {
             'id': cleanwalk.cleanwalk_id,
             'name': cleanwalk.cleanwalk_name,
@@ -61,17 +74,18 @@ def get_cleanwalk_by_id(cleanwalk_id):
             'description': cleanwalk.description,
             'address': cleanwalk.address,
             'host': {
-                'author_id': cleanwalk.author_id,  # This key is missing in the original code snippet, so I added it to match the expected JSON output
+                'author_id': cleanwalk.author_id,
                 'firstname': cleanwalk.firstname,
                 'lastname': cleanwalk.lastname,
                 'role_id': cleanwalk.role_id,
                 'profile_picture': cleanwalk.profile_picture
-            }
+            },
+            'participant_count': participant_count,
+            'is_user_participant': is_user_participant
         }
         return jsonify(cleanwalk_data)
     else:
         return jsonify({'message': 'Cleanwalk not found'}), 404
-
     
 # Route for get all Cleanwalks
 
