@@ -13,13 +13,13 @@ import { useRoute } from 'vue-router';
 import router from '@/router';
 import dateHelper from '@/helpers/dateHelper';
 import { useAccountStore } from '@/stores/AccountStore';
+import LeaveCwPopup from './LeaveCwPopup.vue';
 
 const cleanwalkStore = useCleanwalkStore();
 const currenUserId = ref(useAccountStore().CurrentUser?.id);
 const token = ref(useAccountStore().getAccessToken());
 
 let currentCleanwalk:Ref<SingleCleanwalk | undefined >= ref(undefined);
-
 
 onMounted (async() => {
   const id = +useRoute().params.id; // + to convert string to number
@@ -40,6 +40,12 @@ onMounted (async() => {
     router.push('/404');
   }
 })
+
+const showLeaveCwPopup = ref(false);
+
+const toogleLeaveCwPopup = () => {
+  showLeaveCwPopup.value = !showLeaveCwPopup.value;
+}
 
 let popupBool = ref(false);
 let counterParticipate = ref(1);
@@ -86,6 +92,7 @@ const leaveCleanwalk = () => {
   }
   cleanwalkStore.leaveCleanwalk(currentCleanwalk.value.id, token.value, currenUserId.value);
   currentCleanwalk.value.is_user_participant = false;
+  toogleLeaveCwPopup();
 }
 
 const joinCleanwalk = () => {
@@ -112,7 +119,7 @@ const actionButton = () => {
   }
   if (currentCleanwalk.value.is_user_participant === true) {
     // leave cleanwalk
-    leaveCleanwalk();
+    toogleLeaveCwPopup();
     return;
   }
   if(currentCleanwalk.value.is_user_participant === false) {
@@ -148,7 +155,7 @@ const getActionButtonText = ():string => {
       <iconInfo />
     </button>
   </div>
-
+  <LeaveCwPopup :isVisible="showLeaveCwPopup" :tooglePopup="toogleLeaveCwPopup" :leaveCw="leaveCleanwalk"/>
   <div class="popup" v-if="popupBool">
     <div class="popup-validation">
       <div class="cross-container">
@@ -194,6 +201,9 @@ const getActionButtonText = ():string => {
           <iconMiniMap />
           <div>{{ currentCleanwalk?.address }}</div>
         </div>
+      </div>
+      <div v-if="currentCleanwalk?.host.author_id === currenUserId">
+        {{ currentCleanwalk?.participant_count }} participant(s)
       </div>
       <div class="orga">
         <div class="left">
