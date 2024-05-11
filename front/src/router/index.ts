@@ -77,6 +77,8 @@ const router = createRouter({
   
 })
 
+const routesRequiringAuth = ['profile', 'anotherProtectedRoute'];
+
 router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
   const isMobile = window.innerWidth <= 768;
   if(!useAccountStore().isLoggedIn) {
@@ -84,7 +86,7 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
   }
  console.log('isLogedIn', useAccountStore().isLoggedIn);
 
-  if (to.name !== 'login' && to.name !== 'signup' && !useAccountStore().isLoggedIn && isMobile) {
+  if (routesRequiringAuth.includes(to.name as string) && !useAccountStore().isLoggedIn && isMobile) {
     next({ name: 'login' }); // Redirige vers la page de login
   } else {
     next(); // Continue vers la route demandée

@@ -1,25 +1,19 @@
 <script setup lang="ts">
-import iconLeftArrow from './icons/icon-left-arrow.vue';
-import iconInfo from './icons/icon-info.vue';
 import { ref, type Ref } from 'vue';
-import type { Cleanwalk, CleanwalkCreation } from '@/interfaces/cleanwalkInterface';
+import type {CleanwalkCreation } from '@/interfaces/cleanwalkInterface';
 import router from '@/router';
-import { differenceInHours, set, parse, differenceInMinutes } from 'date-fns';
+import {set, parse, differenceInMinutes } from 'date-fns';
 import Toast from './Toast.vue'
 import nominatimHelper from '@/helpers/nominatimHelper';
 import type { Coordinate } from '@/interfaces/coordinateInterface';
-import iconPhoto from './icons/icon-photo.vue';
 import iconMiniMap from './icons/icon-mini-map.vue';
 import iconClock from './icons/icon-clock.vue';
 import dateHelper from '@/helpers/dateHelper';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import dragDrop from './dragDrop.vue';
-import type { ApiResponse } from '@/interfaces/apiResponseInterface';
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
 import { useAccountStore } from '@/stores/AccountStore';
 import { format } from 'date-fns';
-import { tr } from 'date-fns/locale';
-
 
 const showToast = useUtilsStore().showToast;
 const createCleanwalk = useCleanwalkStore().createCleanwalk;

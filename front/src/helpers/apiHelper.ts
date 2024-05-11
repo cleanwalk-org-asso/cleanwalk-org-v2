@@ -81,9 +81,10 @@ const kyPut = async (route: string, data:Record<string, unknown>, access_token:s
     }
 };
 
-const kyDelete = async (route: string, access_token: string):Promise<ApiResponse> => {
+const kyDelete = async (route: string, data:Record<string, unknown>, access_token: string):Promise<ApiResponse> => {
     try {
         const response:Record<string, unknown> = await ky.delete(apiUrl + route, {
+            json: data,
             headers: {
                 'X-API-Key': import.meta.env.VITE_API_KEY,
                 'Authorization': 'Bearer ' + access_token,

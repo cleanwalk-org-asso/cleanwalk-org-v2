@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Cleanwalk } from '@/interfaces/cleanwalkInterface'
+import type { Cleanwalk, SingleCleanwalk } from '@/interfaces/cleanwalkInterface'
 import iconClock from './icons/icon-clock.vue';
 import iconMiniMap from './icons/icon-mini-map.vue';
 import iconLeftArrow from './icons/icon-left-arrow.vue';
@@ -12,10 +12,14 @@ import { onMounted, ref, type Ref } from 'vue';
 import { useRoute } from 'vue-router';
 import router from '@/router';
 import dateHelper from '@/helpers/dateHelper';
+import { useAccountStore } from '@/stores/AccountStore';
 
 const cleanwalkStore = useCleanwalkStore();
+const currenUserId = ref(useAccountStore().CurrentUser?.id);
+const token = ref(useAccountStore().getAccessToken());
 
-let currentCleanwalk:Ref<Cleanwalk | undefined >= ref(undefined);
+let currentCleanwalk:Ref<SingleCleanwalk | undefined >= ref(undefined);
+
 
 onMounted (async() => {
   const id = +useRoute().params.id; // + to convert string to number
@@ -27,8 +31,11 @@ onMounted (async() => {
     router.push('/404');
     return;
   }
-  currentCleanwalk.value = await cleanwalkStore.getCleanwalkById(id);
-  console.log(currentCleanwalk.value);
+
+  console.log("userId:", useAccountStore().CurrentUser?.id)
+  
+  currentCleanwalk.value = await cleanwalkStore.getCleanwalkById(id, useAccountStore().CurrentUser?.id);
+  console.log("cw data",currentCleanwalk.value);
   if (!currentCleanwalk.value) {
     router.push('/404');
   }
@@ -70,6 +77,65 @@ const getDate = () => {
   }
 }
 
+
+const leaveCleanwalk = () => {
+  console.log("leave cleanwalk");
+  if (!currentCleanwalk.value || !currenUserId.value || !token.value) {
+    router.push('/login');
+    return;
+  }
+  cleanwalkStore.leaveCleanwalk(currentCleanwalk.value.id, token.value, currenUserId.value);
+  currentCleanwalk.value.is_user_participant = false;
+}
+
+const joinCleanwalk = () => {
+  
+  console.log("join cleanwalk");
+  if (!currentCleanwalk.value || !currenUserId.value || !token.value) {
+    router.push('/login');
+    return;
+  }
+  cleanwalkStore.joinCleanwalk(currentCleanwalk.value?.id, token.value, counterParticipate.value, currenUserId.value);
+  currentCleanwalk.value.is_user_participant = true;
+  tooglePopup();
+}
+
+const actionButton = () => {
+  if(!currentCleanwalk.value || !currenUserId.value || !token.value) {
+    router.push('/login');
+    return;
+  }
+  if(currentCleanwalk.value.host.author_id === currenUserId.value) {
+    // edit cleanwalk
+    console.log("edit cleanwalk");
+    return;
+  }
+  if (currentCleanwalk.value.is_user_participant === true) {
+    // leave cleanwalk
+    leaveCleanwalk();
+    return;
+  }
+  if(currentCleanwalk.value.is_user_participant === false) {
+    // join cleanwalk
+    participate();
+    return;
+  }
+
+}
+
+const getActionButtonText = ():string => {
+    if (currentCleanwalk.value?.host.author_id === currenUserId.value) {
+      return "Editer la cleanwalk";
+    }
+    if (currentCleanwalk.value?.is_user_participant === true) {
+      return "Se désinscrire";
+    }
+    if (currentCleanwalk.value?.is_user_participant === false) {
+      return "Je participe";
+    }
+    return "";
+  }
+
 </script>
 
 <template>
@@ -107,7 +173,7 @@ const getDate = () => {
       </div>
       <div class="button-container">
         <button @click="cancel()" class="cancel">Annuler</button>
-        <button class="button-primary">Valider</button>
+        <button @click="joinCleanwalk()" class="button-primary">Valider</button>
       </div>
     </div>
 
@@ -138,8 +204,8 @@ const getDate = () => {
           <img :src="currentCleanwalk?.host?.profile_picture" alt="profile-picture">
         </div>
       </div>
-      <button class="button-primary" @click="participate()">
-        Je participe
+      <button class="button-primary" @click="actionButton()">
+        {{ getActionButtonText() }}
       </button>
       <p>
         {{ currentCleanwalk?.description }}
@@ -368,6 +434,8 @@ main {
     .anonyme {
       display: flex;
       padding-top: 20px;
+      visibility: hidden; //provisoire
+      padding: 0;
 
       input[type="checkbox"] {
         // styles for checkbox

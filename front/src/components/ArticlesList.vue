@@ -64,7 +64,7 @@ const articles: Article[] = [
 
 <template>
     <div class="container">
-        <div v-for="article in articles" class="card">
+        <div v-for="article in articles" :key="article.id" class="card">
             <img :src="article.imageUrl" alt="image de l'article" />
             <div class="right">
               <h2>{{ article.title }}</h2>

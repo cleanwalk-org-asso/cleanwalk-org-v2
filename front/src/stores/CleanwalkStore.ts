@@ -1,6 +1,6 @@
 import NominatimHelper from '@/helpers/nominatimHelper';
 import apiHelper from '@/helpers/apiHelper';
-import type { Cleanwalk, CleanwalkCreation } from '@/interfaces/cleanwalkInterface';
+import type { Cleanwalk, CleanwalkCreation, SingleCleanwalk } from '@/interfaces/cleanwalkInterface';
 import router from '@/router';
 import { defineStore } from 'pinia'
 import {ref, computed} from 'vue';
@@ -37,11 +37,15 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
         return cleanwalksTab.value;
     }
 
-    async function getCleanwalkById(id: number): Promise<Cleanwalk|undefined> {
-        const result = await apiHelper.kyGet(route + '/' + id);
+    async function getCleanwalkById(id: number, userId?:number): Promise<SingleCleanwalk|undefined> {
+        let url = route + '/' + id;
+        if(userId) {
+            url += '?user_id=' + userId;
+        }
+        const result = await apiHelper.kyGet(url);
         console.log(result);
         if(result.success && result.data) {
-            return result.data as unknown as Cleanwalk;
+            return result.data as unknown as SingleCleanwalk;
         }
         return undefined;
     }
@@ -68,6 +72,29 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
         return undefined;
     }
 
-    return {getAllCleanwalks, cleanwalksTab, getCleanwalkById, createCleanwalk}
+    async function joinCleanwalk(cleanwalkId: number, token:string, nb_participants:number, user_id:number): Promise<boolean> {
+        const result = await apiHelper.kyPost(route + '/join', {
+            cleanwalk_id: cleanwalkId,
+            user_id: user_id,
+            nb_person: nb_participants
+        }, token);
+        if(result != undefined) {
+            return result.success;
+        }
+        return false;
+    }
+
+    async function leaveCleanwalk(cleanwalkId: number, token:string, user_id:number): Promise<boolean> {
+        const result = await apiHelper.kyDelete(route + '/leave', {
+            cleanwalk_id: cleanwalkId,
+            user_id: user_id
+        }, token);
+        if(result != undefined) {
+            return result.success;
+        }
+        return false;
+    }
+
+    return {getAllCleanwalks, cleanwalksTab, getCleanwalkById, createCleanwalk, joinCleanwalk, leaveCleanwalk}
    
 });

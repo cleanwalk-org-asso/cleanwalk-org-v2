@@ -26,7 +26,9 @@ def check_api_key():
 
 # Route for get Cleanwalk by id
 @cleanwalks_bp.route('/<int:cleanwalk_id>', methods=['GET'])
-def get_cleanwalk_by_id(cleanwalk_id, user_id=None):
+def get_cleanwalk_by_id(cleanwalk_id):
+    user_id = request.args.get('user_id', None)
+    print("user id", user_id )
     cleanwalk = db.session.query(
         Cleanwalk.id.label('cleanwalk_id'),
         Cleanwalk.name.label('cleanwalk_name'),
@@ -181,6 +183,28 @@ def create_cleanwalk():
         db.session.rollback()  # Roll back in case of error
         return jsonify({'error': str(e)}), 500
 
+
+#route for participate in a cleanwalk
+@cleanwalks_bp.route('/join', methods=['POST'])
+@jwt_required()
+def participate_cleanwalk():
+    try:
+        data = request.json
+        print("my datattatta",data)
+
+        new_cleanwalk_user = CleanwalkUser(
+            cleanwalk_id=data['cleanwalk_id'],
+            user_id=data['user_id'],
+            nb_person=data['nb_person'],
+            is_host=False
+        )
+        db.session.add(new_cleanwalk_user)
+        db.session.commit()
+
+        return jsonify({'message': 'User added to the cleanwalk successfully'}), 201
+
+    except Exception as e:
+        db.session.rollback()
 #------------------------------------PUT------------------------------------#
 
 # Route for update a Cleanwalk by its ID
@@ -216,4 +240,28 @@ def delete_cleanwalk(cleanwalk_id):
         return jsonify({'message': 'Cleanwalk deleted successfully'}), 200
     else:
         return jsonify({'message': 'Cleanwalk not found'}), 404
+    
+# Route for leave a Cleanwalk
+@cleanwalks_bp.route('/leave', methods=['DELETE'])
+@jwt_required()
+def leave_cleanwalk():
+    try:
+        data = request.json
+        print("my datattatta",data)
+        cleanwalk_user = CleanwalkUser.query.filter_by(
+            cleanwalk_id=data['cleanwalk_id'],
+            user_id=data['user_id']
+        ).first()
+
+        if cleanwalk_user:
+            db.session.delete(cleanwalk_user)
+            db.session.commit()
+            return jsonify({'message': 'User removed from the cleanwalk successfully'}), 200
+        else:
+            return jsonify({'message': 'User not found in the cleanwalk'}), 404
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
 

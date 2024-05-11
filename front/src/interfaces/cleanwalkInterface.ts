@@ -30,3 +30,29 @@ export interface CleanwalkCreation {
     user_id: number,
     city: string,
 }
+
+export interface SingleCleanwalk {
+    id: number;
+    name: string;
+    pos_lat: number;
+    pos_long: number;
+    date_begin: string;
+    duration: number;
+    description: string;
+    address: string;
+    host: {
+        author_id: number;
+        firstname: string;
+        lastname: string;
+        role_id: number;
+        profile_picture: string;
+    };
+    participant_count: number;
+    is_user_participant: boolean;
+}
+
+export interface SubscibeToCleanwalk {
+    cleanwalk_id: number;
+    user_id: number;
+    nb_participants: number;
+}

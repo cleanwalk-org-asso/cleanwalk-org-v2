@@ -15,13 +15,23 @@ const currentUser = accountStore.CurrentUser!;
 
 <template>
     <section class="container">
-        <router-link to="/profile" class="profil">
+        <router-link v-if="currentUser" to="/profile" class="profil">
             <img class="img" src="https://cdn2.thecatapi.com/images/tv8tNeYaU.jpg" alt="">
-            <h3>{{ currentUser.firstname }} {{ currentUser.lastname }}</h3>
+            <h3 >{{ currentUser.firstname }} {{ currentUser.lastname }}</h3>
             <iconRightArrow />
         </router-link>
+        <div v-if="!currentUser" class="unlog-profiles">
+            <router-link to="/login" class="profil unlog">
+                <h3 >Se connecter</h3>
+                <iconRightArrow />
+            </router-link>
+            <router-link to="/signup" class="profil unlog">
+                <h3 >S'inscrire</h3>
+                <iconRightArrow />
+            </router-link>
+        </div>
         <ul class="list">
-            <li>
+            <li v-if="currentUser">
                 <iconCalendar />
                 <h3>Mes évènements</h3>
                 <iconRightArrow />
@@ -48,7 +58,7 @@ const currentUser = accountStore.CurrentUser!;
             </li>
         </ul>
 
-        <button @click="accountStore.logout()" class="logout">
+        <button v-if="currentUser" @click="accountStore.logout()" class="logout">
             <iconLogout />
             <h3>Se Déconnecter</h3>
             <iconRightArrow class="arrow"/>
@@ -70,6 +80,13 @@ const currentUser = accountStore.CurrentUser!;
     justify-content: space-between;
     height: 100vh;
 
+    .unlog-profiles {
+        width: 100%;
+        gap: 1rem;
+        display: flex;
+        flex-direction: column;
+    }
+
 
     .profil {
         stroke: #94A3B8;
@@ -79,6 +96,13 @@ const currentUser = accountStore.CurrentUser!;
         align-items: center;
         padding: 1rem;
         border-radius: 8px;
+
+        &.unlog {
+            color: var(--color-primary);
+            ;
+        }
+
+
 
         .img {
             width: 44px;
