@@ -6,7 +6,7 @@ export interface Cleanwalk {
     duration: number,
     pos_lat: number,
     pos_long: number,
-    address?: string,
+    address: string,
     img_url?: string,
     city?: string,
     host? : {

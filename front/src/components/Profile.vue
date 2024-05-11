@@ -2,16 +2,30 @@
 import { defineProps, ref, onMounted } from 'vue';
 import VueFilePond from 'vue-filepond';
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
-const FilePond = VueFilePond();
 const backgroundImageUrl = ref('https://cdn2.thecatapi.com/images/1nk.jpg');
 import iconPhoto from '@/components/icons/icon-photo.vue';
+import { useAccountStore } from '@/stores/AccountStore';
+import router from '@/router';
+import iconShuffleArrow from './icons/icon-shuffle-arrow.vue';
+import { v4 as uuidv4 } from 'uuid';
+import { useUtilsStore } from '@/stores/UtilsStore';
+import { profile } from 'console';
 
+const getToken = useAccountStore().getAccessToken;
+
+const showToast = useUtilsStore().showToast;
 const currentMdp = ref('');
 const newMdp = ref('');
 const confirmNewMdp = ref('');
 
+
+const currentUser = ref(useAccountStore().CurrentUser);
+
+let debounceTimeout: string | number | NodeJS.Timeout | null | undefined = null;
+
+
+
 const changePassword = () => {
-    console.log('change password', currentMdp.value, newMdp.value, confirmNewMdp.value);
     currentMdp.value = '';
     newMdp.value = '';
     confirmNewMdp.value = '';
@@ -21,22 +35,52 @@ const changePassword = () => {
 
 onMounted(() => {
     console.log('mounted');
+    if (!currentUser.value) {
+        router.push('/login');
+        return;
+    }
 });
+
+const changeUserPP = () => {
+    currentUser.value!.profile_picture = 'https://api.dicebear.com/8.x/fun-emoji/svg?seed=' + uuidv4();
+
+    // Clear the previous timeout if it exists
+    if (debounceTimeout) {
+        clearTimeout(debounceTimeout);
+    }
+
+    // Set a new timeout
+    debounceTimeout = setTimeout(() => {
+        useAccountStore().modifyUser(currentUser.value!.id!, getToken()!, undefined, undefined, currentUser.value!.profile_picture);
+        showToast('Votre photo de profil a été modifiée', true);
+        useAccountStore().CurrentUser!.profile_picture = currentUser.value!.profile_picture;
+        debounceTimeout = null; // Reset the timeout variable
+    }, 2000);
+}
 
 </script>
 <template>
     <section class="container">
-        <img class="cover-img" src="https://cdn2.thecatapi.com/images/66l.jpg" alt="cover-img">
-        <div class="icon-photo cover">
-            <iconPhoto />
+        <div v-if="currentUser?.role === 'organisation'" class="asso-imgs">
+            <img class="cover-img" src="https://cdn2.thecatapi.com/images/66l.jpg" alt="cover-img">
+            <div class="icon-photo cover">
+                <iconPhoto />
+            </div>
+            <img class="pp" src="https://cdn2.thecatapi.com/images/uk0SrrBbQ.jpg" alt="pp">
+            <div class="icon-photo pp-icon">
+                <iconPhoto />
+            </div>
         </div>
-        <img class="pp" src="https://cdn2.thecatapi.com/images/uk0SrrBbQ.jpg" alt="pp">
-        <div class="icon-photo pp-icon">
-            <iconPhoto />
+        <div class="img-user" v-if="currentUser?.role !== 'organisation'">
+            <img class="pp" :src="currentUser?.profile_picture" alt="cover-img">
+            <div @click="changeUserPP()" class="icon-shuffle-arrow">
+                <iconShuffleArrow />
+            </div>
+
         </div>
         <div class="content">
             <h1>
-                Qui netoie si ce n'est toi ?
+                {{ currentUser?.firstname }} {{ currentUser?.lastname }}
             </h1>
             <form @submit.prevent="changePassword()">
                 <label class="label" for="mdp">Mot de passe actuel</label>
@@ -58,6 +102,45 @@ onMounted(() => {
     flex-direction: column;
     align-items: center;
     overflow: hidden;
+
+    .asso-imgs {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .img-user {
+        margin-top: 9rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        .icon-shuffle-arrow {
+            width: 26px;
+            height: 26px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            padding-right: 1px;
+            padding-bottom: 1px;
+            margin-top: -25px;
+            z-index: 999;
+            margin-right: -60px;
+            stroke: #fff;
+            background-color: var(--color-primary);
+            transition: transform 0.3s ease-in-out;
+
+            &:active {
+                transform: rotate(-180deg);
+                transition: transform 0.2s ease-in-out;
+            }
+        }
+    }
+  
 
     .icon-photo {
         background-color: var(--color-primary);

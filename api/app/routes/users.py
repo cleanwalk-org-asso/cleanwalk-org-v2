@@ -178,6 +178,7 @@ def create_user():
 # route for updating user by id
 
 @users_bp.route('/<string:user_id>', methods=['PUT'])
+@jwt_required()
 def update_user(user_id):
     user = User.query.get(user_id)
 
@@ -187,13 +188,7 @@ def update_user(user_id):
         # Update user data from the request JSON
         user.firstname = data.get('firstname', user.firstname)
         user.lastname = data.get('lastname', user.lastname)
-        user.email = data.get('email', user.email)
-
-        # Check if a new photo is provided
-        if 'photo' in request.files:
-            filename = upload_img(request.files['photo'])
-            user.profile_picture = filename
-
+        user.profile_picture = data.get('profile_picture', user.profile_picture)
         db.session.commit()
         return jsonify({'message': 'User updated successfully'})
     else:

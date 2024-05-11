@@ -2,7 +2,7 @@
 import "leaflet/dist/leaflet.css";
 import { LMap, LTileLayer, LMarker, LIcon } from "@vue-leaflet/vue-leaflet";
 import L, { LatLng, LatLngBounds, Map, type PointExpression } from "leaflet";
-import { ref, type Ref, onMounted, nextTick } from "vue";
+import { ref, type Ref, onMounted, nextTick, computed } from "vue";
 import iconLeftArrow from "@/components/icons/icon-left-arrow.vue";
 import iconSearch from "@/components/icons/icon-search.vue";
 import iconInfo from "./icons/icon-info.vue";
@@ -26,6 +26,16 @@ let selectedCleanwalk:Ref<Cleanwalk | null> = ref(null);
 
 
 const searchInput = ref("");
+
+const filteredCleanwalks = computed(() => {
+  if (!searchInput.value) {
+    return cleanwalkStore.cleanwalksTab;
+  }
+  return cleanwalkStore.cleanwalksTab.filter(cleanwalk =>
+    cleanwalk.name.toLowerCase().includes(searchInput.value.toLowerCase())||
+    cleanwalk.address.toLowerCase().includes(searchInput.value.toLowerCase())
+  );
+});
 
 const backButton = () => {
     cardListBool.value = false
@@ -203,7 +213,7 @@ function mapClick() {
         </div>
         <div class="cleanwalk-list" :class="{ 'active': cardListBool === false }">
             <div class="container" ref="cleanwalkListContainer">
-                <router-link v-for="cleanwalk in cleanwalkStore.cleanwalksTab" :to="{name: 'cleanwalk', params:{id: cleanwalk.id}}"  :key="cleanwalk.id" class="cleanwalk">
+                <router-link v-for="cleanwalk in filteredCleanwalks" :to="{name: 'cleanwalk', params:{id: cleanwalk.id}}"  :key="cleanwalk.id" class="cleanwalk">
                     <div class="title">{{ cleanwalk.name }}</div>
                     <div class="flex">
                         <icon-clock />

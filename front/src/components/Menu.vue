@@ -7,16 +7,25 @@ import iconFile from '@/components/icons/icon-file.vue';
 import iconPaperPlane from '@/components/icons/icon-paper-plane.vue';
 import iconLogout from '@/components/icons/icon-logout.vue';
 import { useAccountStore } from '@/stores/AccountStore';
+import { ref } from 'vue';
+import LogoutPopup from './LogoutPopup.vue';
 const accountStore = useAccountStore();
+
+const isPopupVisible = ref(false);
+
+const togglePopup = () => {
+    isPopupVisible.value = !isPopupVisible.value;
+};
 
 const currentUser = accountStore.CurrentUser!;
 
 </script>
 
 <template>
+    <LogoutPopup :is-visible="isPopupVisible" :toggle-popup="togglePopup" />
     <section class="container">
         <router-link v-if="currentUser" to="/profile" class="profil">
-            <img class="img" src="https://cdn2.thecatapi.com/images/tv8tNeYaU.jpg" alt="">
+            <img class="img" :src="currentUser.profile_picture" alt="">
             <h3 >{{ currentUser.firstname }} {{ currentUser.lastname }}</h3>
             <iconRightArrow />
         </router-link>
@@ -58,7 +67,7 @@ const currentUser = accountStore.CurrentUser!;
             </li>
         </ul>
 
-        <button v-if="currentUser" @click="accountStore.logout()" class="logout">
+        <button v-if="currentUser" @click="togglePopup()" class="logout">
             <iconLogout />
             <h3>Se Déconnecter</h3>
             <iconRightArrow class="arrow"/>

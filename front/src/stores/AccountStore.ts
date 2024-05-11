@@ -48,7 +48,8 @@ export const useAccountStore = defineStore('account', () => {
                     firstname: response.data.firstname as string,
                     lastname: response.data.lastname as string,
                     id: response.data.id as number,
-                    role: response.data.role as string,
+                    role: response.data.role as 'organisation' | 'user',
+                    profile_picture: response.data.profile_picture as string,
                 }
                 CurrentUser.value = user;
                 console.log('CurrentUser', CurrentUser.value);
@@ -66,5 +67,13 @@ export const useAccountStore = defineStore('account', () => {
         return $cookies!.get(tokenCookieName);
     }
 
-    return { setToken, printUser, logout, isLoggedIn, tokenLogin, CurrentUser, getAccessToken}
+    const modifyUser = (userId: number, token: string, firstname?: string, lastname?: string, profile_picture?: string) => {
+        apiHelper.kyPut('/users/' + userId, {
+            firstname: firstname,
+            lastname: lastname,
+            profile_picture: profile_picture,
+        }, token);
+    }
+
+    return { setToken, printUser, logout, isLoggedIn, tokenLogin, CurrentUser, getAccessToken, modifyUser}
 })

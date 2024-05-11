@@ -4,5 +4,6 @@ export interface User {
     lastname: string,
     email: string,
     password?: string,
-    role: string,
+    profile_picture: string,
+    role: 'organisation' | 'user',
 }

@@ -217,7 +217,7 @@ const getActionButtonText = ():string => {
       <button class="button-primary" @click="actionButton()">
         {{ getActionButtonText() }}
       </button>
-      <p>
+      <p class="description">
         {{ currentCleanwalk?.description }}
       </p>
     </div>
@@ -284,6 +284,13 @@ main {
 .container {
   padding: 0 26px;
   font-size: 12px;
+
+  .description {
+    width: 100%;
+    //le texte ne dois pas depasser et sauter une ligne si besoins
+    overflow: hidden;
+    word-wrap: break-word;
+  }
 
   h1 {
     color: var(--text-color-primary);
