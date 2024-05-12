@@ -11,8 +11,7 @@ export interface Cleanwalk {
     city?: string,
     host? : {
         id?: number,
-        firstname: string,
-        lastname: string,
+        name: string,
         profile_picture: string,
         role_id: number,
     }
@@ -42,8 +41,7 @@ export interface SingleCleanwalk {
     address: string;
     host: {
         author_id: number;
-        firstname: string;
-        lastname: string;
+        name: string;
         role_id: number;
         profile_picture: string;
     };

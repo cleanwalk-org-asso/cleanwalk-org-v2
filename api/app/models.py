@@ -5,14 +5,21 @@ db = SQLAlchemy()
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    firstname = db.Column(db.String(255), nullable=False)
-    lastname = db.Column(db.String(255), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255), unique=True, index=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     salt = db.Column(db.BINARY(16), nullable=True)
     created_at = db.Column(db.TIMESTAMP, nullable=False)
     profile_picture = db.Column(db.String(255), nullable=True)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
+
+class Organisation(db.Model):
+    __tablename__ = 'organisations'
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    description = db.Column(db.String(255), nullable=True)
+    web_site = db.Column(db.String(255), nullable=True)
+    social_media = db.Column(db.JSON, nullable=True)
+    banner_img = db.Column(db.String(255), nullable=True)
 
 class Cleanwalk(db.Model):
     __tablename__ = 'cleanwalks'

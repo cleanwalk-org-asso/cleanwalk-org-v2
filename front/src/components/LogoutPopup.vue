@@ -16,8 +16,8 @@ defineProps({
     <div v-if="isVisible" class="popup">
         <div class="popup-content">
             <div class="cross"><iconCross @click="togglePopup!" /></div>
-            <h2>Se désinscrire</h2>
-            <p>Etes vous certain de vouloir vous désinscrire de la clenawalk</p>
+            <h2>Se déconnecter</h2>
+            <p>Etes vous certain de vouloir vous déconnecter ?</p>
             <div class="btn-container">
                 <button @click="togglePopup!" class="cancel-button">annuler</button>
                 <button @click="lougout()" class="danger-button">confirmer</button>

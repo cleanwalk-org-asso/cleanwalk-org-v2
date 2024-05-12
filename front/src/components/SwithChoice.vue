@@ -2,6 +2,8 @@
 const props = defineProps({
     categorie1: String,
     categorie2: String,
+    route1: String,
+    route2: String,
     activeCategory: Boolean,
 });
 
@@ -13,10 +15,10 @@ const scrollToTop = () => {
 
 <template>
     <div class="container">
-        <router-link class="router-link" @click="scrollToTop" :to="'/' + categorie1" :class="{ active: activeCategory === true }">
+        <router-link class="router-link" @click="scrollToTop" :to="'/' + route1" :class="{ active: activeCategory === true }">
             {{ categorie1 }}
         </router-link>
-        <router-link class="router-link" @click="scrollToTop" :to="'/' + categorie2" :class="{ active: activeCategory === false }">
+        <router-link class="router-link" @click="scrollToTop" :to="'/' + route2" :class="{ active: activeCategory === false }">
             {{ categorie2 }}
         </router-link>
     </div>

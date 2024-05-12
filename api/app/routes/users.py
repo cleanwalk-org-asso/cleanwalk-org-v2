@@ -3,7 +3,7 @@
 import datetime
 from flask import Blueprint, jsonify, request
 from flask_cors import CORS
-from app.models import db, User, Role
+from app.models import db, User, Role, Organisation
 from app.utils import validate_api_key, hash_password, upload_img
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, get_jwt
 from sqlalchemy.exc import IntegrityError
@@ -35,8 +35,7 @@ def get_user(user_id):
     if user:
         user_data = {
             'id': user.User.id,
-            'firstname': user.User.firstname,
-            'lastname': user.User.lastname,
+            'name': user.User.name,
             'email': user.User.email,
             'created_at': user.User.created_at,
             'profile_picture': user.User.profile_picture,
@@ -55,8 +54,7 @@ def get_all_users():
         for user in users:
             user_data.append({
                 'id': user.User.id,
-                'firstname': user.User.firstname,
-                'lastname': user.User.lastname,
+                'name': user.User.name,
                 'email': user.User.email,
                 'created_at': user.User.created_at,
                 'profile_picture': user.User.profile_picture,
@@ -94,8 +92,7 @@ def login():
             return jsonify({
                 'message': 'Successful connection', 
                 'id': res.User.id, 'email': email, 
-                'firstname': res.User.firstname,
-                'lastname': res.User.lastname,
+                'name': res.User.name,
                 'profile_picture': res.User.profile_picture, 
                 'access_token': access_token,
                 'role': res.Role.role
@@ -119,8 +116,7 @@ def tokenLogin():
             'message': 'Successful connection', 
             'id': res.User.id, 
             'email': res.User.email, 
-            'firstname': res.User.firstname,
-            'lastname': res.User.lastname, 
+            'name': res.User.name,
             'profile_picture': res.User.profile_picture, 
             "role":claims["role"]
         }), 200
@@ -135,13 +131,12 @@ def create_user():
     if not data:
         return jsonify({'message': 'Request body is empty or not a valid JSON'}), 400
 
-    required_keys = ['firstname', 'lastname', 'email', 'password', 'role_id']
+    required_keys = ['name', 'email', 'password', 'role_id']
     if not all(key in data for key in required_keys):
         return jsonify({'message': 'Request body is incomplete'}), 400
 
     # Extract user data from the request JSON
-    firstname = data.get('firstname')
-    lastname = data.get('lastname')
+    name = data.get('name')
     email = data.get('email')
     profile_picture = data.get('profile_picture')
     salt = os.urandom(16)
@@ -152,8 +147,7 @@ def create_user():
     try:
         # Essayez de créer le nouvel utilisateur
         new_user = User(
-            firstname=firstname,
-            lastname=lastname,
+            name=name,
             email=email,
             profile_picture=profile_picture,
             password=password,
@@ -163,6 +157,11 @@ def create_user():
         )
         db.session.add(new_user)
         db.session.commit()
+
+        if role_id == 2: # If the user is an organisation create association table
+            new_association = Organisation(user_id=new_user.id)
+            db.session.add(new_association)
+            db.session.commit()
 
         return jsonify({'message': 'User created successfully', 'user_id': new_user.id}), 201
 
@@ -186,8 +185,7 @@ def update_user(user_id):
         data = request.get_json()
 
         # Update user data from the request JSON
-        user.firstname = data.get('firstname', user.firstname)
-        user.lastname = data.get('lastname', user.lastname)
+        user.name = data.get('name', user.name)
         user.profile_picture = data.get('profile_picture', user.profile_picture)
         db.session.commit()
         return jsonify({'message': 'User updated successfully'})

@@ -26,7 +26,7 @@ const currentUser = accountStore.CurrentUser!;
     <section class="container">
         <router-link v-if="currentUser" to="/menu/profile" class="profil">
             <img class="img" :src="currentUser.profile_picture" alt="">
-            <h3 >{{ currentUser.firstname }} {{ currentUser.lastname }}</h3>
+            <h3 >{{ currentUser.name }}</h3>
             <iconRightArrow />
         </router-link>
         <div v-if="!currentUser" class="unlog-profiles">

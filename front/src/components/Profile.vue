@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { defineProps, ref, onMounted } from 'vue';
-import VueFilePond from 'vue-filepond';
-import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 const backgroundImageUrl = ref('https://cdn2.thecatapi.com/images/1nk.jpg');
 import iconPhoto from '@/components/icons/icon-photo.vue';
 import { useAccountStore } from '@/stores/AccountStore';
@@ -9,7 +7,6 @@ import router from '@/router';
 import iconShuffleArrow from './icons/icon-shuffle-arrow.vue';
 import { v4 as uuidv4 } from 'uuid';
 import { useUtilsStore } from '@/stores/UtilsStore';
-import { profile } from 'console';
 
 const getToken = useAccountStore().getAccessToken;
 
@@ -80,7 +77,7 @@ const changeUserPP = () => {
         </div>
         <div class="content">
             <h1>
-                {{ currentUser?.firstname }} {{ currentUser?.lastname }}
+                {{ currentUser?.name }}
             </h1>
             <form @submit.prevent="changePassword()">
                 <label class="label" for="mdp">Mot de passe actuel</label>

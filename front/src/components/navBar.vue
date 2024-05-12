@@ -3,7 +3,7 @@ import iconAdd from '@/components/icons/icon-add.vue';
 import iconDiscover from '@/components/icons/icon-discover.vue';
 import iconMap from '@/components/icons/icon-map.vue';
 import iconBurger from '@/components/icons/icon-burger.vue';
-import { useAccountStore } from '@/stores/AccountStore';
+// import { useAccountStore } from '@/stores/AccountStore';
 
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
@@ -11,7 +11,7 @@ import { useRoute } from 'vue-router';
 const currentPage = ref('');
 const route = useRoute();
 
-const currenUserProfilePicture = useAccountStore().CurrentUser?.profile_picture;
+// const currenUserProfilePicture = useAccountStore().CurrentUser?.profile_picture;
 
 onMounted(() => {
     currentPage.value = route.name as string;
@@ -44,8 +44,8 @@ onMounted(() => {
             </li>
             <li :class="{ 'active': currentPage.includes('menu')}" >
                 <router-link to='/menu' class="redirect">
-                    <iconBurger v-if="!currenUserProfilePicture" />
-                    <img v-else :src="currenUserProfilePicture" class="pp" alt="profile picture" />
+                    <iconBurger />
+                    <!-- <img v-else :src="currenUserProfilePicture" class="pp" alt="profile picture" /> -->
                     <div>Menu</div>
                 </router-link>
             </li>

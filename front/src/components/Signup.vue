@@ -3,8 +3,10 @@ import { ref } from 'vue';
 import Toast from './Toast.vue';
 import apiHelper from '@/helpers/apiHelper';
 import type { ApiResponse } from '@/interfaces/apiResponseInterface';
-
+import { v4 as uuidv4 } from 'uuid';
 import { useUtilsStore } from '@/stores/UtilsStore';
+import { profile } from 'console';
+import router from '@/router';
 
 const showToast = useUtilsStore().showToast;
 
@@ -16,7 +18,6 @@ const callback = (response: any) => {
 
 const email = ref("");
 const name = ref("");
-const surname = ref("");
 const password = ref("");
 const confirmPassword = ref("");
 
@@ -24,10 +25,6 @@ const signup = async ( ) => {
     console.log("Signup");
     if(!name.value) {
         showToast("Veuillez renseigner votre prénom", false);
-        return;
-    }
-    if(!surname.value) {
-        showToast("Veuillez renseigner votre nom", false);
         return;
     }
     if(!email.value) {
@@ -45,8 +42,8 @@ const signup = async ( ) => {
     const response:ApiResponse = await apiHelper.kyPostWithoutToken( "/users", {
         email: email.value,
         password: password.value,
-        firstname: name.value,
-        lastname: surname.value,
+        name: name.value,
+        profile_picture: 'https://api.dicebear.com/8.x/fun-emoji/svg?seed=' + uuidv4(),
         role_id: 1
     });
     if(response.success === false) {
@@ -54,10 +51,15 @@ const signup = async ( ) => {
         return;
     } else {
         showToast("Votre compte a été créé avec succès", true);
+        setTimeout(() => {
+            router.push('/login').then(() => router.go(0));
+        }, 1000);
+
     }
     
     
 }
+
 </script>
 
 <template>
@@ -67,17 +69,16 @@ const signup = async ( ) => {
         <h1>
             Bienvenue sur la plateforme Cleanwalk.org
         </h1>
-        <GoogleLogin :callback="callback" />
+
+        <!-- <GoogleLogin :callback="callback" />
         <div class="or">
             <div class="line"></div>
             <span>ou</span>
             <div class="line"></div>
-        </div>
+        </div> -->
         <form @submit.prevent="signup()">
-            <label class="label" for="email">Prénom</label>
-            <input v-model="name" class="input" name="name" type="text" placeholder="votre prénom ...">
-            <label class="label" for="surname">Nom</label>
-            <input v-model="surname" class="input" name="mdp" type="text" placeholder="Votre nom de famille ...">
+            <label class="label" for="email">Comment voulez vous qu'on vous appelle ?</label>
+            <input v-model="name" class="input" name="name" type="text" placeholder="nom, prenom, pseudo ... .">
             <label class="label" for="email">Email</label>
             <input v-model="email" class="input" name="mdp" type="email" placeholder="user@domain.fr">
             <label class="label" for="password">Mot de passe</label>
@@ -139,6 +140,7 @@ const signup = async ( ) => {
     }
 
     form {
+            margin-top: 3rem;
             display: flex;
             width: 100%;
             flex-direction: column;

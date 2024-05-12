@@ -38,8 +38,7 @@ def get_cleanwalk_by_id(cleanwalk_id):
         Cleanwalk.duration,
         Cleanwalk.description,
         Cleanwalk.address,
-        User.firstname,
-        User.lastname,
+        User.name,
         User.role_id,
         User.profile_picture,
         User.id.label('author_id')
@@ -77,8 +76,7 @@ def get_cleanwalk_by_id(cleanwalk_id):
             'address': cleanwalk.address,
             'host': {
                 'author_id': cleanwalk.author_id,
-                'firstname': cleanwalk.firstname,
-                'lastname': cleanwalk.lastname,
+                'name': cleanwalk.name,
                 'role_id': cleanwalk.role_id,
                 'profile_picture': cleanwalk.profile_picture
             },
@@ -106,8 +104,7 @@ def get_all_cleanwalks():
         Cleanwalk.duration,
         Cleanwalk.description,
         Cleanwalk.address,
-        User.firstname,
-        User.lastname,
+        User.name,
         User.role_id,
         User.profile_picture
     ).join(
@@ -130,8 +127,7 @@ def get_all_cleanwalks():
         'description': cw.description,
         'address': cw.address,
         'host': {
-            'firstname': cw.firstname,
-            'lastname': cw.lastname,
+            'name': cw.name,
             'role_id': cw.role_id,
             'profile_picture': cw.profile_picture
         }

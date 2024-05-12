@@ -208,10 +208,10 @@ const getActionButtonText = ():string => {
       <div class="orga">
         <div class="left">
           <div>organisé par:</div>
-          <h2> {{ currentCleanwalk?.host?.firstname }} {{ currentCleanwalk?.host?.lastname ?? '' }} </h2>
+          <h2> {{ currentCleanwalk?.host?.name }} </h2>
         </div>
-        <div class="right">
-          <img :src="currentCleanwalk?.host?.profile_picture" alt="profile-picture">
+        <div class="right" v-if="currentCleanwalk?.host?.profile_picture">
+          <img :src="currentCleanwalk.host.profile_picture" alt="profile-picture">
         </div>
       </div>
       <button class="button-primary" @click="actionButton()">

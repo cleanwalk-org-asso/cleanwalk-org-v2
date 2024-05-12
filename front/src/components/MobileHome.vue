@@ -203,7 +203,7 @@ function mapClick() {
                     </div>
                     <div class="right">
                         <img :src="selectedCleanwalk.host!.profile_picture" alt="profile_picture">
-                        <div>{{ selectedCleanwalk.host!.firstname }} {{ selectedCleanwalk.host!.lastname }}</div>
+                        <div>{{ selectedCleanwalk.host!.name }}</div>
                     </div>
                 </router-link>
             </div>
