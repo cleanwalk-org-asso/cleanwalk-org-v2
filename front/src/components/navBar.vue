@@ -3,16 +3,19 @@ import iconAdd from '@/components/icons/icon-add.vue';
 import iconDiscover from '@/components/icons/icon-discover.vue';
 import iconMap from '@/components/icons/icon-map.vue';
 import iconBurger from '@/components/icons/icon-burger.vue';
+import { useAccountStore } from '@/stores/AccountStore';
 
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
 const currentPage = ref('');
 const route = useRoute();
 
+const currenUserProfilePicture = useAccountStore().CurrentUser?.profile_picture;
+
 onMounted(() => {
     currentPage.value = route.name as string;
-    console.log('mounted', currentPage.value);
+    console.log("hellllllo");
 
 });
 
@@ -27,7 +30,7 @@ onMounted(() => {
                     <div>Carte</div>
                 </router-link>
             </li>
-            <li :class="{ 'active': currentPage === 'add'}">
+            <li :class="{ 'active': currentPage.includes('add')}">
                 <router-link to="/add" class="redirect">
                     <iconAdd />
                     <div>Ajouter</div>
@@ -39,9 +42,10 @@ onMounted(() => {
                     <div>Découvrir</div>
                 </router-link>
             </li>
-            <li :class="{ 'active': currentPage === 'menu' || currentPage === 'profile'}" >
+            <li :class="{ 'active': currentPage.includes('menu')}" >
                 <router-link to='/menu' class="redirect">
-                    <iconBurger />
+                    <iconBurger v-if="!currenUserProfilePicture" />
+                    <img v-else :src="currenUserProfilePicture" class="pp" alt="profile picture" />
                     <div>Menu</div>
                 </router-link>
             </li>
@@ -94,6 +98,13 @@ onMounted(() => {
                     align-items: center;
                     justify-content: center;
                     height: 100%;
+
+                    .pp {
+                        width: 26px;
+                        height: 26px;
+                        border-radius: 999px;
+                        border: 2px solid #111; 
+                    }
                 }
 
                 &.active {

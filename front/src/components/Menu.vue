@@ -24,7 +24,7 @@ const currentUser = accountStore.CurrentUser!;
 <template>
     <LogoutPopup :is-visible="isPopupVisible" :toggle-popup="togglePopup" />
     <section class="container">
-        <router-link v-if="currentUser" to="/profile" class="profil">
+        <router-link v-if="currentUser" to="/menu/profile" class="profil">
             <img class="img" :src="currentUser.profile_picture" alt="">
             <h3 >{{ currentUser.firstname }} {{ currentUser.lastname }}</h3>
             <iconRightArrow />

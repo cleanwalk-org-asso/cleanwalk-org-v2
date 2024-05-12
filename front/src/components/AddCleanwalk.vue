@@ -52,6 +52,10 @@ const Upload = async() => {
             const response_cw = await createCleanwalk(newCleanwalk.value);
             if (response_cw) {
                 showToast('Votre cleanwalk a bien été publiée', true);
+                //attendre 1 seconde et rediriger a la racine:
+                setTimeout(() => {
+                    router.push('/').then(() => router.go(0));
+                }, 1000);
             } else {
                 showToast('Erreur lors de l\'upload de l\'image', false);
             }
@@ -213,7 +217,7 @@ const conseils = ref([
                     <p>{{ getConseil() }}</p>
                 </div>
                 <div class="button-container">
-                    <button @click="backBtn()" class="secondary-button">{{ progress === 6 ? 'Modifier' : 'Précédant'
+                    <button @click="backBtn()" class="secondary-button">{{ progress === 6 ? 'Modifier' : 'Précédent'
                         }}</button>
                     <button @click="nextBtn()" class="button-primary">{{ progress === 6 ? 'Publier':
                         'Suivant'}}</button>
