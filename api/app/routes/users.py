@@ -191,3 +191,22 @@ def update_user(user_id):
         return jsonify({'message': 'User updated successfully'})
     else:
         return jsonify({'message': 'User not found'}), 404
+    
+# route for updating user password by id
+@users_bp.route('/password/<string:user_id>', methods=['PUT'])
+@jwt_required()
+def update_user_password(user_id):
+    user = User.query.get(user_id)
+
+    if user:
+        data = request.get_json()
+        print("my datata",data)
+
+        # Check if the old password is correct
+        if user.password == hash_password(data.get('old_password'), user.salt):
+            # Update user password
+            user.password = hash_password(data.get('new_password'), user.salt)
+            db.session.commit()
+            return jsonify({'message': 'Password updated successfully'})
+        else:
+            return jsonify({'message': 'Old password is incorrect'}), 400

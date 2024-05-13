@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, ref, onMounted } from 'vue';
+import { watch, ref, onMounted } from 'vue';
 const backgroundImageUrl = ref('https://cdn2.thecatapi.com/images/1nk.jpg');
 import iconPhoto from '@/components/icons/icon-photo.vue';
 import { useAccountStore } from '@/stores/AccountStore';
@@ -11,22 +11,62 @@ import { useUtilsStore } from '@/stores/UtilsStore';
 const getToken = useAccountStore().getAccessToken;
 
 const showToast = useUtilsStore().showToast;
+
 const currentMdp = ref('');
 const newMdp = ref('');
 const confirmNewMdp = ref('');
 
 
 const currentUser = ref(useAccountStore().CurrentUser);
+const userName = ref(currentUser.value?.name);
 
 let debounceTimeout: string | number | NodeJS.Timeout | null | undefined = null;
 
+watch(() => userName.value, () => {
+    if (debounceTimeout) {
+        clearTimeout(debounceTimeout);
+    }
+
+    if (userName.value === useAccountStore().CurrentUser?.name) {
+        return;
+    }
+
+    debounceTimeout = setTimeout(() => {
+        if (!userName.value || userName.value === '') {
+            debounceTimeout = null;
+            userName.value = currentUser.value?.name;
+            showToast('Veuillez entrer un nom valide', false);
+            return;
+        }
+        useAccountStore().modifyUser(currentUser.value!.id!, getToken()!, userName.value);
+        showToast('Votre nom a été modifié', true);
+        useAccountStore().CurrentUser!.name = userName.value;
+        debounceTimeout = null;
+    }, 2000);
+});
 
 
-const changePassword = () => {
+
+const changePassword = async() => {
+    if (!currentMdp.value || !newMdp.value || !confirmNewMdp.value) {
+        showToast('Veuillez remplir tous les champs', false);
+        return;
+    }
+
+    if (newMdp.value !== confirmNewMdp.value) {
+        showToast('Les mots de passe ne correspondent pas', false);
+        return;
+    }
+
+    const response = await useAccountStore().changePassword(currentUser.value!.id!, getToken()!, currentMdp.value, newMdp.value);
+    if (response) {
+        showToast('Votre mot de passe a été modifié', true);
+    } else {
+        showToast('Mot de passe actuel incorrect', false);
+    }
     currentMdp.value = '';
     newMdp.value = '';
     confirmNewMdp.value = '';
-
 }
 
 
@@ -48,7 +88,7 @@ const changeUserPP = () => {
 
     // Set a new timeout
     debounceTimeout = setTimeout(() => {
-        useAccountStore().modifyUser(currentUser.value!.id!, getToken()!, undefined, undefined, currentUser.value!.profile_picture);
+        useAccountStore().modifyUser(currentUser.value!.id!, getToken()!, undefined, currentUser.value!.profile_picture);
         showToast('Votre photo de profil a été modifiée', true);
         useAccountStore().CurrentUser!.profile_picture = currentUser.value!.profile_picture;
         debounceTimeout = null; // Reset the timeout variable
@@ -76,16 +116,15 @@ const changeUserPP = () => {
 
         </div>
         <div class="content">
-            <h1>
-                {{ currentUser?.name }}
-            </h1>
+            <h3>{{ currentUser?.email }}</h3>
+            <input class="input name" type="text" v-model="userName">
             <form @submit.prevent="changePassword()">
                 <label class="label" for="mdp">Mot de passe actuel</label>
-                <input v-model="currentMdp" class="input" name="mdp" type="text" placeholder="Votre mot de passe">
+                <input v-model="currentMdp" class="input" name="mdp" type="password" placeholder="Votre mot de passe">
                 <label class="label" for="mdp">Nouveau mot de passe</label>
-                <input v-model="newMdp"  class="input" name="mdp" type="text" placeholder="Votre mot de passe">
+                <input v-model="newMdp" class="input" name="mdp" type="password" placeholder="Votre mot de passe">
                 <label class="label" for="mdp">Confirmation du nouveau mot de passe</label>
-                <input v-model="confirmNewMdp" class="input" name="mdp" type="text" placeholder="Votre mot de passe">
+                <input v-model="confirmNewMdp" class="input" name="mdp" type="password" placeholder="Votre mot de passe">
                 <button class="action-button" type="submit">Changer votre mot de passe</button>
             </form>
             <button class="danger-button">Cloturer mon compte</button>
@@ -137,7 +176,7 @@ const changeUserPP = () => {
             }
         }
     }
-  
+
 
     .icon-photo {
         background-color: var(--color-primary);
@@ -180,24 +219,45 @@ const changeUserPP = () => {
         position: relative;
         margin-top: -48px;
     }
+
     .content {
         width: 100%;
         padding: 1rem 2.45rem 0;
 
-        h1 {
+        .input {
+            border: 1px solid #94A3B8;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 0.5rem;
             font-size: 14px;
             font-style: normal;
             font-weight: 500;
-            padding-top: 1rem;
+
+            &::placeholder {
+                color: #94A3B8;
+            }
+
+            &:focus {
+                outline: none;
+            }
+
+            &.name {
+
+                font-size: 18px;
+                font-style: normal;
+                font-weight: 500;
+                padding: 12px 0 8px 12px;
+                width: 100%;
+            }
         }
-    
+
         form {
             display: flex;
             width: 100%;
             flex-direction: column;
             color: #94A3B8;
-    
-    
+
+
             .label {
                 font-size: 12px;
                 font-weight: 500;
@@ -206,36 +266,20 @@ const changeUserPP = () => {
                 background-color: #fff;
                 width: fit-content;
                 margin-left: 13px;
-                margin-top: 5px;           
-    
+                margin-top: 5px;
+
             }
-    
-            .input {
-                border: 1px solid #94A3B8;
-                border-radius: 8px;
-                padding: 12px;
-                margin-top: 0.5rem;
-                font-size: 14px;
-                font-style: normal;
-                font-weight: 500;
-    
-                &::placeholder {
-                    color: #94A3B8;
-                }
-                &:focus {
-                    outline: none;
-                }
-            }
-    
+
             .action-button {
                 margin-top: 1.5rem;
             }
         }
+
         .danger-button {
             margin-top: 3.5rem;
         }
     }
 
-    
+
 }
 </style>

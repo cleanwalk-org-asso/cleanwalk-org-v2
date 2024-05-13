@@ -11,19 +11,17 @@ import iconClock from './icons/icon-clock.vue';
 import iconMiniMap from './icons/icon-mini-map.vue';
 import type { Cleanwalk } from "@/interfaces/cleanwalkInterface";
 import dateHelper from "@/helpers/dateHelper";
+import { el } from "date-fns/locale";
 
 const cleanwalkStore = useCleanwalkStore();
 
 const draggableCard = ref<HTMLElement | null>(null);
 let zoom = ref(5);
-let centerMap = ref([48.866667, 2.333333]);
-let center: Ref<PointExpression> = ref([48.866667, 2.333333]);
+let center: Ref<PointExpression> = ref([47.866667, 2.333333]);
 let mapInstance: Ref<Map | null> = ref(null);
 let cardListBool = ref(false);  //to display or not the cleanwalk list
 const cleanwalkListContainer = ref<HTMLElement | null>(null); //ref to the html cleanwalk list container
 let selectedCleanwalk:Ref<Cleanwalk | null> = ref(null);
-
-
 
 const searchInput = ref("");
 
@@ -98,6 +96,19 @@ const setSelectedCleanwalk = (cleanwalkId: number) => {
     if (cw) {
         selectedCleanwalk.value = cw;
     }
+};
+
+const getCleanwalkVisibleCount = () => {
+    let count = 0;
+    cleanwalkStore.cleanwalksTab.forEach((cleanwalk) => {
+        if (isPointVisible(cleanwalk.pos_lat, cleanwalk.pos_long)) {
+            count++;
+        }
+    });
+    if (count === 1) {
+        slideUp(cleanwalkStore.cleanwalksTab.find((cleanwalk) => isPointVisible(cleanwalk.pos_lat, cleanwalk.pos_long))?.id);
+    }
+    return count;
 };
 
 function slideUp(id?: number) {
@@ -208,7 +219,7 @@ function mapClick() {
                 </router-link>
             </div>
             <div class="card-nb-cw" v-else>
-                <h3>10 cleanwalks à proximité </h3>
+                <h3>{{ getCleanwalkVisibleCount() }} cleanwalks à proximité </h3>
             </div>
         </div>
         <div class="cleanwalk-list" :class="{ 'active': cardListBool === false }">
@@ -351,7 +362,8 @@ main {
 
 
     .map-container {
-        height: 100vh;
+        padding: 78px 0 ;
+        height: calc(100vh - 20px);
     }
 
     .cleanwalk-list {

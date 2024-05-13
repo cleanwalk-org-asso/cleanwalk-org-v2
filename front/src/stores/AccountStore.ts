@@ -62,17 +62,24 @@ export const useAccountStore = defineStore('account', () => {
         return isLoggedIn.value;
     }
 
+    const changePassword = async (userId:number, token:string, oldPassword: string, newPassword: string) => {
+        const response:ApiResponse = await apiHelper.kyPut('/users/password/' + userId, {
+            old_password: oldPassword,
+            new_password: newPassword
+        }, token);
+        return response.success;
+    }
+
     const getAccessToken = ():string | undefined => {
         return $cookies!.get(tokenCookieName);
     }
 
-    const modifyUser = (userId: number, token: string, firstname?: string, lastname?: string, profile_picture?: string) => {
+    const modifyUser = (userId: number, token: string, name?: string, profile_picture?: string) => {
         apiHelper.kyPut('/users/' + userId, {
-            firstname: firstname,
-            lastname: lastname,
+            name: name,
             profile_picture: profile_picture,
         }, token);
     }
 
-    return { setToken, printUser, logout, isLoggedIn, tokenLogin, CurrentUser, getAccessToken, modifyUser}
+    return { setToken, printUser, logout, isLoggedIn, tokenLogin, CurrentUser, getAccessToken, modifyUser, changePassword}
 })
