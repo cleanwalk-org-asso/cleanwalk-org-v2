@@ -19,11 +19,11 @@ const cleanwalkStore = useCleanwalkStore();
 const currenUserId = ref(useAccountStore().CurrentUser?.id);
 const token = ref(useAccountStore().getAccessToken());
 
-let currentCleanwalk:Ref<SingleCleanwalk | undefined >= ref(undefined);
+let currentCleanwalk: Ref<SingleCleanwalk | undefined> = ref(undefined);
 
-onMounted (async() => {
+onMounted(async () => {
   const id = +useRoute().params.id; // + to convert string to number
-  console.log("test",id);
+  console.log("test", id);
   console.log(id);
 
   // id is NaN if it's not a number
@@ -33,9 +33,9 @@ onMounted (async() => {
   }
 
   console.log("userId:", useAccountStore().CurrentUser?.id)
-  
+
   currentCleanwalk.value = await cleanwalkStore.getCleanwalkById(id, useAccountStore().CurrentUser?.id);
-  console.log("cw data",currentCleanwalk.value);
+  console.log("cw data", currentCleanwalk.value);
   if (!currentCleanwalk.value) {
     router.push('/404');
   }
@@ -96,7 +96,7 @@ const leaveCleanwalk = () => {
 }
 
 const joinCleanwalk = () => {
-  
+
   console.log("join cleanwalk");
   if (!currentCleanwalk.value || !currenUserId.value || !token.value) {
     router.push('/login');
@@ -108,11 +108,11 @@ const joinCleanwalk = () => {
 }
 
 const actionButton = () => {
-  if(!currentCleanwalk.value || !currenUserId.value || !token.value) {
+  if (!currentCleanwalk.value || !currenUserId.value || !token.value) {
     router.push('/login');
     return;
   }
-  if(currentCleanwalk.value.host.author_id === currenUserId.value) {
+  if (currentCleanwalk.value.host.author_id === currenUserId.value) {
     // edit cleanwalk
     console.log("edit cleanwalk");
     return;
@@ -122,7 +122,7 @@ const actionButton = () => {
     toogleLeaveCwPopup();
     return;
   }
-  if(currentCleanwalk.value.is_user_participant === false) {
+  if (currentCleanwalk.value.is_user_participant === false) {
     // join cleanwalk
     participate();
     return;
@@ -130,18 +130,18 @@ const actionButton = () => {
 
 }
 
-const getActionButtonText = ():string => {
-    if (currentCleanwalk.value?.host.author_id === currenUserId.value) {
-      return "Editer la cleanwalk";
-    }
-    if (currentCleanwalk.value?.is_user_participant === true) {
-      return "Se désinscrire";
-    }
-    if (currentCleanwalk.value?.is_user_participant === false) {
-      return "Je participe";
-    }
-    return "";
+const getActionButtonText = (): string => {
+  if (currentCleanwalk.value?.host.author_id === currenUserId.value) {
+    return "Editer la cleanwalk";
   }
+  if (currentCleanwalk.value?.is_user_participant === true) {
+    return "Se désinscrire";
+  }
+  if (currentCleanwalk.value?.is_user_participant === false) {
+    return "Je participe";
+  }
+  return "";
+}
 
 </script>
 
@@ -155,7 +155,7 @@ const getActionButtonText = ():string => {
       <iconInfo />
     </button>
   </div>
-  <LeaveCwPopup :isVisible="showLeaveCwPopup" :tooglePopup="toogleLeaveCwPopup" :leaveCw="leaveCleanwalk"/>
+  <LeaveCwPopup :isVisible="showLeaveCwPopup" :tooglePopup="toogleLeaveCwPopup" :leaveCw="leaveCleanwalk" />
   <div class="popup" v-if="popupBool">
     <div class="popup-validation">
       <div class="cross-container">
@@ -201,6 +201,21 @@ const getActionButtonText = ():string => {
           <iconMiniMap />
           <div>{{ currentCleanwalk?.address }}</div>
         </div>
+      </div>
+      <div class="map-links">
+        <!-- Lien vers Google Maps -->
+        <a :href="`https://www.google.com/maps/?q=${currentCleanwalk?.pos_lat},${currentCleanwalk?.pos_long}`"
+          target="_blank">
+          <img src="../assets/googleMap.svg" alt="google map logo">
+          <h4>Ouvrir dans Google Maps</h4>
+        </a>
+
+        <!-- Lien vers OpenStreetMap -->
+        <a :href="`https://www.openstreetmap.org/?mlat=${currentCleanwalk?.pos_lat}&mlon=${currentCleanwalk?.pos_long}`"
+          target="_blank">
+          <img src="../assets/Openstreetmap_logo.png" alt="google map logo">
+          <h4>Ouvrir dans OpenStreetMap</h4>
+        </a>
       </div>
       <div v-if="currentCleanwalk?.host.author_id === currenUserId">
         {{ currentCleanwalk?.participant_count }} participant(s)
@@ -323,6 +338,37 @@ main {
     }
   }
 
+  .map-links {
+    display: flex;
+    justify-content: space-between;
+    border: dashed 2px #0cab2e;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+
+    a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      img {
+        width: 30px;
+        height: 30px;
+      }
+
+      h4 {
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 18px;
+        letter-spacing: 0em;
+        text-align: center;
+        text-align: left;
+        max-width: 6rem;
+      }
+    }
+  }
+
   .orga {
     display: flex;
     background-color: var(--color-secondary);
@@ -369,6 +415,7 @@ main {
   }
 
 }
+
 .popup {
   position: fixed;
   top: 0;
@@ -387,11 +434,13 @@ main {
     overflow: hidden;
     width: 90%;
     padding: 0 10%;
+
     .cross-container {
       display: flex;
       justify-content: flex-end;
       position: relative;
       margin-right: -10%; // to compensate padding :( sorry
+
       .cross {
         background-color: transparent;
         stroke: var(--text-color-primary);
@@ -404,6 +453,7 @@ main {
       padding: 40px 0 10px;
       font-size: 12px;
     }
+
     h3 {
       // styles for h3
       font-size: 18px;
@@ -425,8 +475,10 @@ main {
         height: 50px;
         stroke: #fff;
         padding-top: 4px;
+
         &.add {
           padding-top: 4px;
+
           svg {
             width: 32px;
             height: 32px;
@@ -434,6 +486,7 @@ main {
         }
 
       }
+
       div {
         // styles for counter div
         font-size: 25px;
@@ -448,6 +501,7 @@ main {
 
       }
     }
+
     .anonyme {
       display: flex;
       padding-top: 20px;
@@ -457,27 +511,31 @@ main {
       input[type="checkbox"] {
         // styles for checkbox
         margin-right: 5px
-        
       }
+
       label {
         display: block;
         font-size: 12px;
         padding-top: 2px;
       }
     }
+
     .button-container {
       display: flex;
       padding: 20px 0;
+
       button {
         font-weight: 500;
         padding: 15px 0;
         border-radius: 8px;
+
         &.cancel {
           // styles for cancel button
           flex-grow: 0.25;
           margin-right: 10px;
           font-size: 16px;
         }
+
         &.button-primary {
           // styles for primary button
           flex-grow: 0.75;
@@ -486,5 +544,4 @@ main {
     }
   }
 }
-
 </style>

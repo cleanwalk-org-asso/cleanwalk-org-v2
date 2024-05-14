@@ -21,6 +21,9 @@ class Organisation(db.Model):
     social_media = db.Column(db.JSON, nullable=True)
     banner_img = db.Column(db.String(255), nullable=True)
 
+    # Relation vers User
+    user = db.relationship('User', backref=db.backref('organisation', uselist=False))
+
 class Cleanwalk(db.Model):
     __tablename__ = 'cleanwalks'
     id = db.Column(db.Integer, primary_key=True)

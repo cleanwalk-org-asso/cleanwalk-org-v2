@@ -44,6 +44,52 @@ def get_user(user_id):
         return jsonify(user_data)
     else:
         return jsonify({'message': 'User not found'}), 404
+    
+# route for get association by user id
+@users_bp.route('/association/<string:user_id>', methods=['GET'])
+def get_association(user_id):
+    user = db.session.query(User, Organisation).join(Organisation, User.id == Organisation.user_id).filter(User.id == user_id).first()
+
+    if user:
+        user_data = {
+            'id':user.User.id,
+            'name':user.User.name,
+            'email':user.User.email,
+            'description':user.Organisation.description,
+            'web_site':user.Organisation.website,
+            'social_media':user.Organisation.social_media,
+            'banner_img':user.Organisation.banner_img,
+            'profile_picture':user.User.profile_picture,
+            'role':user.User.role_id
+        }
+        return jsonify(user_data)
+    else:
+        return jsonify({'message': 'User not found'}), 404
+    
+    # route for get all organisations
+@users_bp.route('/organisations', methods=['GET'])
+def get_all_organisations():
+    organisations =  db.session.query(Organisation).join(User).all()
+    if organisations:
+        organisation_data = []
+        for organisation in organisations:
+            user = User.query.get(organisation.user_id)
+            organisation_data.append({
+                'id': user.id,
+                'name': user.name,
+                'email': user.email,
+                'description': organisation.description,
+                'web_site': organisation.web_site,
+                'social_media': organisation.social_media,
+                'banner_img': organisation.banner_img,
+                'profile_picture': user.profile_picture,
+                'role': user.role_id
+            })
+        return jsonify(organisation_data)
+    else:
+        return jsonify({'message': 'Organisations not found'}), 404
+    
+
 
 # route for get all users
 @users_bp.route('', methods=['GET'])

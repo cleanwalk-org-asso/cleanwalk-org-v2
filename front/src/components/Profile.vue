@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch, ref, onMounted } from 'vue';
+import { watch, ref, onMounted, type Ref } from 'vue';
 const backgroundImageUrl = ref('https://cdn2.thecatapi.com/images/1nk.jpg');
 import iconPhoto from '@/components/icons/icon-photo.vue';
 import { useAccountStore } from '@/stores/AccountStore';
@@ -7,6 +7,7 @@ import router from '@/router';
 import iconShuffleArrow from './icons/icon-shuffle-arrow.vue';
 import { v4 as uuidv4 } from 'uuid';
 import { useUtilsStore } from '@/stores/UtilsStore';
+import type { Association } from '@/interfaces/userInterface';
 
 const getToken = useAccountStore().getAccessToken;
 
@@ -15,12 +16,23 @@ const showToast = useUtilsStore().showToast;
 const currentMdp = ref('');
 const newMdp = ref('');
 const confirmNewMdp = ref('');
-
+const accountStore = useAccountStore();
 
 const currentUser = ref(useAccountStore().CurrentUser);
+const assocciation:Ref<Association|undefined> = ref(undefined);
 const userName = ref(currentUser.value?.name);
 
 let debounceTimeout: string | number | NodeJS.Timeout | null | undefined = null;
+
+onMounted(async() => {
+    if (!currentUser.value) {
+        router.push('/login');
+        return;
+    }
+    if (currentUser.value?.role === 'organisation') {
+        assocciation.value = await accountStore.getOrganisationById(currentUser.value.id!);
+    }
+});
 
 watch(() => userName.value, () => {
     if (debounceTimeout) {
@@ -69,15 +81,6 @@ const changePassword = async() => {
     confirmNewMdp.value = '';
 }
 
-
-onMounted(() => {
-    console.log('mounted');
-    if (!currentUser.value) {
-        router.push('/login');
-        return;
-    }
-});
-
 const changeUserPP = () => {
     currentUser.value!.profile_picture = 'https://api.dicebear.com/8.x/fun-emoji/svg?seed=' + uuidv4();
 
@@ -118,6 +121,9 @@ const changeUserPP = () => {
         <div class="content">
             <h3>{{ currentUser?.email }}</h3>
             <input class="input name" type="text" v-model="userName">
+            <textarea v-if="assocciation" name="text" id="text">
+                {{ assocciation?.description }}
+            </textarea>
             <form @submit.prevent="changePassword()">
                 <label class="label" for="mdp">Mot de passe actuel</label>
                 <input v-model="currentMdp" class="input" name="mdp" type="password" placeholder="Votre mot de passe">
@@ -224,7 +230,11 @@ const changeUserPP = () => {
         width: 100%;
         padding: 1rem 2.45rem 0;
 
-        .input {
+        textarea {
+            height: 145px;
+        }
+
+        .input, textarea{
             border: 1px solid #94A3B8;
             border-radius: 8px;
             padding: 12px;
@@ -232,6 +242,7 @@ const changeUserPP = () => {
             font-size: 14px;
             font-style: normal;
             font-weight: 500;
+            width: 100%;
 
             &::placeholder {
                 color: #94A3B8;

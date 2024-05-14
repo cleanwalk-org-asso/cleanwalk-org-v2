@@ -1,13 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue';
 import type {Ref} from 'vue';
-import type {User} from '@/interfaces/userInterface';
+import type {User, Association} from '@/interfaces/userInterface';
 import apiHelper from '@/helpers/apiHelper';
 import router from '@/router';
 import { inject } from 'vue';
 import type {VueCookies} from 'vue-cookies';
 import type { ApiResponse } from '@/interfaces/apiResponseInterface';
-
 
 export const useAccountStore = defineStore('account', () => {
     const $cookies = inject<VueCookies>('$cookies'); 
@@ -27,6 +26,11 @@ export const useAccountStore = defineStore('account', () => {
 
     function printUser() {
         console.log(CurrentUser.value);
+    }
+
+    const getOrganisationById = async (organisationId: number) => {
+        const response:ApiResponse = await apiHelper.kyGet('/users/organisations/' + organisationId);
+        return response.data as unknown as Association;
     }
 
     async function logout() {
@@ -81,5 +85,5 @@ export const useAccountStore = defineStore('account', () => {
         }, token);
     }
 
-    return { setToken, printUser, logout, isLoggedIn, tokenLogin, CurrentUser, getAccessToken, modifyUser, changePassword}
+    return { setToken, printUser, logout, isLoggedIn, tokenLogin, CurrentUser, getAccessToken, modifyUser, changePassword, getOrganisationById}
 })
