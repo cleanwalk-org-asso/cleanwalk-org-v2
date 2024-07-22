@@ -15,11 +15,6 @@ const toast = useUtilsStore().toast;
 
 <style scoped lang="scss">
 .toast {
-    &.is-visible {
-        transform: translateY(0);
-        opacity: 1;
-    }
-
     opacity: 0;
     position: fixed;
     transform: translateY(-100%);
@@ -32,6 +27,11 @@ const toast = useUtilsStore().toast;
     z-index: 1000;
     transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; // Réduisez la durée et ajoutez opacity
     pointer-events: none;
+
+    &.is-visible {
+        transform: translateY(0);
+        opacity: 1;
+    }
 
     &.toast-success {
         background-color: #3ee243;

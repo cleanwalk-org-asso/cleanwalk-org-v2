@@ -19,12 +19,12 @@ const confirmNewMdp = ref('');
 const accountStore = useAccountStore();
 
 const currentUser = ref(useAccountStore().CurrentUser);
-const assocciation:Ref<Association|undefined> = ref(undefined);
+const assocciation: Ref<Association | undefined> = ref(undefined);
 const userName = ref(currentUser.value?.name);
 
-let debounceTimeout: string | number | NodeJS.Timeout | null | undefined = null;
+let debounceTimeout: any;
 
-onMounted(async() => {
+onMounted(async () => {
     if (!currentUser.value) {
         router.push('/login');
         return;
@@ -45,7 +45,7 @@ watch(() => userName.value, () => {
 
     debounceTimeout = setTimeout(() => {
         if (!userName.value || userName.value === '') {
-            debounceTimeout = null;
+            debounceTimeout = undefined;
             userName.value = currentUser.value?.name;
             showToast('Veuillez entrer un nom valide', false);
             return;
@@ -53,13 +53,11 @@ watch(() => userName.value, () => {
         useAccountStore().modifyUser(currentUser.value!.id!, getToken()!, userName.value);
         showToast('Votre nom a été modifié', true);
         useAccountStore().CurrentUser!.name = userName.value;
-        debounceTimeout = null;
+        debounceTimeout = undefined;
     }, 2000);
 });
 
-
-
-const changePassword = async() => {
+const changePassword = async () => {
     if (!currentMdp.value || !newMdp.value || !confirmNewMdp.value) {
         showToast('Veuillez remplir tous les champs', false);
         return;
@@ -94,10 +92,9 @@ const changeUserPP = () => {
         useAccountStore().modifyUser(currentUser.value!.id!, getToken()!, undefined, currentUser.value!.profile_picture);
         showToast('Votre photo de profil a été modifiée', true);
         useAccountStore().CurrentUser!.profile_picture = currentUser.value!.profile_picture;
-        debounceTimeout = null; // Reset the timeout variable
+        debounceTimeout = undefined; // Reset the timeout variable
     }, 2000);
 }
-
 </script>
 <template>
     <section class="container">

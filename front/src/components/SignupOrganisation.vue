@@ -5,7 +5,6 @@ import apiHelper from '@/helpers/apiHelper';
 import type { ApiResponse } from '@/interfaces/apiResponseInterface';
 import { v4 as uuidv4 } from 'uuid';
 import { useUtilsStore } from '@/stores/UtilsStore';
-import { profile } from 'console';
 import router from '@/router';
 
 const showToast = useUtilsStore().showToast;

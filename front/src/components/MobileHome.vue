@@ -285,6 +285,14 @@ main {
 
         .search-bar {
             &.base {
+                background-color: #fff;
+                border-radius: 8px;
+                border: 1px solid #CBD5E1;
+                width: 38px;
+                height: 38px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
 
                 input {
                     opacity: 0;
@@ -300,14 +308,7 @@ main {
                     padding: 0 10px;
                 }
 
-                background-color: #fff;
-                border-radius: 8px;
-                border: 1px solid #CBD5E1;
-                width: 38px;
-                height: 38px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
+                
 
                 svg {
                     stroke: #94A3B8;

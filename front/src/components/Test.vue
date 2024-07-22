@@ -3,7 +3,6 @@ import { onMounted, ref } from 'vue';
 import dragDrop from './dragDrop.vue';
 import type { ApiResponse } from '@/interfaces/apiResponseInterface';
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
-import { Console } from 'console';
 
 const cleanwalkStore = useCleanwalkStore();
 

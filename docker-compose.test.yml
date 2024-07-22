@@ -1,24 +1,19 @@
-version: '3.7'
+version: '3.8'
 services:
-
-  adminer:
-    image: adminer
-    restart: always
-    environment:
-      - ADMINER_DESIGN=dracula
-    ports: 
-      - '8080:8080'
-
+      
   api:
-    build: ./api # Chemin vers le dossier contenant le Dockerfile de l'API
+    build:
+      context: ./api
+      dockerfile: Dockerfile.prod
     restart: always
-    volumes:
-      - ./api:/app # Montez le code de l'API dans le conteneur
-      - ./uploads:/app/images
     ports:
-      - '5000:5000' # Exposez le port 5000 pour l'API Flask
+      - '5000:5000'
+    volumes:
+      - ./uploads:/app/images
     environment:
-      - UPLOAD_FOLDER=/app/images
+      - UPLOAD_FOLDER=/app/uploads
+    networks:
+      - my_network
   
 networks:
   my_network:
