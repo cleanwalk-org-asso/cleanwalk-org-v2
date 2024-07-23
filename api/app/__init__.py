@@ -16,8 +16,6 @@ db = SQLAlchemy()
 def create_app():
     app = Flask(__name__)
     CORS(app)
-    print("databaseURIIIIIIIIIIIIIIIIIII------------------>",os.getenv('DATABASE_URI'))
-
     # Configurer l'application
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
     app.config['API_KEY'] = os.getenv('API_KEY')

@@ -13,9 +13,9 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile.prod
+    volumes:
+      - ./uploads:/app/uploads
     restart: always
-    environment:
-      - UPLOAD_FOLDER=/app/uploads
     networks:
       - my_network
 
