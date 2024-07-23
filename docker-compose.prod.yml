@@ -29,6 +29,7 @@ services:
     volumes:
       - ./data-nginx:/data
       - ./letsencrypt:/etc/letsencrypt
+      - ./uploads:/var/www/uploads
     networks:
       - my_network
 
