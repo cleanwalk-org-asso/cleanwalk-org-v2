@@ -11,12 +11,8 @@ import { useRoute } from 'vue-router';
 const currentPage = ref('');
 const route = useRoute();
 
-// const currenUserProfilePicture = useAccountStore().CurrentUser?.profile_picture;
-
 onMounted(() => {
     currentPage.value = route.name as string;
-    console.log("hellllllo");
-
 });
 
 

@@ -9,19 +9,12 @@ import router from '@/router';
 
 const showToast = useUtilsStore().showToast;
 
-const callback = (response: any) => {
-    // This callback will be triggered when the user selects or login to
-    // his Google account from the popup
-    console.log("Handle the response", response)
-}
-
 const email = ref("");
 const name = ref("");
 const password = ref("");
 const confirmPassword = ref("");
 
 const signup = async ( ) => {
-    console.log("Signup");
     if(!name.value) {
         showToast("Veuillez renseigner votre prénom", false);
         return;
@@ -112,7 +105,7 @@ const signup = async ( ) => {
         font-size: 12px;
         width: 100%;
         text-align: left;
-        padding-top: 2rem;
+        margin-top: 2rem;
 
         span {
             color: var(--text-color-primary);

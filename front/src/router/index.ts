@@ -12,14 +12,6 @@ const router = createRouter({
       component: HomeView
     },
     {
-      path: '/test',
-      name: 'test',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/TestView.vue')
-    },
-    {
       path: '/cleanwalk/:id',
       name: 'cleanwalk',
       component: () => import('../views/SingleCleanwalkView.vue')
@@ -90,7 +82,6 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
   if(!useAccountStore().isLoggedIn) {
     await useAccountStore().tokenLogin();
   }
- console.log('isLogedIn', useAccountStore().isLoggedIn);
 
   if (routesRequiringAuth.includes(to.name as string) && !useAccountStore().isLoggedIn && isMobile) {
     next({ name: 'login' }); // Redirige vers la page de login

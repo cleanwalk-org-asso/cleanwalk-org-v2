@@ -23,8 +23,6 @@ let currentCleanwalk: Ref<SingleCleanwalk | undefined> = ref(undefined);
 
 onMounted(async () => {
   const id = +useRoute().params.id; // + to convert string to number
-  console.log("test", id);
-  console.log(id);
 
   // id is NaN if it's not a number
   if (isNaN(id)) {
@@ -32,10 +30,8 @@ onMounted(async () => {
     return;
   }
 
-  console.log("userId:", useAccountStore().CurrentUser?.id)
 
   currentCleanwalk.value = await cleanwalkStore.getCleanwalkById(id, useAccountStore().CurrentUser?.id);
-  console.log("cw data", currentCleanwalk.value);
   if (!currentCleanwalk.value) {
     router.push('/404');
   }
@@ -85,7 +81,6 @@ const getDate = () => {
 
 
 const leaveCleanwalk = () => {
-  console.log("leave cleanwalk");
   if (!currentCleanwalk.value || !currenUserId.value || !token.value) {
     router.push('/login');
     return;
@@ -97,7 +92,6 @@ const leaveCleanwalk = () => {
 
 const joinCleanwalk = () => {
 
-  console.log("join cleanwalk");
   if (!currentCleanwalk.value || !currenUserId.value || !token.value) {
     router.push('/login');
     return;
@@ -114,7 +108,6 @@ const actionButton = () => {
   }
   if (currentCleanwalk.value.host.author_id === currenUserId.value) {
     // edit cleanwalk
-    console.log("edit cleanwalk");
     return;
   }
   if (currentCleanwalk.value.is_user_participant === true) {

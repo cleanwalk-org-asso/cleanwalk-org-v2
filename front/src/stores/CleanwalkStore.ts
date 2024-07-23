@@ -43,7 +43,6 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
             url += '?user_id=' + userId;
         }
         const result = await apiHelper.kyGet(url);
-        console.log(result);
         if(result.success && result.data) {
             return result.data as unknown as SingleCleanwalk;
         }
@@ -52,7 +51,6 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
 
     async function createCleanwalk(cleanwalk: CleanwalkCreation): Promise<CleanwalkCreation|undefined> {
         const token = getToken();
-        console.log("cw: ", cleanwalk);
         if (token === undefined) {
             router.push('/login');
             return undefined;

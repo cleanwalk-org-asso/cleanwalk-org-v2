@@ -14,18 +14,10 @@ export const useAccountStore = defineStore('account', () => {
     const tokenCookieExpireTime = '30d'; // 3m => 3 months (d => days, m => months, y => years)
     let CurrentUser: Ref<User|undefined> = ref();
     let isLoggedIn = ref(false);
-    let token: string|undefined = undefined;
-
 
     const setToken = (token: string) => {
-        console.log('setTokenCalled', token);
         $cookies!.remove(tokenCookieName);
         $cookies!.set(tokenCookieName, token, tokenCookieExpireTime);
-    }
-
-
-    function printUser() {
-        console.log(CurrentUser.value);
     }
 
     const getOrganisationById = async (organisationId: number) => {
@@ -41,7 +33,6 @@ export const useAccountStore = defineStore('account', () => {
     }
 
     async function tokenLogin(): Promise<boolean> {
-        console.log('tokenLoginCalled');
         const token:string = $cookies!.get(tokenCookieName);
         if(token != undefined) {
             const response:ApiResponse = await apiHelper.kyPost('/users/token-login', {}, token);
@@ -55,7 +46,6 @@ export const useAccountStore = defineStore('account', () => {
                     profile_picture: response.data.profile_picture as string,
                 }
                 CurrentUser.value = user;
-                console.log('CurrentUser', CurrentUser.value);
             } else {
                 isLoggedIn.value = false;
             }
@@ -85,5 +75,5 @@ export const useAccountStore = defineStore('account', () => {
         }, token);
     }
 
-    return { setToken, printUser, logout, isLoggedIn, tokenLogin, CurrentUser, getAccessToken, modifyUser, changePassword, getOrganisationById}
+    return { setToken, logout, isLoggedIn, tokenLogin, CurrentUser, getAccessToken, modifyUser, changePassword, getOrganisationById}
 })

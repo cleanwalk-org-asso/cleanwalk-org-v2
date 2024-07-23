@@ -6,15 +6,8 @@ import { onMounted } from 'vue';
 
 
 const store = useCleanwalkStore();
-console.log('test');
-console.log(store.getAllCleanwalks());
-
 onMounted( async () => {
   const data = await store.getAllCleanwalks();
-  if (data) {
-    console.log(data);
-  }
-  
 });
 </script>
 

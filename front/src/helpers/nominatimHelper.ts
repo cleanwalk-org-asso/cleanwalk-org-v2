@@ -52,7 +52,7 @@ const nominatimRequest = async (url: string, params: Record<string, any>) => {
         const res = await ky.get(fullUrl).json<any>();
         return res;
     } catch (error) {
-        console.log('Nominatim error: ' + error);
+        console.error('Nominatim error: ' + error);
         return undefined;
     }
 };
@@ -75,7 +75,6 @@ const nominatimSearch = async (searchString: string): Promise<Coordinate | undef
 
     if (result) {
         const firstResult = result[0];
-        console.log(firstResult);
         if (firstResult) {
             return {
                 pos_lat: firstResult.lat,
@@ -117,7 +116,7 @@ const nominatimReverse = async (lat: number, lon: number) => {
 const nominatimReverseWrittenAddress = async (lat: number, lon: number) => {
     let location = '';
     const result = await nominatimReverse(lat, lon).catch((error) => {
-        console.log(error);
+        console.error(error);
     });
 
     if (result == null) {

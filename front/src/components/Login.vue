@@ -13,17 +13,10 @@ const router = useRouter();
 const accountStore = useAccountStore();
 const showToast = useUtilsStore().showToast;
 
-const callback = (response:any) => {
-    // This callback will be triggered when the user selects or login to
-    // his Google account from the popup
-    console.log("Handle the response", response)
-}
-
 const email = ref("");
 const password = ref("");
 
 const login = async ( ) => {
-    console.log("Login");
     if(!email.value) {
         showToast("Veuillez renseigner votre email", false);
         return;
@@ -42,7 +35,6 @@ const login = async ( ) => {
         showToast('Email ou mot de passe incorrect', false);
         return;
     }
-    console.log("Response", response);
     const user:User = {
         email: response.data.email as string,
         name: response.data.name as string,
@@ -51,7 +43,6 @@ const login = async ( ) => {
         role: response.data.role as "organisation" | "user",
     }
     accountStore.CurrentUser = user;
-    console.log("User", user);
     router.push({ path: '/' });
     accountStore.setToken(response.data.access_token as string);
 
@@ -67,12 +58,12 @@ const login = async ( ) => {
         <h1>
             Se connecter
         </h1>
-        <GoogleLogin :callback="callback" />
+        <!-- <GoogleLogin :callback="callback" />
         <div class="or">
             <div class="line"></div>
             <span>ou</span>
             <div class="line"></div>
-        </div>
+        </div> -->
         <form @submit.prevent="login()">
             <label class="label" for="email">Email</label>
             <input v-model="email" class="input" name="mdp" type="email" placeholder="user@domain.fr">
@@ -107,7 +98,7 @@ const login = async ( ) => {
         font-size: 12px;
         width: 100%;
         text-align: left;
-        padding-top: 2rem;
+        margin-top: 2rem;
 
         span {
             color: var(--text-color-primary);
