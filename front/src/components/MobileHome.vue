@@ -187,7 +187,7 @@ function mapClick() {
                 <button @click="backButton()">
                     <iconLeftArrow />
                 </button>
-                <input @click="hideCleanwalkList()" name="search" type="text" placeholder="Rechercher une cleanwalk" v-model="searchInput" />
+                <input @click="hideCleanwalkList()" name="search" autocomplete="off" type="text" placeholder="Rechercher une cleanwalk" v-model="searchInput" />
                 <label for="search" @click="cardListBool = true">
                     <iconSearch />
                 </label>
