@@ -21,7 +21,8 @@ def create_app():
     app.config['API_KEY'] = os.getenv('API_KEY')
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=30)
-    app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER') or '../uploads'
+    app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER')
+    app.config['UPLOADS_URL'] = os.getenv('UPLOADS_URL')
 
     # Initialiser les extensions
     db.init_app(app)

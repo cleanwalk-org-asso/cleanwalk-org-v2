@@ -11,7 +11,10 @@ import iconClock from './icons/icon-clock.vue';
 import iconMiniMap from './icons/icon-mini-map.vue';
 import type { Cleanwalk } from "@/interfaces/cleanwalkInterface";
 import dateHelper from "@/helpers/dateHelper";
-import { el } from "date-fns/locale";
+import cleanwalkCard from './cards/CleanwalkListCard.vue';
+import { useAccountStore } from "@/stores/AccountStore";
+
+const userImg = useAccountStore().CurrentUser?.profile_picture;
 
 const cleanwalkStore = useCleanwalkStore();
 
@@ -179,7 +182,7 @@ function mapClick() {
             </l-map>
         </div>
         <div class="top-bar">
-            <img src="../assets/logo.svg" alt="logo" v-if="!cardListBool">
+            <img class="logo" src="../assets/logo.svg" alt="logo" v-if="!cardListBool">
             <div class="search-bar" :class="{ 'active': cardListBool, 'base': !cardListBool }">
                 <button @click="backButton()">
                     <iconLeftArrow />
@@ -189,7 +192,10 @@ function mapClick() {
                     <iconSearch />
                 </label>
             </div>
-            <button class="info">
+            <RouterLink to="/menu/profile" class="pp" v-if="userImg">
+                <img :src="userImg" alt="user img">
+            </RouterLink>
+            <button class="info" v-else>
                 <iconInfo />
             </button>
         </div>
@@ -224,20 +230,10 @@ function mapClick() {
         </div>
         <div class="cleanwalk-list" :class="{ 'active': cardListBool === false }">
             <div class="container" ref="cleanwalkListContainer">
-                <router-link v-for="cleanwalk in filteredCleanwalks" :to="{name: 'cleanwalk', params:{id: cleanwalk.id}}"  :key="cleanwalk.id" class="cleanwalk">
-                    <div class="title">{{ cleanwalk.name }}</div>
-                    <div class="flex">
-                        <icon-clock />
-                        <div>{{ dateHelper.getCleanwalkWrittenDate(new Date(cleanwalk.date_begin), cleanwalk.duration) }}</div>
-                    </div>
-                    <div class="flex">
-                        <iconMiniMap />
-                        <div>{{ cleanwalk.address }}</div>
-                    </div>
+                <router-link v-for="cleanwalk in filteredCleanwalks" :to="{name: 'cleanwalk', params:{id: cleanwalk.id}}"  :key="cleanwalk.id" class="listContainer">
+                    <cleanwalk-card :cleanwalk="cleanwalk" />
                 </router-link>
             </div>
-
-
         </div>
     </main>
 </template>
@@ -262,13 +258,26 @@ main {
         padding: 20px 19px 20px;
         justify-content: end;
 
-        img {
+        .logo {
             position: absolute;
             left: 31px;
             width: 104px;
             margin-top: 10px;
         }
 
+        .pp {
+            border-radius: 999px;
+            width: 38px;
+            height: 38px;
+            margin-left: 8px;
+            overflow: hidden;
+            
+            img {
+                width: 100%;
+                height: 100%;
+                
+            }
+        }
         .info {
             background-color: #fff;
             border-radius: 8px;
@@ -395,25 +404,11 @@ main {
             gap: 10px;
             overflow: auto;
 
-            .cleanwalk {
-                border: 2px solid rgb(155, 155, 155);
-                border-radius: 12px;
-                padding: 10px;
-                background-color: white;
-                width: 90%;
-
-                .title {
-                    font-size: 16px;
-                    font-style: normal;
-                    font-weight: 500;
-                }
-
-                .flex {
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                }
-
+            .listContainer {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
             }
         }
 

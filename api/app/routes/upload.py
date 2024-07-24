@@ -42,4 +42,4 @@ def upload_file():
         unique_filename = str(uuid.uuid4()) + '.' + extention
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
         
-        return jsonify({'message': 'File successfully uploaded', 'img_url': 'https://uploads.cleanwalk.online/'+unique_filename}), 200
+        return jsonify({'message': 'File successfully uploaded', 'img_url': app.config['UPLOADS_URL']+unique_filename}), 200
