@@ -24,7 +24,7 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$VPS_IP '
           cd /home/cleanwalk-org-v2 &&
-          git pull origin release &&
+          git pull origin feat/discover-view &&
           docker compose -f docker-compose.prod.yml down &&
           docker compose -f docker-compose.prod.yml up -d --build
         '
