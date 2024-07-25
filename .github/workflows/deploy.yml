@@ -3,7 +3,7 @@ name: Deploy to VPS
 on:
   push:
     branches:
-      - release  # Déclencher le déploiement uniquement sur la branche release
+      - feat/discover-view  # Déclencher le déploiement uniquement sur la branche release
 
 jobs:
   deploy:
