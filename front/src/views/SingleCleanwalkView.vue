@@ -6,4 +6,4 @@ import navBar from '@/components/navBar.vue';
 <template>
   <SingleCleanwalk />
   <navBar />
-</template>
+  </template>

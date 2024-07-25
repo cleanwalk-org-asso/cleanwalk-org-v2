@@ -1,9 +1,56 @@
 export interface Cleanwalk {
-    id: number,
+    id?: number,
     name: string,
     description: string,
     date_begin: Date,
     duration: number,
     pos_lat: number,
     pos_long: number,
+    address: string,
+    img_url?: string,
+    city?: string,
+    host? : {
+        id?: number,
+        name: string,
+        profile_picture: string,
+        role_id: number,
+    }
+}
+
+export interface CleanwalkCreation {
+    name: string,
+    description: string,
+    date_begin: string,
+    duration: number,
+    pos_lat: number,
+    pos_long: number,
+    address: string,
+    img_url?: string,
+    user_id: number,
+    city: string,
+}
+
+export interface SingleCleanwalk {
+    id: number;
+    name: string;
+    pos_lat: number;
+    pos_long: number;
+    date_begin: string;
+    duration: number;
+    description: string;
+    address: string;
+    host: {
+        author_id: number;
+        name: string;
+        role_id: number;
+        profile_picture: string;
+    };
+    participant_count: number;
+    is_user_participant: boolean;
+}
+
+export interface SubscibeToCleanwalk {
+    cleanwalk_id: number;
+    user_id: number;
+    nb_participants: number;
 }

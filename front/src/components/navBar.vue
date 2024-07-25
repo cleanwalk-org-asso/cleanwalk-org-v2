@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import iconAdd from '@/components/icons/icon-add.vue';
-import iconArticle from '@/components/icons/icon-article.vue';
+import iconDiscover from '@/components/icons/icon-discover.vue';
 import iconMap from '@/components/icons/icon-map.vue';
-import iconProfile from '@/components/icons/icon-profile.vue';
+import iconBurger from '@/components/icons/icon-burger.vue';
+// import { useAccountStore } from '@/stores/AccountStore';
 
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
 const currentPage = ref('');
@@ -12,8 +13,6 @@ const route = useRoute();
 
 onMounted(() => {
     currentPage.value = route.name as string;
-    console.log('mounted', currentPage.value);
-
 });
 
 
@@ -27,22 +26,23 @@ onMounted(() => {
                     <div>Carte</div>
                 </router-link>
             </li>
-            <li :class="{ 'active': currentPage === 'add'}">
+            <li :class="{ 'active': currentPage.includes('add')}">
                 <router-link to="/add" class="redirect">
                     <iconAdd />
                     <div>Ajouter</div>
                 </router-link>
             </li>
-            <li :class="{ 'active': currentPage === 'article'}">
-                <router-link to="/article" class="redirect">
-                    <iconArticle />
-                    <div>Articles</div>
+            <li :class="{ 'active': currentPage === 'articles' || currentPage === 'associations'}">
+                <router-link to="/articles" class="redirect">
+                    <iconDiscover />
+                    <div>Découvrir</div>
                 </router-link>
             </li>
-            <li :class="{ 'active': currentPage === 'profile'}" >
-                <router-link to='profile' class="redirect">
-                    <iconProfile />
-                    <div>Profile</div>
+            <li :class="{ 'active': currentPage.includes('menu')}" >
+                <router-link to='/menu' class="redirect">
+                    <iconBurger />
+                    <!-- <img v-else :src="currenUserProfilePicture" class="pp" alt="profile picture" /> -->
+                    <div>Menu</div>
                 </router-link>
             </li>
         </ul>
@@ -60,6 +60,7 @@ onMounted(() => {
         font-weight: 500;
         z-index: 999;
         background-color: var(--color-nav-bg);
+        font-family: "Roboto", sans-serif;
 
         .container {
             display: flex;
@@ -78,6 +79,7 @@ onMounted(() => {
                 justify-content: center;
                 flex-direction: column;
                 color: var(--text-color-nav);
+                
                 width: 100%;
                 
                 .redirect {
@@ -91,11 +93,19 @@ onMounted(() => {
                     flex-direction: column;
                     align-items: center;
                     justify-content: center;
-                    
+                    height: 100%;
+
+                    .pp {
+                        width: 26px;
+                        height: 26px;
+                        border-radius: 999px;
+                        border: 2px solid #111; 
+                    }
                 }
 
                 &.active {
                     stroke: var(--text-color-nav-active);
+                    fill: var(--text-color-nav-active);
                     color: var(--text-color-nav-active);
                     
                     .redirect {

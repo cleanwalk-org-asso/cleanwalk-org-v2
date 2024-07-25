@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue';
 import type {Ref} from 'vue';
-import type {User} from '@/interfaces/userInterface';
+import type {User, Association} from '@/interfaces/userInterface';
 import apiHelper from '@/helpers/apiHelper';
 import router from '@/router';
 import { inject } from 'vue';
 import type {VueCookies} from 'vue-cookies';
-
+import type { ApiResponse } from '@/interfaces/apiResponseInterface';
 
 export const useAccountStore = defineStore('account', () => {
     const $cookies = inject<VueCookies>('$cookies'); 
@@ -14,24 +14,15 @@ export const useAccountStore = defineStore('account', () => {
     const tokenCookieExpireTime = '30d'; // 3m => 3 months (d => days, m => months, y => years)
     let CurrentUser: Ref<User|undefined> = ref();
     let isLoggedIn = ref(false);
-    let token: string|undefined = undefined;
 
-    async function login(email: string, password: string): Promise<boolean> {
-        const result = await apiHelper.kyPostWithoutToken('/users/login', {"email":email,"password": password} );
-        if(result != undefined && result as User != undefined) {
-            CurrentUser.value = result as User;
-            $cookies!.set(tokenCookieName, CurrentUser.value.access_token, tokenCookieExpireTime, '', '', true);
-            // need to create a cookie token
-            isLoggedIn.value = true;
-        }
-        return isLoggedIn.value;
+    const setToken = (token: string) => {
+        $cookies!.remove(tokenCookieName);
+        $cookies!.set(tokenCookieName, token, tokenCookieExpireTime);
     }
 
-    function printToken() {
-        console.log($cookies!.get(tokenCookieName));
-    }
-    function printUser() {
-        console.log(CurrentUser.value);
+    const getOrganisationById = async (organisationId: number) => {
+        const response:ApiResponse = await apiHelper.kyGet('/users/organisations/' + organisationId);
+        return response.data as unknown as Association;
     }
 
     async function logout() {
@@ -42,20 +33,47 @@ export const useAccountStore = defineStore('account', () => {
     }
 
     async function tokenLogin(): Promise<boolean> {
-        const token = $cookies!.get(tokenCookieName);
+        const token:string = $cookies!.get(tokenCookieName);
         if(token != undefined) {
-            const result = await apiHelper.kyPost('/users/token-login', {}, token);
-            if(result != undefined && result as User != undefined) {
-                CurrentUser.value = result as User;
+            const response:ApiResponse = await apiHelper.kyPost('/users/token-login', {}, token);
+            if(response.success === true) {
                 isLoggedIn.value = true;
+                const user:User = {
+                    email: response.data.email as string,
+                    name: response.data.name as string,
+                    id: response.data.id as number,
+                    role: response.data.role as 'organisation' | 'user',
+                    profile_picture: response.data.profile_picture as string,
+                }
+                CurrentUser.value = user;
             } else {
                 isLoggedIn.value = false;
             }
         } else {
+            
             isLoggedIn.value = false;
         }
         return isLoggedIn.value;
     }
 
-    return {login, printToken, printUser, logout, isLoggedIn, tokenLogin}
+    const changePassword = async (userId:number, token:string, oldPassword: string, newPassword: string) => {
+        const response:ApiResponse = await apiHelper.kyPut('/users/password/' + userId, {
+            old_password: oldPassword,
+            new_password: newPassword
+        }, token);
+        return response.success;
+    }
+
+    const getAccessToken = ():string | undefined => {
+        return $cookies!.get(tokenCookieName);
+    }
+
+    const modifyUser = (userId: number, token: string, name?: string, profile_picture?: string) => {
+        apiHelper.kyPut('/users/' + userId, {
+            name: name,
+            profile_picture: profile_picture,
+        }, token);
+    }
+
+    return { setToken, logout, isLoggedIn, tokenLogin, CurrentUser, getAccessToken, modifyUser, changePassword, getOrganisationById}
 })

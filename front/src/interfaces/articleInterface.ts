@@ -1,4 +1,7 @@
 export interface Article {
-    title: string,
-    content: string,
-}
+    id?: number;
+    content: string;
+    title: string;
+    imageUrl: string;
+    createdAt: String;
+};

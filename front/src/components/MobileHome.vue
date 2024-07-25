@@ -2,107 +2,41 @@
 import "leaflet/dist/leaflet.css";
 import { LMap, LTileLayer, LMarker, LIcon } from "@vue-leaflet/vue-leaflet";
 import L, { LatLng, LatLngBounds, Map, type PointExpression } from "leaflet";
-import { ref, type Ref, onMounted, nextTick } from "vue";
+import { ref, type Ref, onMounted, nextTick, computed } from "vue";
 import iconLeftArrow from "@/components/icons/icon-left-arrow.vue";
 import iconSearch from "@/components/icons/icon-search.vue";
 import iconInfo from "./icons/icon-info.vue";
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
 import iconClock from './icons/icon-clock.vue';
 import iconMiniMap from './icons/icon-mini-map.vue';
-import router from "@/router";
-import { max } from "date-fns";
+import type { Cleanwalk } from "@/interfaces/cleanwalkInterface";
+import dateHelper from "@/helpers/dateHelper";
+import cleanwalkCard from './cards/CleanwalkListCard.vue';
+import { useAccountStore } from "@/stores/AccountStore";
 
-const cleanwalkStore = useCleanwalkStore()
+const userImg = useAccountStore().CurrentUser?.profile_picture;
+
+const cleanwalkStore = useCleanwalkStore();
 
 const draggableCard = ref<HTMLElement | null>(null);
 let zoom = ref(5);
-let centerMap = ref([48.866667, 2.333333]);
-let center: Ref<PointExpression> = ref([48.866667, 2.333333]);
+let center: Ref<PointExpression> = ref([47.866667, 2.333333]);
 let mapInstance: Ref<Map | null> = ref(null);
 let cardListBool = ref(false);  //to display or not the cleanwalk list
 const cleanwalkListContainer = ref<HTMLElement | null>(null); //ref to the html cleanwalk list container
-
-const testCleanwalkList = ref([
-    {
-        id: 1,
-        title: "Cleanwalk 1",
-        lat: 42.866667,
-        lng: 2.333333,
-        isAsso: true
-    },
-    {
-        id: 1,
-        title: "Cleanwalk 2",
-        lat: 45.866667,
-        lng: 1.333333,
-        isAsso: false
-    },
-    {
-        id: 1,
-        title: "Cleanwalk 3",
-        lat: 48.866667,
-        lng: 4.333333,
-        isAsso: false
-    },
-    {
-        id: 1,
-        title: "Cleanwalk 4",
-        lat: 49.866667,
-        lng: 3.333333,
-        isAsso: true
-    },
-    {
-        id: 1,
-        title: "Cleanwalk 1",
-        lat: 42.866667,
-        lng: 2.333333,
-        isAsso: true
-    },
-    {
-        id: 1,
-        title: "Cleanwalk 2",
-        lat: 45.866667,
-        lng: 1.333333,
-        isAsso: false
-    },
-    {
-        id: 1,
-        title: "Cleanwalk 3",
-        lat: 48.866667,
-        lng: 4.333333,
-        isAsso: false
-    },
-    {
-        id: 1,
-        title: "Cleanwalk 4",
-        lat: 49.866667,
-        lng: 3.333333,
-        isAsso: true
-    },
-    {
-        id: 1,
-        title: "Cleanwalk 2",
-        lat: 45.866667,
-        lng: 1.333333,
-        isAsso: false
-    },
-    {
-        id: 1,
-        title: "Cleanwalk 3",
-        lat: 48.866667,
-        lng: 4.333333,
-        isAsso: false
-    },
-    {
-        id: 1,
-        title: "Cleanwalk 4",
-        lat: 49.866667,
-        lng: 3.333333,
-        isAsso: true
-    },
-]);
+let selectedCleanwalk:Ref<Cleanwalk | null> = ref(null);
 
 const searchInput = ref("");
+
+const filteredCleanwalks = computed(() => {
+  if (!searchInput.value) {
+    return cleanwalkStore.cleanwalksTab;
+  }
+  return cleanwalkStore.cleanwalksTab.filter(cleanwalk =>
+    cleanwalk.name.toLowerCase().includes(searchInput.value.toLowerCase())||
+    cleanwalk.address.toLowerCase().includes(searchInput.value.toLowerCase())
+  );
+});
 
 const backButton = () => {
     cardListBool.value = false
@@ -117,7 +51,7 @@ const setMapEvents = (map: Map) => {
 };
 
 onMounted(() => {
-    console.log(cleanwalkStore.cleanwalkIsSelect.valueOf())
+    cleanwalkStore.getAllCleanwalks();
     const card = draggableCard.value;
     if (!card) return;
 
@@ -126,7 +60,7 @@ onMounted(() => {
     let maxHeight = -10 // Limite de hauteur en px
 
     const onTouchStart = (e: TouchEvent) => {
-        if (cleanwalkStore.cleanwalkIsSelect) { //bloquer le slide si aucune cleanwalk sélectionnée
+        if (selectedCleanwalk.value !== null) { //bloquer le slide si aucune cleanwalk sélectionnée
             maxHeight = 65;
         } else {
             maxHeight = -10;
@@ -141,7 +75,7 @@ onMounted(() => {
         e.preventDefault(); // Prévenir le scroll de la page
         const diffY = startY - e.touches[0].clientY;
         let newBottom = initialBottom + diffY;
-        if (!cleanwalkStore.cleanwalkIsSelect) { // si aucune cleanwalk n'est sélectionnée on affiche la liste
+        if (selectedCleanwalk.value === null) { // si aucune cleanwalk n'est sélectionnée on affiche la liste
             showCleanwalkList();
         }
         if (newBottom > maxHeight) {
@@ -160,8 +94,31 @@ onMounted(() => {
     card.addEventListener('touchstart', onTouchStart);
 });
 
-function slideUp() {
-    cleanwalkStore.cleanwalkIsSelect = true;
+const setSelectedCleanwalk = (cleanwalkId: number) => {
+    const cw = cleanwalkStore.cleanwalksTab.find((cleanwalk) => cleanwalk.id === cleanwalkId);
+    if (cw) {
+        selectedCleanwalk.value = cw;
+    }
+};
+
+const getCleanwalkVisibleCount = () => {
+    let count = 0;
+    cleanwalkStore.cleanwalksTab.forEach((cleanwalk) => {
+        if (isPointVisible(cleanwalk.pos_lat, cleanwalk.pos_long)) {
+            count++;
+        }
+    });
+    if (count === 1) {
+        slideUp(cleanwalkStore.cleanwalksTab.find((cleanwalk) => isPointVisible(cleanwalk.pos_lat, cleanwalk.pos_long))?.id);
+    }
+    return count;
+};
+
+function slideUp(id?: number) {
+    if(!id) {
+        return;
+    }
+    setSelectedCleanwalk(id);
     if (draggableCard.value) {
         draggableCard.value.style.bottom = '65px'; // Modifiez cette valeur selon la hauteur désirée
     }
@@ -203,6 +160,7 @@ function isPointVisible(lat: number, lng: number): boolean {
 }
 
 function mapClick() {
+    selectedCleanwalk.value = null;
     slideDown()
 }
 
@@ -214,75 +172,68 @@ function mapClick() {
             <l-map ref="map" v-model:zoom="zoom" v-model:center="center" @ready="setMapEvents" :min-zoom="5"
                 @click="mapClick()" :useGlobalLeaflet="false">
                 <l-tile-layer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="base"></l-tile-layer>
-                <div v-for="cleanwalk in testCleanwalkList">
-                    <l-marker @click="slideUp()" :lat-lng="L.latLng(cleanwalk.lat, cleanwalk.lng)">
+                <div v-for="cleanwalk in cleanwalkStore.cleanwalksTab">
+                    <l-marker @click="slideUp(cleanwalk.id!)" :lat-lng="L.latLng(cleanwalk.pos_lat, cleanwalk.pos_long)">
                         <l-icon :icon-size="[25, 41]" :icon-anchor="[12, 41]"
-                            :iconUrl="cleanwalk.isAsso ? 'https://i.ibb.co/XkyvQmm/blue-map.png' : 'https://i.ibb.co/zZjWfnp/green-map.png'">
+                            :iconUrl="cleanwalk.host?.role_id === 1 ? 'https://firebasestorage.googleapis.com/v0/b/horrorfire-88d56.appspot.com/o/cw%2FGroup%20172.svg?alt=media&token=2b337af1-bed2-4491-834c-c2aeaf8be593' : 'https://firebasestorage.googleapis.com/v0/b/horrorfire-88d56.appspot.com/o/cw%2FGroup%20173.svg?alt=media&token=2c75133b-e73f-4cac-95fb-277e4516dfb7'">
                         </l-icon>
                     </l-marker>
                 </div>
             </l-map>
         </div>
         <div class="top-bar">
-            <img src="../assets/logo.svg" alt="logo" v-if="!cardListBool">
+            <img class="logo" src="../assets/logo.svg" alt="logo" v-if="!cardListBool">
             <div class="search-bar" :class="{ 'active': cardListBool, 'base': !cardListBool }">
                 <button @click="backButton()">
                     <iconLeftArrow />
                 </button>
-                <input @click="hideCleanwalkList()" name="search" type="text" placeholder="Rechercher une cleanwalk" v-model="searchInput" />
+                <input @click="hideCleanwalkList()" name="search" autocomplete="off" type="text" placeholder="Rechercher une cleanwalk" v-model="searchInput" />
                 <label for="search" @click="cardListBool = true">
                     <iconSearch />
                 </label>
             </div>
-            <button class="info">
+            <RouterLink to="/menu/profile" class="pp" v-if="userImg">
+                <img :src="userImg" alt="user img">
+            </RouterLink>
+            <button class="info" v-else>
                 <iconInfo />
             </button>
         </div>
         <div ref="draggableCard" class="draggable-card">
-            <div class="card-handle" @click="!cleanwalkStore.cleanwalkIsSelect && (cardListBool = true);">
+            <div class="card-handle" @click="!selectedCleanwalk && (cardListBool = true);">
                 <svg width="43" height="3" viewBox="0 0 43 3" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect width="43" height="3" rx="1.5" fill="#373646" />
                 </svg>
             </div>
-            <div class="card-content" v-if="cleanwalkStore.cleanwalkIsSelect">
-                <h3>Je nettoie la Nature</h3>
-                <router-link to="/cleanwalk" class="flex-container">
+            <div class="card-content" v-if="selectedCleanwalk">
+                <h3>{{ selectedCleanwalk.name }}</h3>
+                <router-link :to="{name: 'cleanwalk', params:{id: selectedCleanwalk.id}}" class="flex-container">
                     <div class="left">
                         <div class="top">
                             <icon-clock />
-                            <div>Date et heure de l’évènement</div>
+                            <div>{{ dateHelper.getCleanwalkWrittenDate( new Date(selectedCleanwalk.date_begin), selectedCleanwalk.duration) }}</div>
                         </div>
                         <div class="bot">
                             <iconMiniMap />
-                            <div>Localité, France</div>
+                            <div>{{ selectedCleanwalk.address }}</div>
                         </div>
                     </div>
                     <div class="right">
-                        <img src="../assets/defaultprofile.png" alt="profile_picture">
-                        <div>username</div>
+                        <img :src="selectedCleanwalk.host!.profile_picture" alt="profile_picture">
+                        <div>{{ selectedCleanwalk.host!.name }}</div>
                     </div>
                 </router-link>
             </div>
             <div class="card-nb-cw" v-else>
-                <h3>10 cleanwalks à proximité</h3>
+                <h3>{{ getCleanwalkVisibleCount() }} cleanwalks à proximité </h3>
             </div>
         </div>
         <div class="cleanwalk-list" :class="{ 'active': cardListBool === false }">
             <div class="container" ref="cleanwalkListContainer">
-                <router-link to="/cleanwalk" v-for="cleanwalk in testCleanwalkList" :key="cleanwalk.id" class="cleanwalk">
-                    <div class="title">{{ cleanwalk.title }}</div>
-                    <div class="flex">
-                        <icon-clock />
-                        <div>Date et heure de l’évènement</div>
-                    </div>
-                    <div class="flex">
-                        <iconMiniMap />
-                        <div>Localité, France</div>
-                    </div>
+                <router-link v-for="cleanwalk in filteredCleanwalks" :to="{name: 'cleanwalk', params:{id: cleanwalk.id}}"  :key="cleanwalk.id" class="listContainer">
+                    <cleanwalk-card :cleanwalk="cleanwalk" />
                 </router-link>
             </div>
-
-
         </div>
     </main>
 </template>
@@ -304,16 +255,29 @@ main {
         z-index: 9998;
         background-color: var(--color-primary);
         display: flex;
-        padding: 30px 19px 20px;
+        padding: 20px 19px 20px;
         justify-content: end;
 
-        img {
+        .logo {
             position: absolute;
             left: 31px;
             width: 104px;
-            margin-top: 8px;
+            margin-top: 10px;
         }
 
+        .pp {
+            border-radius: 999px;
+            width: 38px;
+            height: 38px;
+            margin-left: 8px;
+            overflow: hidden;
+            
+            img {
+                width: 100%;
+                height: 100%;
+                
+            }
+        }
         .info {
             background-color: #fff;
             border-radius: 8px;
@@ -330,6 +294,14 @@ main {
 
         .search-bar {
             &.base {
+                background-color: #fff;
+                border-radius: 8px;
+                border: 1px solid #CBD5E1;
+                width: 38px;
+                height: 38px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
 
                 input {
                     opacity: 0;
@@ -345,14 +317,7 @@ main {
                     padding: 0 10px;
                 }
 
-                background-color: #fff;
-                border-radius: 8px;
-                border: 1px solid #CBD5E1;
-                width: 38px;
-                height: 38px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
+                
 
                 svg {
                     stroke: #94A3B8;
@@ -407,7 +372,8 @@ main {
 
 
     .map-container {
-        height: 100vh;
+        padding: 78px 0 ;
+        height: calc(100vh - 20px);
     }
 
     .cleanwalk-list {
@@ -438,25 +404,11 @@ main {
             gap: 10px;
             overflow: auto;
 
-            .cleanwalk {
-                border: 2px solid rgb(155, 155, 155);
-                border-radius: 12px;
-                padding: 10px;
-                background-color: white;
-                width: 90%;
-
-                .title {
-                    font-size: 16px;
-                    font-style: normal;
-                    font-weight: 500;
-                }
-
-                .flex {
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                }
-
+            .listContainer {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
             }
         }
 

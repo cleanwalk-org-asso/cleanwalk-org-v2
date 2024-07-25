@@ -1,65 +1,27 @@
+version: '3.7'
 services:
-    front:
-        hostname: front
-        container_name: front
-        image: cleanwalk-org/front
-        build:
-            context: ./front
-            dockerfile: Dockerfile
-            target: prod
-        restart: unless-stopped
-        depends_on:
-            - api
-            - db
-        ports:
-            - "80:80"
-        networks:
-            - frontend
 
-    api:
-        hostname: api
-        container_name: api
-        image: cleanwalk-org/api
-        build:
-            context: ./api
-            dockerfile: Dockerfile
-        restart: unless-stopped
-        depends_on:
-            - db
-        env_file:
-            - stash.env
-        networks:
-            - frontend
-            - backend
+  adminer:
+    image: adminer
+    restart: always
+    environment:
+      - ADMINER_DESIGN=dracula
+    ports: 
+      - '8080:8080'
 
-    db:
-        hostname: db
-        container_name: db
-        image: mysql:latest
-        restart: unless-stopped
-        env_file:
-            - stash.env
-        volumes:
-            - db:/var/lib/mysql
-        networks:
-            - backend
-
-    adminer:
-        container_name: adminer
-        image: adminer:latest
-        restart: unless-stopped
-        depends_on:
-            - db
-        ports:
-            - "8080:8080"
-        env_file:
-            - stash.env
-        networks:
-            - backend
-
-volumes:
-    db:
-
+  api:
+    build:
+        context: ./api
+        dockerfile: Dockerfile.dev # Chemin vers le Dockerfile de production de l'API
+    restart: always
+    volumes:
+      - ./api:/app # Montez le code de l'API dans le conteneur
+      - ./uploads:/app/images
+    ports:
+      - '5000:5000' # Exposez le port 5000 pour l'API Flask
+    environment:
+      - UPLOAD_FOLDER=/app/images
+  
 networks:
-    frontend:
-    backend:
+  my_network:
+    external: true

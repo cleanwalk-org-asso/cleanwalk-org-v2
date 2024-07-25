@@ -8,7 +8,41 @@
 .button-primary {
   background-color: var(--color-primary );
   color: #fff;
-  font-family: "Roboto", sans-serif;
+  font-family: "Catamaran", sans-serif;
   font-size: 16px;
   border-radius: 8px;
 }
+
+.google-button {
+  border-radius: var(--Button-Border-radius, 8px);
+  border: 1px solid #CBD5E1;
+}
+
+.action-button {
+  background-color: var(--color-primary);
+  color: #fff;
+  padding:0.75rem 0;
+  width: 100%;
+  text-align: center;
+  border-radius: 8px;
+}
+
+.danger-button {
+  background-color: #FF5757;
+  color: #fff;
+  padding:0.75rem 0;
+  width: 100%;
+  text-align: center;
+  border-radius: 8px;
+}
+
+.cancel-button {
+  background-color: #E8E8E8;
+  color: #373646;
+  padding:0.75rem 0;
+  width: 100%;
+  text-align: center;
+  border-radius: 8px;
+}
+
+

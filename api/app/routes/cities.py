@@ -6,6 +6,8 @@ cities_bp = Blueprint('cities', __name__)
 
 @cities_bp.before_request
 def check_api_key():
+    if request.method == 'OPTIONS': # Handle preflight requests to enable CORS
+        return
     api_key = request.headers.get('X-API-Key')  # Get the api key from the header
     
     # Verify the api key

@@ -35,3 +35,8 @@ lerna-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+/uploads
+
+/data-nginx
+/letsencrypt

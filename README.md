@@ -51,6 +51,49 @@ To shutdown all stack or just a specific one:
 docker compose down
 ```
 
-### Production
+## Production
 
-Use Portainer for easier management. To install it, launch the script named "install-portainer.sh" and to access it you can check the service on port 9000.
+### config nginx proxy manager
+
+**first login**: connect to @server_ip:81
+- username: admin@example.com
+- password: changeme    **! change admin info**
+
+**proxy hosts**
+Go to Hosts > Proxy Hosts and click on Add Proxy Host.
+
+**frontend**
+- Domain Names: yourdomain.example, www.yourdomain.example
+- Scheme: http
+- Forward Hostname / IP: frontend
+- Forward Port: 80
+
+**API**
+- Domain Names: api.yourdomain.example
+- Scheme: http
+- Forward Hostname / IP: api
+- Forward Port: 5000
+
+**uploads**
+- Domain Names : uploads.yourdomain.example
+- Scheme : http
+- Forward Hostname / IP : nginx-proxy-manager
+- Forward Port : 81
+
+in advanced add:
+```
+location / {
+    alias /var/www/uploads/;
+    autoindex on;
+}
+```
+
+**SSL Config**
+- check Force SSL
+- select Request a new SSL certificate
+- add email and save
+
+
+
+
+
