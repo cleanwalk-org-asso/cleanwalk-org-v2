@@ -18,6 +18,15 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SECRET_KEY }}  # Utilisation de la clé SSH
 
+    - name: Backup current state
+      env:
+        VPS_IP: ${{ secrets.VPS_IP }}
+      run: |
+        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$VPS_IP '
+          rm -rf /home/cleanwalk-backup &&
+          cp -r /home/cleanwalk-org-v2 /home/cleanwalk-backup
+        '
+
     - name: Deploy to VPS
       env:
         VPS_IP: ${{ secrets.VPS_IP }}
@@ -26,5 +35,24 @@ jobs:
           cd /home/cleanwalk-org-v2 &&
           git pull origin release &&
           docker compose -f docker-compose.prod.yml down &&
+          docker compose -f docker-compose.prod.yml up -d --build
+        '
+
+    - name: Cleanup backup
+      if: success()
+      env:
+        VPS_IP: ${{ secrets.VPS_IP }}
+      run: |
+        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$VPS_IP '
+          rm -rf /home/cleanwalk-backup
+        '
+
+    - name: Rollback (if needed)
+      if: failure()
+      env:
+        VPS_IP: ${{ secrets.VPS_IP }}
+      run: |
+        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$VPS_IP '
+          cd /home/cleanwalk-backup &&
           docker compose -f docker-compose.prod.yml up -d --build
         '
