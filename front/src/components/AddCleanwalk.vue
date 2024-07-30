@@ -1,27 +1,27 @@
+<!-- Votre composant principal -->
 <script setup lang="ts">
 import { ref, type Ref } from 'vue';
-import type {CleanwalkCreation } from '@/interfaces/cleanwalkInterface';
 import router from '@/router';
-import {set, parse, differenceInMinutes } from 'date-fns';
-import Toast from './Toast.vue'
-import nominatimHelper from '@/helpers/nominatimHelper';
-import type { Coordinate } from '@/interfaces/coordinateInterface';
-import iconMiniMap from './icons/icon-mini-map.vue';
-import iconClock from './icons/icon-clock.vue';
+import { set, parse, differenceInMinutes, format } from 'date-fns';
+import Toast from './Toast.vue';
 import dateHelper from '@/helpers/dateHelper';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import dragDrop from './dragDrop.vue';
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
 import { useAccountStore } from '@/stores/AccountStore';
-import { format } from 'date-fns';
+import AutocompleteAddress from './AutocompleteAddress.vue';
+import type { CleanwalkCreation } from '@/interfaces/cleanwalkInterface';
+import iconMiniMap from './icons/icon-mini-map.vue';
+import iconClock from './icons/icon-clock.vue';
 
+// Utils and stores
 const showToast = useUtilsStore().showToast;
 const createCleanwalk = useCleanwalkStore().createCleanwalk;
-
 
 const dragDropRef = ref(null as any);
 const progress = ref(1);
 
+// New Cleanwalk state
 let newCleanwalk: Ref<CleanwalkCreation> = ref({
     name: "",
     description: "",
@@ -34,43 +34,49 @@ let newCleanwalk: Ref<CleanwalkCreation> = ref({
     city: "",
     user_id: useAccountStore().CurrentUser?.id as number,
 });
+
 const dateCleanwalk = ref({
-    dateDay: undefined, // Initialise la date à undefined
+    dateDay: undefined,
     hourBegin: '',
     hourEnd: ''
 });
 
+// Handle address selection
+const handleSelectAddress = (addressData: { address: string, lat: string, lon: string, city: string }) => {
+    newCleanwalk.value.address = addressData.address;
+    newCleanwalk.value.pos_lat = parseFloat(addressData.lat);
+    newCleanwalk.value.pos_long = parseFloat(addressData.lon);
+    newCleanwalk.value.city = addressData.city;
+};
 
-const Upload = async() => {
+// Other functions (Upload, setDate, nextBtn, backBtn, getConseil)
+
+const Upload = async () => {
     if (!dragDropRef.value) {
         return;
     }
     try {
-        const response:string | undefined = await dragDropRef.value.handleUpload();
+        const response: string | undefined = await dragDropRef.value.handleUpload();
         if (response !== undefined) {
             newCleanwalk.value.img_url = response;
             const response_cw = await createCleanwalk(newCleanwalk.value);
             if (response_cw) {
                 showToast('Votre cleanwalk a bien été publiée', true);
-                //attendre 1 seconde et rediriger a la racine:
                 setTimeout(() => {
                     router.push('/').then(() => router.go(0));
                 }, 1000);
             } else {
                 showToast('Erreur lors de l\'upload de l\'image', false);
             }
-
         } else {
             showToast('Erreur lors de l\'upload de l\'image', false);
         }
     } catch (error) {
         showToast('Erreur lors de l\'upload de l\'image', false);
     }
-}
-
+};
 
 const setDate = () => {
-    // Parsez la date et l'heure de début en un objet Date
     if (!dateCleanwalk.value.dateDay || !dateCleanwalk.value.hourBegin || !dateCleanwalk.value.hourEnd) {
         return;
     }
@@ -81,19 +87,16 @@ const setDate = () => {
 
     let formattedStartDate = format(startDate, 'yyyy-MM-dd HH:mm:ss');
 
-    // Parsez la date et l'heure de fin en un objet Date
     let endDate = set(parse(dateCleanwalk.value.dateDay, 'yyyy-MM-dd', new Date()), {
         hours: parseInt(dateCleanwalk.value.hourEnd.split(':')[0]),
         minutes: parseInt(dateCleanwalk.value.hourEnd.split(':')[1]),
     });
 
-    // Calculez la durée en heures
     let duration = differenceInMinutes(endDate, startDate);
 
-    // Mettez à jour les propriétés de newCleanwalk
     newCleanwalk.value.date_begin = formattedStartDate;
     newCleanwalk.value.duration = duration;
-}
+};
 
 const nextBtn = async () => {
     if (progress.value === 1 && !newCleanwalk.value.name) {
@@ -105,19 +108,6 @@ const nextBtn = async () => {
             showToast('Veuillez saisir une adresse pour votre évènement', false);
             return;
         }
-
-        const newPos: Coordinate | undefined = await nominatimHelper.nominatimSearch(newCleanwalk.value.address!);
-
-        if (newPos === undefined) {
-            showToast('Adresse invalide', false);
-            return;
-        }
-        newCleanwalk.value.pos_lat = newPos.pos_lat;
-        newCleanwalk.value.pos_long = newPos.pos_long;
-        newCleanwalk.value.address = newPos.address;
-        newCleanwalk.value.city = newPos.city;
-        console.log(newPos);
-
     }
     if (progress.value === 3) {
         setDate();
@@ -133,11 +123,11 @@ const nextBtn = async () => {
     if (progress.value === 6) {
         Upload();
         showToast('Votre cleanwalk a bien été publiée', true);
-       return;
+        return;
     }
 
     progress.value += 1;
-}
+};
 
 const backBtn = () => {
     if (progress.value === 1) {
@@ -145,7 +135,7 @@ const backBtn = () => {
         return;
     }
     progress.value -= 1;
-}
+};
 
 const getConseil = () => {
     if (progress.value < 6) {
@@ -153,7 +143,7 @@ const getConseil = () => {
     } else {
         return conseils.value[1];
     }
-}
+};
 
 const titles = ref([
     'Nom de votre évènement',
@@ -168,8 +158,8 @@ const conseils = ref([
     'Avant de lancer votre ramassage, pensez à consulter le guide du ramasseur pour connaître les règles d’or d’une bonne organisation.',
     'L’ajout d’une photo est optionnel'
 ]);
-
 </script>
+
 <template>
     <Toast />
     <section class="section">
@@ -178,14 +168,13 @@ const conseils = ref([
         </div>
         <div class="container">
             <div class="top">
-
-                <h1>
-                    {{ titles[progress - 1] }}
-                </h1>
+                <h1>{{ titles[progress - 1] }}</h1>
                 <input v-model="newCleanwalk.name" v-if="progress === 1" type="text"
                     placeholder="Saisissez le nom de votre évènement">
-                <input v-model="newCleanwalk.address" v-if="progress === 2" type="text"
-                    placeholder="Saisissez l’adresse">
+                <div v-if="progress === 2" class="autocomplete-container">
+                    <AutocompleteAddress v-model:query="newCleanwalk.address"
+                        @select-suggestion="handleSelectAddress" />
+                </div>
                 <label v-if="progress === 3" class="label" for="date">date de l'évènement</label>
                 <input id="date" v-model="dateCleanwalk.dateDay" v-if="progress === 3" type="date">
                 <label v-if="progress === 3" class="label" for="hourBegin">heure de début</label>
@@ -194,13 +183,14 @@ const conseils = ref([
                 <input id="hourEnd" v-model="dateCleanwalk.hourEnd" v-if="progress === 3" type="time">
                 <textarea v-if="progress === 4" v-model="newCleanwalk.description" name="description" id="description"
                     cols="30" rows="10" placeholder="Saisissez une description précise de votre évènement"></textarea>
-                <dragDrop ref="dragDropRef" v-if="progress>= 5" :auto-upload="false" format="card" />
+                <dragDrop ref="dragDropRef" v-if="progress >= 5" :auto-upload="false" format="card" />
                 <div v-if="progress === 6" class="preview">
                     <h3>{{ newCleanwalk.name }}</h3>
                     <div class="date-locate">
                         <div class="divtop">
                             <iconClock />
-                            <div>{{ dateHelper.getCleanwalkWrittenDate(new Date(newCleanwalk.date_begin), newCleanwalk.duration) }}</div>
+                            <div>{{ dateHelper.getCleanwalkWrittenDate(new Date(newCleanwalk.date_begin),
+                                newCleanwalk.duration) }}</div>
                         </div>
                         <div class="bot">
                             <iconMiniMap />
@@ -209,7 +199,6 @@ const conseils = ref([
                     </div>
                     <p>{{ newCleanwalk.description }}</p>
                 </div>
-
             </div>
             <div class="bottom">
                 <div v-if="progress < 6" class="conseil">
@@ -219,19 +208,14 @@ const conseils = ref([
                 <div class="button-container">
                     <button @click="backBtn()" class="secondary-button">{{ progress === 6 ? 'Modifier' : 'Précédent'
                         }}</button>
-                    <button @click="nextBtn()" class="button-primary">{{ progress === 6 ? 'Publier':
-                        'Suivant'}}</button>
-
+                    <button @click="nextBtn()" class="button-primary">{{ progress === 6 ? 'Publier' : 'Suivant'
+                        }}</button>
                 </div>
             </div>
-
         </div>
-
-
-
     </section>
-
 </template>
+
 
 <style scoped lang="scss">
 .section {
@@ -251,7 +235,6 @@ const conseils = ref([
         background-color: #72BDA3;
         transition: width 0.5s ease-in-out;
     }
-
 }
 
 .container {
@@ -266,91 +249,88 @@ const conseils = ref([
         align-items: left;
         flex-direction: column;
         padding: 0 1rem;
+    }
 
-        h1 {
-            color: var(#373646);
-            text-align: center;
+    h1 {
+        color: var(#373646);
+        text-align: center;
+        font-size: 20px;
+        font-weight: 700;
+        width: 100%;
+    }
+
+    input,
+    textarea {
+        border: 1px solid #94A3B8;
+        border-radius: 8px;
+        padding: 12px;
+        margin-top: 0.5rem;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 500;
+        width: 100%;
+
+        &::placeholder {
+            color: #94A3B8;
+        }
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    .label {
+        font-size: 12px;
+        font-weight: 500;
+        position: relative;
+        margin-bottom: -18px;
+        background-color: #fff;
+        width: fit-content;
+        margin-left: 13px;
+        margin-top: 5px;
+    }
+
+    .preview {
+        h3 {
             font-size: 20px;
-            font-weight: 700;
-            width: 100%;
-        }
-
-        input,
-        textarea {
-            border: 1px solid #94A3B8;
-            border-radius: 8px;
-            padding: 12px;
-            margin-top: 0.5rem;
-            font-size: 14px;
             font-style: normal;
-            font-weight: 500;
+            font-weight: 700;
+            line-height: normal;
+            padding-top: 1rem;
+        }
+
+        img {
             width: 100%;
-
-            &::placeholder {
-                color: #94A3B8;
-            }
-
-            &:focus {
-                outline: none;
-            }
+            object-fit: cover;
+            aspect-ratio: 16/9;
+            border-radius: 8px;
+            margin-top: 1rem;
         }
 
-        .label {
-            font-size: 12px;
-            font-weight: 500;
-            position: relative;
-            margin-bottom: -18px;
-            background-color: #fff;
-            width: fit-content;
-            margin-left: 13px;
-            margin-top: 5px;
+        .date-locate {
+            padding-top: 2rem;
+            display: flex;
+            stroke: black;
+            flex-direction: column;
 
-        }
-
-
-        .preview {
-            h3 {
-                font-size: 20px;
-                font-style: normal;
-                font-weight: 700;
-                line-height: normal;
-                padding-top: 1rem;
-            }
-
-            img {
-                width: 100%;
-                object-fit: cover;
-                aspect-ratio: 16/9;
-                border-radius: 8px;
-                margin-top: 1rem;
-            }
-
-            .date-locate {
-                padding-top: 2rem;
+            .divtop {
                 display: flex;
-                stroke: black;
-                flex-direction: column;
-
-                .divtop {
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                }
-
-                .bot {
-                    margin-top: 10px;
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-
-                }
+                align-items: center;
+                gap: 10px;
             }
 
-            p {
-                padding-top: 2rem;
-                font-size: 14px;
-                word-wrap: break-word;
+            .bot {
+                margin-top: 10px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
             }
+        }
+
+        p {
+            padding-top: 2rem;
+            font-size: 14px;
+            word-wrap: break-word;
         }
     }
 
@@ -406,7 +386,6 @@ const conseils = ref([
                 border: 1px solid #132778;
                 border-radius: 8px;
                 flex-grow: 0.5;
-
             }
         }
     }

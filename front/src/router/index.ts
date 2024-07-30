@@ -75,7 +75,7 @@ const router = createRouter({
   
 })
 
-const routesRequiringAuth = ['profile', 'anotherProtectedRoute'];
+const routesRequiringAuth = ['profile', 'addCleanwalk'];
 
 router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
   const isMobile = window.innerWidth <= 768;

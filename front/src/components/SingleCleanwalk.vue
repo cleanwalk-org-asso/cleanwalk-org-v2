@@ -32,6 +32,8 @@ onMounted(async () => {
 
 
   currentCleanwalk.value = await cleanwalkStore.getCleanwalkById(id, useAccountStore().CurrentUser?.id);
+  console.log(currentCleanwalk.value);
+
   if (!currentCleanwalk.value) {
     router.push('/404');
   }
@@ -176,12 +178,10 @@ const getActionButtonText = (): string => {
         <button @click="joinCleanwalk()" class="button-primary">Valider</button>
       </div>
     </div>
-
-
   </div>
   <main>
     <div>
-      <img class="cover" src="../assets/desert.png" alt="" />
+      <img v-if="currentCleanwalk" class="cover" :src="currentCleanwalk?.img_url" alt="" />
     </div>
     <div class="container">
       <h1>{{ currentCleanwalk?.name }}</h1>

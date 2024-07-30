@@ -38,6 +38,7 @@ def get_cleanwalk_by_id(cleanwalk_id):
         Cleanwalk.duration,
         Cleanwalk.description,
         Cleanwalk.address,
+        Cleanwalk.img_url,
         User.name,
         User.role_id,
         User.profile_picture,
@@ -74,6 +75,7 @@ def get_cleanwalk_by_id(cleanwalk_id):
             'duration': cleanwalk.duration,
             'description': cleanwalk.description,
             'address': cleanwalk.address,
+            'img_url': cleanwalk.img_url,
             'host': {
                 'author_id': cleanwalk.author_id,
                 'name': cleanwalk.name,
