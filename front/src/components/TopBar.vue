@@ -28,14 +28,14 @@ const props = defineProps({
   background-color: var(--color-primary);
   stroke: #fff;
   display: flex;
-  padding: 20px;
-  flex-direction: center;
+  padding: 0px;
   justify-content: space-between;
-  height: 78px;
+  align-items: center;
+  height: 58px;
 
   .back {
     position: absolute;
-    top: 34px;
+    top: 1rem;
     left: 20px;
 
     svg {
@@ -49,7 +49,6 @@ const props = defineProps({
     font-size: 18px;
     font-style: normal;
     font-weight: 700;
-    padding-top: 1rem;
     text-align: center;
     width: 100%;
   }

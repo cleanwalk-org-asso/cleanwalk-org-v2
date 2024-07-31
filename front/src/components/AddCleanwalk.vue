@@ -219,11 +219,11 @@ const conseils = ref([
 
 <style scoped lang="scss">
 .section {
-    padding: 78px 0;
+    padding: 58px 0;
     height: 100%;
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: 100dvh;
 }
 
 .progression-bar {

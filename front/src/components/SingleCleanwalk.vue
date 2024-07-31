@@ -14,6 +14,7 @@ import router from '@/router';
 import dateHelper from '@/helpers/dateHelper';
 import { useAccountStore } from '@/stores/AccountStore';
 import LeaveCwPopup from './LeaveCwPopup.vue';
+import TopBar from './TopBar.vue';
 
 const cleanwalkStore = useCleanwalkStore();
 const currenUserId = ref(useAccountStore().CurrentUser?.id);
@@ -110,6 +111,7 @@ const actionButton = () => {
   }
   if (currentCleanwalk.value.host.author_id === currenUserId.value) {
     // edit cleanwalk
+    router.push(`/cleanwalk/edit/${currentCleanwalk.value.id}`);
     return;
   }
   if (currentCleanwalk.value.is_user_participant === true) {
@@ -141,15 +143,7 @@ const getActionButtonText = (): string => {
 </script>
 
 <template>
-  <div class="top-bar">
-    <router-link class="back" to="/">
-      <iconLeftArrow />
-    </router-link>
-    <img src="../assets/logo.svg" alt="logo">
-    <button class="info">
-      <iconInfo />
-    </button>
-  </div>
+  <TopBar backUrl="/" pageName="Cleanwalk" />
   <LeaveCwPopup :isVisible="showLeaveCwPopup" :tooglePopup="toogleLeaveCwPopup" :leaveCw="leaveCleanwalk" />
   <div class="popup" v-if="popupBool">
     <div class="popup-validation">
@@ -241,52 +235,11 @@ main {
   overflow: scroll;
 }
 
-.top-bar {
-  position: sticky;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  z-index: 999;
-  background-color: var(--color-primary);
-  stroke: #fff;
-  display: flex;
-  padding: 20px;
-  flex-direction: center;
-  justify-content: space-between;
-
-  .back {
-    display: flex;
-    flex-direction: column;
-    justify-content: end;
-    padding-bottom: 5px;
-
-    svg {
-      width: 24px;
-      height: 24px;
-    }
-  }
-
-  img {
-    width: 104px;
-    margin-top: 10px;
-  }
-
-  .info {
-    background-color: #fff;
-    border-radius: 8px;
-    border: 1px solid #CBD5E1;
-    width: 38px;
-    height: 38px;
-    stroke: #94A3B8;
-  }
-
-
-}
-
 .cover {
   width: 100vw;
   object-fit: cover;
   aspect-ratio: 21/9;
+  margin-top: 58px;
 }
 
 .container {
@@ -414,7 +367,7 @@ main {
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
   z-index: 999;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;

@@ -69,6 +69,11 @@ const router = createRouter({
       path: '/:catchAll(.*)',
       name: 'NotFound',
       component: () => import('../views/404.vue')
+    },
+    {
+      path: '/cleanwalk/edit/:id',
+      name: 'editCleanwalk',
+      component: () => import('../views/EditCleanwalkView.vue')
     }
   ]
 
