@@ -5,10 +5,14 @@ import TopBar from './TopBar.vue';
 import { useAccountStore } from '@/stores/AccountStore';
 import type { SingleCleanwalk } from '@/interfaces/cleanwalkInterface';
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
-import dateHelper from '@/helpers/dateHelper';
+import dateHelper from '@/helpers/dateHelper'; // Assurez-vous d'importer correctement
 import dragDrop from './dragDrop.vue';
 import AutocompleteAddress from './AutocompleteAddress.vue';
-import { set, parse, differenceInMinutes, format } from 'date-fns';
+import { format, parse } from 'date-fns';
+import { useUtilsStore } from '@/stores/UtilsStore';
+import apiHelper from '@/helpers/apiHelper';
+
+const showToast = useUtilsStore().showToast;
 
 const getCleanwalkById = useCleanwalkStore().getCleanwalkById;
 
@@ -16,13 +20,16 @@ const accountStore = useAccountStore();
 const route = useRoute();
 const router = useRouter();
 
+const dragDropRef = ref(null as any);
+
 const dateCleanwalk = ref({
-    dateDay: undefined,
+    dateDay: '',
     hourBegin: '',
     hourEnd: ''
 });
 
 let currentCleanwalk: Ref<SingleCleanwalk | undefined> = ref(undefined);
+
 onMounted(async () => {
   if (!accountStore.CurrentUser?.id) {
     console.log('User not connected');
@@ -30,49 +37,76 @@ onMounted(async () => {
   }
   const cleanwalkId = route.params.id;
   if (!cleanwalkId) {
-    router.push('/')
+    router.push('/');
   }
   // fetch cleanwalk
   currentCleanwalk.value = await getCleanwalkById(+cleanwalkId);
   if (!currentCleanwalk.value) {
     router.push('/');
+  } else {
+    const { dateDay, hourBegin, hourEnd } = dateHelper.getDayAndHourBegginEndByDate(currentCleanwalk.value.date_begin, currentCleanwalk.value.duration);
+    dateCleanwalk.value.dateDay = format(parse(dateDay, 'dd-MM-yyyy', new Date()), 'yyyy-MM-dd');
+    dateCleanwalk.value.hourBegin = hourBegin;
+    dateCleanwalk.value.hourEnd = hourEnd;
   }
-
-
 });
 
-const getDate = () => {
+const getWrittenDate = () => {
   if (currentCleanwalk.value && currentCleanwalk.value.date_begin && currentCleanwalk.value.duration) {
     return dateHelper.getCleanwalkWrittenDate(new Date(currentCleanwalk.value.date_begin), currentCleanwalk.value.duration);
   }
 }
-const setDate = () => {
-    if (!dateCleanwalk.value.dateDay || !dateCleanwalk.value.hourBegin || !dateCleanwalk.value.hourEnd) {
+
+const validate = async() => {
+  if (dateCleanwalk.value.dateDay && dateCleanwalk.value.hourBegin && dateCleanwalk.value.hourEnd) {
+    const date = dateHelper.getDateBegginAndDuration(dateCleanwalk.value.dateDay, dateCleanwalk.value.hourBegin, dateCleanwalk.value.hourEnd);
+    currentCleanwalk.value!.date_begin = date!.date_begin;
+    currentCleanwalk.value!.duration = date!.duration;
+  }
+  console.log(currentCleanwalk.value);
+  Upload();
+  const res = await apiHelper.kyPut(`/cleanwalks/${currentCleanwalk.value!.id}`,
+        {
+            name: currentCleanwalk.value!.name,
+            description: currentCleanwalk.value!.description,
+            address: currentCleanwalk.value!.address,
+            date_begin: currentCleanwalk.value!.date_begin,
+            duration: currentCleanwalk.value!.duration,
+            img_url: currentCleanwalk.value!.img_url,
+        },
+     accountStore.getAccessToken()!);
+    if (res.success === false) {
+        showToast(res.data.message as string, false);
+    } else {
+        showToast('La cleanwalk a été modifiée avec succès', true);
+        router.push('/cleanwalks').then(() => router.go(0));
+    }
+}
+
+const Upload = async () => {
+    if (!dragDropRef.value) {
+      console.log('No dragDropRef');
         return;
     }
-    let startDate = set(parse(dateCleanwalk.value.dateDay, 'yyyy-MM-dd', new Date()), {
-        hours: parseInt(dateCleanwalk.value.hourBegin.split(':')[0]),
-        minutes: parseInt(dateCleanwalk.value.hourBegin.split(':')[1]),
-    });
-
-    let formattedStartDate = format(startDate, 'yyyy-MM-dd HH:mm:ss');
-
-    let endDate = set(parse(dateCleanwalk.value.dateDay, 'yyyy-MM-dd', new Date()), {
-        hours: parseInt(dateCleanwalk.value.hourEnd.split(':')[0]),
-        minutes: parseInt(dateCleanwalk.value.hourEnd.split(':')[1]),
-    });
-
-    let duration = differenceInMinutes(endDate, startDate);
-
-    currentCleanwalk.value!.date_begin = formattedStartDate;
-    currentCleanwalk.value!.duration = duration;
+    try {
+        const response: string | undefined = await dragDropRef.value.handleUpload();
+        console.log(response);
+        if (response !== undefined) {
+            currentCleanwalk.value!.img_url = response;
+            console.log(currentCleanwalk.value?.img_url);
+        }
+    } catch (error) {
+        showToast('Erreur lors de l\'upload de l\'image', false);
+    }
 };
+
+
 </script>
 
 <template>
   <div v-if="currentCleanwalk" class="container">
     <div class="banner">
-      <dragDrop :current-img="currentCleanwalk.img_url" format="card" />
+      <dragDrop ref="dragDropRef" :current-img="currentCleanwalk.img_url" format="card" />
     </div>
     <label for="name">Nom de la cleanwalk</label>
     <input id="name" type="text" v-model="currentCleanwalk.name">
@@ -86,7 +120,8 @@ const setDate = () => {
     <input id="hourBegin" v-model="dateCleanwalk.hourBegin" type="time">
     <label class="label" for="hourEnd">heure de fin</label>
     <input id="hourEnd" v-model="dateCleanwalk.hourEnd" type="time">
-    <button class="validate button-primary">
+
+    <button @click="validate()" class="validate button-primary">
       Valider
     </button>
   </div>
