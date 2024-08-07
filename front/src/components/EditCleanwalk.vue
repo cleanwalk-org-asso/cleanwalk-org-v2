@@ -32,7 +32,6 @@ let currentCleanwalk: Ref<SingleCleanwalk | undefined> = ref(undefined);
 
 onMounted(async () => {
   if (!accountStore.CurrentUser?.id) {
-    console.log('User not connected');
     router.push('/login');
   }
   const cleanwalkId = route.params.id;
@@ -63,42 +62,52 @@ const validate = async() => {
     currentCleanwalk.value!.date_begin = date!.date_begin;
     currentCleanwalk.value!.duration = date!.duration;
   }
-  console.log(currentCleanwalk.value);
   Upload();
   const res = await apiHelper.kyPut(`/cleanwalks/${currentCleanwalk.value!.id}`,
         {
             name: currentCleanwalk.value!.name,
-            description: currentCleanwalk.value!.description,
-            address: currentCleanwalk.value!.address,
+            pos_lat: currentCleanwalk.value!.pos_lat,
+            pos_long: currentCleanwalk.value!.pos_long,
             date_begin: currentCleanwalk.value!.date_begin,
             duration: currentCleanwalk.value!.duration,
+            description: currentCleanwalk.value!.description,
             img_url: currentCleanwalk.value!.img_url,
+            address: currentCleanwalk.value!.address,
+            city: currentCleanwalk.value!.city,
         },
      accountStore.getAccessToken()!);
     if (res.success === false) {
         showToast(res.data.message as string, false);
     } else {
         showToast('La cleanwalk a été modifiée avec succès', true);
-        router.push('/cleanwalks').then(() => router.go(0));
     }
 }
 
 const Upload = async () => {
     if (!dragDropRef.value) {
-      console.log('No dragDropRef');
         return;
     }
     try {
         const response: string | undefined = await dragDropRef.value.handleUpload();
-        console.log(response);
         if (response !== undefined) {
             currentCleanwalk.value!.img_url = response;
-            console.log(currentCleanwalk.value?.img_url);
         }
     } catch (error) {
         showToast('Erreur lors de l\'upload de l\'image', false);
     }
 };
+
+
+const handleSelectAddress = (addressData: { address: string, lat: string, lon: string, city: string }) => {
+  if (!currentCleanwalk.value) {
+    return;
+  }
+    currentCleanwalk.value.address = addressData.address;
+    currentCleanwalk.value.pos_lat = parseFloat(addressData.lat);
+    currentCleanwalk.value.pos_long = parseFloat(addressData.lon);
+    currentCleanwalk.value.city = addressData.city;
+};
+
 
 
 </script>
@@ -111,7 +120,8 @@ const Upload = async () => {
     <label for="name">Nom de la cleanwalk</label>
     <input id="name" type="text" v-model="currentCleanwalk.name">
     <label for="address">Adresse</label>
-    <AutocompleteAddress v-model:query="currentCleanwalk.address" />
+    <AutocompleteAddress v-model:query="currentCleanwalk.address"
+    @select-suggestion="handleSelectAddress" />
     <label for="description">Description</label>
     <textarea name="description" v-model="currentCleanwalk.description" id="description"></textarea>
     <label class="label" for="date">date de l'évènement</label>
