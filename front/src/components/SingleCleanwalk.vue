@@ -33,7 +33,6 @@ onMounted(async () => {
 
 
   currentCleanwalk.value = await cleanwalkStore.getCleanwalkById(id, useAccountStore().CurrentUser?.id);
-  console.log(currentCleanwalk.value);
 
   if (!currentCleanwalk.value) {
     router.push('/404');
