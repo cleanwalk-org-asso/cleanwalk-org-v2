@@ -62,7 +62,7 @@ const validate = async() => {
     currentCleanwalk.value!.date_begin = date!.date_begin;
     currentCleanwalk.value!.duration = date!.duration;
   }
-  Upload();
+  await Upload();
   const res = await apiHelper.kyPut(`/cleanwalks/${currentCleanwalk.value!.id}`,
         {
             name: currentCleanwalk.value!.name,
