@@ -69,13 +69,18 @@ const router = createRouter({
       path: '/:catchAll(.*)',
       name: 'NotFound',
       component: () => import('../views/404.vue')
+    },
+    {
+      path: '/cleanwalk/edit/:id',
+      name: 'editCleanwalk',
+      component: () => import('../views/EditCleanwalkView.vue')
     }
   ]
 
   
 })
 
-const routesRequiringAuth = ['profile', 'anotherProtectedRoute'];
+const routesRequiringAuth = ['profile', 'addCleanwalk'];
 
 router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
   const isMobile = window.innerWidth <= 768;

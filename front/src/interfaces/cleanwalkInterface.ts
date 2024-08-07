@@ -39,6 +39,8 @@ export interface SingleCleanwalk {
     duration: number;
     description: string;
     address: string;
+    city: string;
+    img_url: string;
     host: {
         author_id: number;
         name: string;
