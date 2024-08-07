@@ -255,7 +255,7 @@ main {
         z-index: 9998;
         background-color: var(--color-primary);
         display: flex;
-        padding: 20px 19px 20px;
+        padding: 10px 19px 10px;
         justify-content: end;
 
         .logo {
@@ -370,10 +370,10 @@ main {
         }
     }
 
-
+ 
     .map-container {
-        padding: 78px 0 ;
-        height: calc(100vh - 20px);
+        padding: 58px 0 ;
+        height: calc(100dvh - 20px);
     }
 
     .cleanwalk-list {

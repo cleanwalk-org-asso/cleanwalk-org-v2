@@ -1,17 +1,3 @@
-<template>
-  <div class="container">
-    <button v-if="imageSrc && !props.autoUpload" @click.stop="removeImage()" class="cross">X</button>
-    <div class="drop-area" @dragover.prevent="dragOver" @dragleave.prevent="dragLeave" @drop.prevent="onFileDrop"
-      @click="fileInputClick" :class="{ 'dragover': isDragOver }">
-      <input type="file" ref="fileInput" @change="onFileChange" accept="image/jpeg, image/png" style="display: none" />
-      <icon-photo class="icon-photo" v-if="!imageSrc" />
-
-      <img v-if="imageSrc" :src="imageSrc" alt="Preview" class="preview" />
-    </div>
-  </div>
-
-</template>
-
 <script lang="ts" setup>
 import { ref, type Ref } from 'vue';
 import iconPhoto from './icons/icon-photo.vue';
@@ -24,13 +10,17 @@ const showToast = useUtilsStore().showToast;
 
 const props = defineProps({
   format: {
-    validator: (value: string) => ['card', 'full', 'circle'].includes(value),
+    validator: (value: string) => ['card', 'circle'].includes(value),
     default: 'card',
   },
   autoUpload: {
     type: Boolean,
     default: false,
-  }
+  },
+  currentImg: {
+    type: String,
+    default: '',
+  },
 
 });
 
@@ -108,8 +98,23 @@ const removeImage = () => {
 defineExpose({ handleUpload });
 </script>
 
+<template>
+  <div class="container-drag-drop ">
+    <button v-if="imageSrc && !props.autoUpload" @click.stop="removeImage()" class="cross">X</button>
+    <div  class="drop-area" @dragover.prevent="dragOver" @dragleave.prevent="dragLeave" @drop.prevent="onFileDrop"
+      @click="fileInputClick" :class="{ 'dragover': isDragOver , [props.format]: true }"
+      :style="{ backgroundImage: currentImg ? `url(${currentImg})` : 'none' }">
+      <input type="file" ref="fileInput" @change="onFileChange" accept="image/jpeg, image/png" style="display: none" />
+      <icon-photo class="icon-photo" v-if="!imageSrc" />
+
+      <img v-if="imageSrc" :src="imageSrc" alt="Preview" class="preview" />
+    </div>
+  </div>
+</template>
+
+
 <style scoped lang="scss">
-.container {
+.container-drag-drop {
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -138,14 +143,20 @@ defineExpose({ handleUpload });
   width: 100%;
   text-align: center;
   cursor: pointer;
-  aspect-ratio: 16/9;
+  aspect-ratio: 21/9;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   background-color: #E1F4F8;
-  border-radius: 8px;
   overflow: hidden;
+  background-position: center;
+  background-size: cover;
+
+  &.card {
+    border-radius: 8px;
+
+  }
 }
 
 .dragover {

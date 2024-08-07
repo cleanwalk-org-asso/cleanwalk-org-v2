@@ -2,12 +2,12 @@
 import { ref } from 'vue'
 import iconCross from './icons/icon-cross.vue';
 
-defineProps({
-    isVisible: Boolean,
-    tooglePopup: Function,
-    leaveCw: Function
-});
-
+// Define props
+const props = defineProps<{
+  isVisible: boolean,
+  tooglePopup: () => void,
+  leaveCw: () => void
+}>();
 
 </script>
 

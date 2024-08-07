@@ -87,7 +87,7 @@ const currentUser = accountStore.CurrentUser!;
     font-style: normal;
     font-weight: 700;
     justify-content: space-between;
-    height: 100vh;
+    height: 100dvh;
 
     .unlog-profiles {
         width: 100%;
