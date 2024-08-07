@@ -28,7 +28,6 @@ def check_api_key():
 @cleanwalks_bp.route('/<int:cleanwalk_id>', methods=['GET'])
 def get_cleanwalk_by_id(cleanwalk_id):
     user_id = request.args.get('user_id', None)
-    print("user id", user_id )
     cleanwalk = db.session.query(
         Cleanwalk.id.label('cleanwalk_id'),
         Cleanwalk.name.label('cleanwalk_name'),
@@ -188,8 +187,6 @@ def create_cleanwalk():
 def participate_cleanwalk():
     try:
         data = request.json
-        print("my datattatta",data)
-
         new_cleanwalk_user = CleanwalkUser(
             cleanwalk_id=data['cleanwalk_id'],
             user_id=data['user_id'],
@@ -205,29 +202,56 @@ def participate_cleanwalk():
         db.session.rollback()
 #------------------------------------PUT------------------------------------#
 
-# Route for update a Cleanwalk by its ID
 @cleanwalks_bp.route('/<int:cleanwalk_id>', methods=['PUT'])
+@jwt_required()
 def update_cleanwalk(cleanwalk_id):
-    updated_cleanwalk_data = request.json
-    cleanwalk = Cleanwalk.query.get(cleanwalk_id)
+    try:
+        updated_cleanwalk_data = request.json
+        cleanwalk = Cleanwalk.query.get(cleanwalk_id)
 
-    if cleanwalk:
-        cleanwalk.name = updated_cleanwalk_data['name']
-        cleanwalk.pos_lat = updated_cleanwalk_data['pos_lat']
-        cleanwalk.pos_long = updated_cleanwalk_data['pos_long']
-        cleanwalk.date_begin = updated_cleanwalk_data['date_begin']
-        cleanwalk.duration = updated_cleanwalk_data['duration']
-        cleanwalk.description = updated_cleanwalk_data['description']
-        cleanwalk.city_id = updated_cleanwalk_data['city_id']
-        cleanwalk.address = updated_cleanwalk_data['address']
-        db.session.commit()
-        return jsonify({'message': 'Cleanwalk updated successfully'}), 200
-    else:
-        return jsonify({'message': 'Cleanwalk not found'}), 404
+        if cleanwalk:
+            # Optionally update the city if provided
+            if 'city' in updated_cleanwalk_data:
+                city = City.query.filter_by(name=updated_cleanwalk_data['city']).one_or_none()
+                if not city:
+                    city = City(name=updated_cleanwalk_data['city'])
+                    db.session.add(city)
+                    db.session.commit()
+                cleanwalk.city_id = city.id
+
+            # Update other cleanwalk fields if provided
+            if 'name' in updated_cleanwalk_data:
+                cleanwalk.name = updated_cleanwalk_data['name']
+            if 'pos_lat' in updated_cleanwalk_data:
+                cleanwalk.pos_lat = updated_cleanwalk_data['pos_lat']
+            if 'pos_long' in updated_cleanwalk_data:
+                cleanwalk.pos_long = updated_cleanwalk_data['pos_long']
+            if 'date_begin' in updated_cleanwalk_data:
+                cleanwalk.date_begin = updated_cleanwalk_data['date_begin']  # Ensure date format is correct
+            if 'duration' in updated_cleanwalk_data:
+                cleanwalk.duration = updated_cleanwalk_data['duration']
+            if 'description' in updated_cleanwalk_data:
+                cleanwalk.description = updated_cleanwalk_data['description']
+            if 'img_url' in updated_cleanwalk_data:
+                cleanwalk.img_url = updated_cleanwalk_data['img_url']
+            if 'address' in updated_cleanwalk_data:
+                cleanwalk.address = updated_cleanwalk_data['address']
+
+            # Commit changes
+            db.session.commit()
+            print("Cleanwalk updated successfully")
+            return jsonify({'message': 'Cleanwalk updated successfully'}), 200
+        else:
+            return jsonify({'message': 'Cleanwalk not found'}), 404
+    except Exception as e:
+        db.session.rollback()
+        print("Exception:", str(e))
+        return jsonify({'error': str(e)}), 500
+
     
 #------------------------------------DELETE------------------------------------#
 
-# RRoute for delete a Cleanwalk by its ID
+# Route for delete a Cleanwalk by its ID
 @cleanwalks_bp.route('/<int:cleanwalk_id>', methods=['DELETE'])
 def delete_cleanwalk(cleanwalk_id):
     cleanwalk = Cleanwalk.query.get(cleanwalk_id)
