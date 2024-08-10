@@ -1,0 +1,17 @@
+meta {
+  name: upldate user
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{host}}/users
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "profile_picture": "new_image_url"
+  }
+}

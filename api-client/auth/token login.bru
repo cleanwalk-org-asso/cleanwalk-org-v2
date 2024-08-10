@@ -1,0 +1,15 @@
+meta {
+  name: token login
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{host}}/users/token-login
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt-token}}
+}
