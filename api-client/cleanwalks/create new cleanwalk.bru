@@ -1,0 +1,30 @@
+meta {
+  name: create new cleanwalk
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{host}}/cleanwalks
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt-token}}
+}
+
+body:json {
+  {
+    "name": "Test cleanwalk",
+    "user_id": 18,
+    "pos_lat": 40.7128,
+    "pos_long": -74.0060,
+    "date_begin": "2024-01-15",
+    "duration": 2,
+    "description": "test test test description",
+    "img_url": "https://exemple-img.png",
+    "city": "Nantes",
+    "address": "123 Rue des fake adresse"
+  }
+}

@@ -1,0 +1,26 @@
+meta {
+  name: modify cleanwalk
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{host}}/cleanwalks/{{cleanwalk_id}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt-token}}
+}
+
+body:json {
+  {
+    "description": "test description"
+  }
+  // can add more params
+}
+
+vars:pre-request {
+  cleanwalk_id: 39
+}

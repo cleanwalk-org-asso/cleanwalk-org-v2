@@ -1,0 +1,16 @@
+meta {
+  name: upload picture
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/uploads
+  body: none
+  auth: none
+}
+
+docs {
+  can not use File in bruno
+  info: file must be png, jpg jpeg or gif
+}
