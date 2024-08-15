@@ -22,6 +22,14 @@ or you can use your integrated python extension in your IDE.
 
 Go to your-domain/cleanwalks or your-domain/users
 
+## API Client: use `Bruno`
+https://www.usebruno.com/downloads
+
+### config collection
+- open collection --> "api-client" folder in cleanwalk repo
+- select environement and add secrets variables like email token api-key ... . https://docs.usebruno.com/secrets-management/secret-variables
+
+
 ## API Routes Documentation - Users
 
 ### Authentication

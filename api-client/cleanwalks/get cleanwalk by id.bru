@@ -1,0 +1,15 @@
+meta {
+  name: get cleanwalk by id
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{host}}/cleanwalks/{{cleanwalk_id}}
+  body: none
+  auth: none
+}
+
+vars:pre-request {
+  cleanwalk_id: 39
+}

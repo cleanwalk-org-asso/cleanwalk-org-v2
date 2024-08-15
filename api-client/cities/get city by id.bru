@@ -1,0 +1,15 @@
+meta {
+  name: get city by id
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{host}}/cities/{{city_id}}
+  body: none
+  auth: none
+}
+
+vars:pre-request {
+  city_id: 1
+}
