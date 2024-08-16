@@ -5,19 +5,17 @@ import type {User, Association} from '@/interfaces/userInterface';
 import apiHelper from '@/helpers/apiHelper';
 import router from '@/router';
 import { inject } from 'vue';
-import type {VueCookies} from 'vue-cookies';
 import type { ApiResponse } from '@/interfaces/apiResponseInterface';
 
 export const useAccountStore = defineStore('account', () => {
-    const $cookies = inject<VueCookies>('$cookies'); 
-    const tokenCookieName = 'access_token';
-    const tokenCookieExpireTime = '30d'; // 3m => 3 months (d => days, m => months, y => years)
+    const tokenName = 'access_token';
     let CurrentUser: Ref<User|undefined> = ref();
     let isLoggedIn = ref(false);
 
     const setToken = (token: string) => {
-        $cookies!.remove(tokenCookieName);
-        $cookies!.set(tokenCookieName, token, tokenCookieExpireTime);
+        //set token in local storage
+        localStorage.setItem(tokenName, token);
+        
     }
 
     const getOrganisationById = async (organisationId: number) => {
@@ -27,13 +25,13 @@ export const useAccountStore = defineStore('account', () => {
 
     async function logout() {
         isLoggedIn.value = false;
-        $cookies!.remove(tokenCookieName);
+        localStorage.removeItem(tokenName);
         CurrentUser.value = undefined;
         router.push({name: 'login'});
     }
 
     async function tokenLogin(): Promise<boolean> {
-        const token:string = $cookies!.get(tokenCookieName);
+        const token:string = getAccessToken() as string;
         if(token != undefined) {
             const response:ApiResponse = await apiHelper.kyPost('/users/token-login', {}, token);
             if(response.success === true) {
@@ -65,7 +63,7 @@ export const useAccountStore = defineStore('account', () => {
     }
 
     const getAccessToken = ():string | undefined => {
-        return $cookies!.get(tokenCookieName);
+        return localStorage.getItem(tokenName) as string;
     }
 
     const modifyUser = (userId: number, token: string, name?: string, profile_picture?: string) => {
