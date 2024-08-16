@@ -7,6 +7,13 @@ export interface User {
     role: "organisation" | "user"
 }
 
+export interface modifyAssociation {
+    name?: string,
+    description?: string,
+    profile_picture?: string,
+    banner_img?: string
+}
+
 export interface Association {
     user_id: number,
     name: string,

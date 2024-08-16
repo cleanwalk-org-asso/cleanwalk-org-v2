@@ -11,7 +11,6 @@ import type { Association } from '@/interfaces/userInterface';
 import ProfileAssoAddon from './ProfileAssoAddon.vue';
 
 const getToken = useAccountStore().getAccessToken;
-
 const showToast = useUtilsStore().showToast;
 
 const currentMdp = ref('');
@@ -22,8 +21,11 @@ const accountStore = useAccountStore();
 const currentUser = ref(useAccountStore().CurrentUser);
 const association: Ref<Association | undefined> = ref(undefined);
 const userName = ref(currentUser.value?.name);
+const currentDescription: Ref<string | undefined> = ref(undefined);
 
-let debounceTimeout: any;
+// Separate debounce timeouts for name and description
+let debounceTimeoutName: any;
+let debounceTimeoutDescription: any;
 
 onMounted(async () => {
     if (!currentUser.value) {
@@ -32,22 +34,23 @@ onMounted(async () => {
     }
     if (currentUser.value?.role === 'organisation') {
         association.value = await accountStore.getOrganisationById(currentUser.value.id!);
-        console.log(association.value);
+        currentDescription.value = association.value?.description;
     }
 });
 
+// Watcher for userName with its own debounce logic
 watch(() => userName.value, () => {
-    if (debounceTimeout) {
-        clearTimeout(debounceTimeout);
+    if (debounceTimeoutName) {
+        clearTimeout(debounceTimeoutName);
     }
 
     if (userName.value === useAccountStore().CurrentUser?.name) {
         return;
     }
 
-    debounceTimeout = setTimeout(() => {
+    debounceTimeoutName = setTimeout(() => {
         if (!userName.value || userName.value === '') {
-            debounceTimeout = undefined;
+            debounceTimeoutName = undefined;
             userName.value = currentUser.value?.name;
             showToast('Veuillez entrer un nom valide', false);
             return;
@@ -55,7 +58,24 @@ watch(() => userName.value, () => {
         useAccountStore().modifyUser(currentUser.value!.id!, getToken()!, userName.value);
         showToast('Votre nom a été modifié', true);
         useAccountStore().CurrentUser!.name = userName.value;
-        debounceTimeout = undefined;
+        debounceTimeoutName = undefined;
+    }, 2000);
+});
+
+// Watcher for currentDescription with its own debounce logic
+watch(() => currentDescription.value, () => {
+    if (debounceTimeoutDescription) {
+        clearTimeout(debounceTimeoutDescription);
+    }
+
+    if (currentDescription.value === association.value?.description) {
+        return;
+    }
+
+    debounceTimeoutDescription = setTimeout(() => {
+        useAccountStore().modifyAssociation({ description: currentDescription.value });
+        showToast('Votre description a été modifiée', true);
+        debounceTimeoutDescription = undefined;
     }, 2000);
 });
 
@@ -79,24 +99,24 @@ const changePassword = async () => {
     currentMdp.value = '';
     newMdp.value = '';
     confirmNewMdp.value = '';
-}
+};
 
 const changeUserPP = () => {
     currentUser.value!.profile_picture = 'https://api.dicebear.com/8.x/fun-emoji/svg?seed=' + uuidv4();
 
     // Clear the previous timeout if it exists
-    if (debounceTimeout) {
-        clearTimeout(debounceTimeout);
+    if (debounceTimeoutName) {
+        clearTimeout(debounceTimeoutName);
     }
 
     // Set a new timeout
-    debounceTimeout = setTimeout(() => {
+    debounceTimeoutName = setTimeout(() => {
         useAccountStore().modifyUser(currentUser.value!.id!, getToken()!, undefined, currentUser.value!.profile_picture);
         showToast('Votre photo de profil a été modifiée', true);
         useAccountStore().CurrentUser!.profile_picture = currentUser.value!.profile_picture;
-        debounceTimeout = undefined; // Reset the timeout variable
+        debounceTimeoutName = undefined; // Reset the timeout variable
     }, 2000);
-}
+};
 </script>
 <template>
     <section class="container">
@@ -112,7 +132,7 @@ const changeUserPP = () => {
         <div class="content">
             <h3>{{ currentUser?.email }}</h3>
             <input class="input name" type="text" v-model="userName">
-            <textarea v-if="association" name="text" id="text" v-model="association.description" placeholder="Descrition"></textarea>
+            <textarea v-if="association" name="text" id="text" v-model="currentDescription" placeholder="Descrition"></textarea>
             <form @submit.prevent="changePassword()">
                 <label class="label" for="mdp">Mot de passe actuel</label>
                 <input v-model="currentMdp" class="input" name="mdp" type="password" placeholder="Votre mot de passe">

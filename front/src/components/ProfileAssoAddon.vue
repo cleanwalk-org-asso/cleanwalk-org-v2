@@ -11,16 +11,17 @@ import type { Association } from '@/interfaces/userInterface';
 const showToast = useUtilsStore().showToast;
 const accountStore = useAccountStore();
 
-
 const props = defineProps<{
-  Asso: Association | undefined;
+    Asso: Association | undefined;
 }>();
 
+const currentBanner = ref(props.Asso?.banner_img);
+const currentPP = ref(props.Asso?.profile_picture);
+
 onMounted(() => {
-  if (!props.Asso) {
-    return;
-  }
-  console.log(props.Asso);
+    if (!props.Asso) {
+        return;
+    }
 });
 
 
@@ -28,108 +29,112 @@ const fileInputPP: Ref<HTMLInputElement | null> = ref(null);
 const fileInputBanner: Ref<HTMLInputElement | null> = ref(null);
 
 
-const handleUpload = async (fileInput:HTMLInputElement): Promise<string | undefined> => {
-  if (fileInput.files?.length && fileInput.value) {
-    // Utilisez votre fonction d'aide pour uploader l'image
-    const token = accountStore.getAccessToken();
-    const Response: ApiResponse = await apiHelper.uploadFile(fileInput.files[0], token!);
-    if (Response.success) {
-    } else {
-      showToast(Response.data.message as string, false);
+const handleUpload = async (fileInput: HTMLInputElement): Promise<string | undefined> => {
+    if (fileInput.files?.length && fileInput.value) {
+        // Utilisez votre fonction d'aide pour uploader l'image
+        const token = accountStore.getAccessToken();
+        const Response: ApiResponse = await apiHelper.uploadFile(fileInput.files[0], token!);
+        if (Response.success) {
+        } else {
+            showToast(Response.data.message as string, false);
+        }
+        return Response.data.img_url as string; //img name is in Response.data.filename
     }
-    return Response.data.img_url as string; //img name is in Response.data.filename
-  }
-  showToast("No file selected", false);
-  return undefined;
+    showToast("No file selected", false);
+    return undefined;
 };
 
 const uploadProfilePicture = async () => {
-  const img_url = await handleUpload(fileInputPP.value!);
-  if (img_url) {
-    accountStore.modifyUser(accountStore.CurrentUser!.id!, accountStore.getAccessToken()!, img_url);
-    showToast("Votre photo de profil a été modifiée", true);
-  }
+    const img_url = await handleUpload(fileInputPP.value!);
+    if (img_url) {
+        currentPP.value = img_url;
+        accountStore.modifyAssociation({profile_picture: img_url});
+        showToast("Votre photo de profil a été modifiée", true);
+    }
 };
 
 const uploadBanner = async () => {
-  const img_url = await handleUpload(fileInputBanner.value!);
-  if (img_url) {
-    showToast("Votre bannière a été modifiée", true);
-  }
+    const img_url = await handleUpload(fileInputBanner.value!);
+    if (img_url) {
+        currentBanner.value = img_url;
+        accountStore.modifyAssociation({ banner_img: img_url });
+        showToast("Votre bannière a été modifiée", true);
+    }
 };
+
 </script>
 
 <template>
     <div class="asso-imgs">
-        <input type="file" :current-img="Asso?.banner_img" 
-        :style="{ backgroundImage: `url(${Asso?.banner_img})`}"/>
-        <input type="file" class="pp" alt="pp" 
-        :style="{ backgroundImage: `url(${Asso?.profile_picture})`}"/>
-        <div class="icon-photo pp-icon">
-            <iconPhoto />
+        <!-- Banner Image Area -->
+        <div class="input-area banner" :style="{ backgroundImage: `url(${currentBanner})` }"
+            @click="fileInputBanner?.click()">
+            <input type="file" ref="fileInputBanner" @change="uploadBanner" style="display: none;" />
+            <iconPhoto class="iconPhoto" />
+        </div>
+
+        <!-- Profile Picture Area -->
+        <div class="input-area pp" :style="{ backgroundImage: `url(${currentPP})` }"
+            @click="fileInputPP?.click()">
+            <input type="file" ref="fileInputPP" @change="uploadProfilePicture" style="display: none;" />
+            <iconPhoto class="iconPhoto pp" />
         </div>
     </div>
 </template>
 
+
 <style scoped lang="scss">
-.container-drag-drop {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: end;
-
-  .cross {
-    position: absolute;
-    margin-right: -10px;
-    margin-top: -10px;
-    background-color: #000000;
-    color: #ffffff;
-    border: none;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
+.asso-imgs {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 12px;
-    z-index: 1;
-  }
+    flex-direction: column;
+    gap: 20px;
+
+    .input-area {
+        position: relative;
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &.banner {
+            width: 100%;
+            height: 150px;
+            /* Default background img */
+            background-image: url('../assets/default-banner.svg');
+        }
+
+        &.pp {
+            position: relative;
+            width: 96px;
+            margin-top: -70px;
+            height: 96px;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background-color: #ffc107;
+            /* Default background color */
+        }
+
+        .iconPhoto {
+            width: 50px;
+            height: 50px;
+            stroke: #ffffff;
+            margin-bottom: 2rem;
+
+            &.pp {
+                width: 24px;
+                height: 24px;
+                transform: translate(35px, 43px);
+                background-color: var(--color-primary);
+                border-radius: 9999px;
+                padding: 3px;
+
+            }
+        }
+    }
 }
 
-.drop-area {
-  width: 100%;
-  text-align: center;
-  cursor: pointer;
-  aspect-ratio: 21/9;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background-color: #E1F4F8;
-  overflow: hidden;
-  background-position: center;
-  background-size: cover;
 
-  &.card {
-    border-radius: 8px;
-
-  }
-}
-
-.dragover {
-  background-color: #E1F4F8;
-}
-
-.icon-photo {
-  width: 50px;
-  height: 50px;
-  stroke: #000000;
-}
-
-.preview {
-  width: 100%;
-  aspect-ratio: 16/9;
-  object-fit: cover;
-}
 </style>

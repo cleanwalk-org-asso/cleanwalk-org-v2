@@ -16,7 +16,7 @@ class Organisation(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
     description = db.Column(db.String(255), nullable=True)
     web_site = db.Column(db.String(255), nullable=True)
-    social_media = db.Column(db.JSON, nullable=True)
+    social_medias = db.Column(db.JSON, nullable=True)
     banner_img = db.Column(db.String(255), nullable=True)
 
     # Relation vers User
