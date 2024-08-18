@@ -30,36 +30,35 @@ const fileInputBanner: Ref<HTMLInputElement | null> = ref(null);
 
 
 const handleUpload = async (fileInput: HTMLInputElement): Promise<string | undefined> => {
-    if (fileInput.files?.length && fileInput.value) {
-        // Utilisez votre fonction d'aide pour uploader l'image
-        const token = accountStore.getAccessToken();
-        const Response: ApiResponse = await apiHelper.uploadFile(fileInput.files[0], token!);
-        if (Response.success) {
-        } else {
-            showToast(Response.data.message as string, false);
-        }
-        return Response.data.img_url as string; //img name is in Response.data.filename
+    if (!fileInput.files?.length || !fileInput.value) {
+        showToast("No file selected", false);
+        return undefined;
     }
-    showToast("No file selected", false);
-    return undefined;
+    // Utilisez votre fonction d'aide pour uploader l'image
+    const token = accountStore.getAccessToken();
+    const Response: ApiResponse = await apiHelper.uploadFile(fileInput.files[0], token!);
+    if (Response.success) {
+        return Response.data.img_url as string; //img name is in Response.data.filename
+    } else {
+        showToast(Response.data.message as string, false);
+        return undefined;
+    }
 };
 
 const uploadProfilePicture = async () => {
     const img_url = await handleUpload(fileInputPP.value!);
-    if (img_url) {
-        currentPP.value = img_url;
-        accountStore.modifyAssociation({profile_picture: img_url});
-        showToast("Votre photo de profil a été modifiée", true);
-    }
+    if(!img_url) return;
+    currentPP.value = img_url;
+    accountStore.modifyAssociation({profile_picture: img_url});
+    showToast("Votre photo de profil a été modifiée", true);
 };
 
 const uploadBanner = async () => {
     const img_url = await handleUpload(fileInputBanner.value!);
-    if (img_url) {
-        currentBanner.value = img_url;
-        accountStore.modifyAssociation({ banner_img: img_url });
-        showToast("Votre bannière a été modifiée", true);
-    }
+    if (!img_url) return;
+    currentBanner.value = img_url;
+    accountStore.modifyAssociation({ banner_img: img_url });
+    showToast("Votre bannière a été modifiée", true);
 };
 
 </script>

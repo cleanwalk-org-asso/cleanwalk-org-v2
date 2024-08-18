@@ -4,7 +4,6 @@ import type { Ref } from 'vue';
 import type { User, Association, modifyAssociation } from '@/interfaces/userInterface';
 import apiHelper from '@/helpers/apiHelper';
 import router from '@/router';
-import { inject } from 'vue';
 import type { ApiResponse } from '@/interfaces/apiResponseInterface';
 
 export const useAccountStore = defineStore('account', () => {
