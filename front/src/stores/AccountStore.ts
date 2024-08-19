@@ -31,25 +31,26 @@ export const useAccountStore = defineStore('account', () => {
 
     async function tokenLogin(): Promise<boolean> {
         const token:string = getAccessToken() as string;
-        if(token != undefined) {
-            const response:ApiResponse = await apiHelper.kyPost('/users/token-login', {}, token);
-            if(response.success === true) {
-                isLoggedIn.value = true;
-                const user: User = {
-                    email: response.data.email as string,
-                    name: response.data.name as string,
-                    id: response.data.id as number,
-                    role: response.data.role as 'organisation' | 'user',
-                    profile_picture: response.data.profile_picture as string,
-                }
-                CurrentUser.value = user;
-            } else {
-                isLoggedIn.value = false;
-            }
-        } else {
-
+        if (!token) {
             isLoggedIn.value = false;
+            return isLoggedIn.value;
         }
+        
+        const response:ApiResponse = await apiHelper.kyPost('/users/token-login', {}, token);
+        if (response.success !== true) {
+            isLoggedIn.value = false;
+            return isLoggedIn.value;
+        }
+        
+        isLoggedIn.value = true;
+        const user: User = {
+            email: response.data.email as string,
+            name: response.data.name as string,
+            id: response.data.id as number,
+            role: response.data.role as 'organisation' | 'user',
+            profile_picture: response.data.profile_picture as string,
+        }
+        CurrentUser.value = user;
         return isLoggedIn.value;
     }
 
