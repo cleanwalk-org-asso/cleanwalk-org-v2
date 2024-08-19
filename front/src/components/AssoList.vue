@@ -1,8 +1,14 @@
 <script setup lang="ts">
-import { type Asso } from '@/interfaces/assoInterface';
 import { ref, type Ref } from 'vue';
 
-const assoList: Ref<Asso[]> = ref([
+interface TODO {
+  title: string;
+  description: string;
+  imageUrl: string;
+  coverImageUrl: string;
+}
+
+const assoList: Ref<TODO[]> = ref([
   {
     title: "Association 1",
     description: "Description de l'association 1",

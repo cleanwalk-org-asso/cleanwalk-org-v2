@@ -56,8 +56,8 @@ def get_association(user_id):
             'name':user.User.name,
             'email':user.User.email,
             'description':user.Organisation.description,
-            'web_site':user.Organisation.website,
-            'social_media':user.Organisation.social_media,
+            'web_site':user.Organisation.web_site,
+            'social_mediass':user.Organisation.social_medias,
             'banner_img':user.Organisation.banner_img,
             'profile_picture':user.User.profile_picture,
             'role':user.User.role_id
@@ -80,7 +80,7 @@ def get_all_organisations():
                 'email': user.email,
                 'description': organisation.description,
                 'web_site': organisation.web_site,
-                'social_media': organisation.social_media,
+                'social_medias': organisation.social_medias,
                 'banner_img': organisation.banner_img,
                 'profile_picture': user.profile_picture,
                 'role': user.role_id
@@ -256,3 +256,39 @@ def update_user_password(user_id):
             return jsonify({'message': 'Password updated successfully'})
         else:
             return jsonify({'message': 'Old password is incorrect'}), 400
+        
+# route for updating association by user id
+@users_bp.route('/association/<string:user_id>', methods=['PUT'])
+@jwt_required()
+def update_association(user_id):
+    # Récupérer l'utilisateur
+    user = User.query.get(user_id)
+    
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
+    # Vérifier si l'utilisateur est une organisation
+    association = Organisation.query.filter_by(user_id=user_id).first()
+    
+    if not association:
+        return jsonify({'message': 'Association not found'}), 404
+
+    # Obtenir les données de la requête JSON
+    data = request.get_json()
+    
+    # Mettre à jour les champs de l'association si fournis
+    association.description = data.get('description', association.description)
+    association.web_site = data.get('web_site', association.web_site)
+    association.social_medias = data.get('social_medias', association.social_medias)
+    association.banner_img = data.get('banner_img', association.banner_img)
+    
+    # Mettre à jour les champs de l'utilisateur si fournis
+    user.profile_picture = data.get('profile_picture', user.profile_picture)
+    
+    try:
+        db.session.commit()
+        return jsonify({'message': 'Association updated successfully'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'Failed to update association', 'error': str(e)}), 500
+

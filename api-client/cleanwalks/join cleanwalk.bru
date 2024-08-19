@@ -1,0 +1,23 @@
+meta {
+  name: join cleanwalk
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{host}}/cleanwalks/join
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt-token}}
+}
+
+body:json {
+  {
+    "cleanwalk_id": 39,
+    "user_id": 18,
+    "nb_person": 2
+  }
+}

@@ -1,0 +1,26 @@
+meta {
+  name: remove cleanwalk
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{host}}/cleanwalks/{{cleanwalk_id}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt-token}}
+}
+
+body:json {
+  {
+    "cleanwalk_id": 39,
+    "user_id": 18
+  }
+}
+
+vars:pre-request {
+  cleanwalk_id: 20
+}
