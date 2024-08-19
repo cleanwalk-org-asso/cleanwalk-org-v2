@@ -66,7 +66,7 @@ const uploadBanner = async () => {
 <template>
     <div class="asso-imgs">
         <!-- Banner Image Area -->
-        <div class="input-area banner" :style="{ backgroundImage: `url(${currentBanner})` }"
+        <div class="input-area banner" :style="currentBanner ? { backgroundImage: `url(${currentBanner})` } : {}"
             @click="fileInputBanner?.click()">
             <input type="file" ref="fileInputBanner" @change="uploadBanner" style="display: none;" />
             <iconPhoto class="iconPhoto" />
