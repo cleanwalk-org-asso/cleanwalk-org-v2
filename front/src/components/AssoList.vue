@@ -1,98 +1,111 @@
 <script setup lang="ts">
-import { ref, type Ref } from 'vue';
+import { onMounted, ref, type Ref } from 'vue';
 
-interface TODO {
-  title: string;
-  description: string;
-  imageUrl: string;
-  coverImageUrl: string;
-}
+// interface TODO {
+//   title: string;
+//   description: string;
+//   imageUrl: string;
+//   coverImageUrl: string;
+// }
 
-const assoList: Ref<TODO[]> = ref([
-  {
-    title: "Association 1",
-    description: "Description de l'association 1",
-    imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
-    coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
-  },
-  {
-    title: "Association 2",
-    description: "Description de l'association 2",
-    imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
-    coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
-  },
-  {
-    title: "Association 3",
-    description: "Description de l'association 3",
-    imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
-    coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
-  },
-  {
-    title: "Association 4",
-    description: "Description de l'association 4",
-    imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
-    coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
-  },
-  {
-    title: "Association 5",
-    description: "Description de l'association 5",
-    imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
-    coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
-  },
-  {
-    title: "Association 6",
-    description: "Description de l'association 6",
-    imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
-    coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
-  },
-  {
-    title: "Association 7",
-    description: "Description de l'association 7",
-    imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
-    coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
-  },
-  {
-    title: "Association 8",
-    description: "Description de l'association 8",
-    imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
-    coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
-  },
-  {
-    title: "Association 9",
-    description: "Description de l'association 9",
-    imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
-    coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
-  },
-  {
-    title: "Association 10",
-    description: "Description de l'association 10",
-    imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
-    coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
-  },
-  {
-    title: "Association 11",
-    description: "Description de l'association 11",
-    imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
-    coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
-  },
-  {
-    title: "Association 12",
-    description: "Description de l'association 12",
-    imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
-    coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
+// const assoList: Ref<TODO[]> = ref([
+//   {
+//     title: "Association 1",
+//     description: "Description de l'association 1",
+//     imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
+//     coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
+//   },
+//   {
+//     title: "Association 2",
+//     description: "Description de l'association 2",
+//     imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
+//     coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
+//   },
+//   {
+//     title: "Association 3",
+//     description: "Description de l'association 3",
+//     imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
+//     coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
+//   },
+//   {
+//     title: "Association 4",
+//     description: "Description de l'association 4",
+//     imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
+//     coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
+//   },
+//   {
+//     title: "Association 5",
+//     description: "Description de l'association 5",
+//     imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
+//     coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
+//   },
+//   {
+//     title: "Association 6",
+//     description: "Description de l'association 6",
+//     imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
+//     coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
+//   },
+//   {
+//     title: "Association 7",
+//     description: "Description de l'association 7",
+//     imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
+//     coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
+//   },
+//   {
+//     title: "Association 8",
+//     description: "Description de l'association 8",
+//     imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
+//     coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
+//   },
+//   {
+//     title: "Association 9",
+//     description: "Description de l'association 9",
+//     imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
+//     coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
+//   },
+//   {
+//     title: "Association 10",
+//     description: "Description de l'association 10",
+//     imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
+//     coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
+//   },
+//   {
+//     title: "Association 11",
+//     description: "Description de l'association 11",
+//     imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
+//     coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
+//   },
+//   {
+//     title: "Association 12",
+//     description: "Description de l'association 12",
+//     imageUrl: "https://cdn2.thecatapi.com/images/4f3.jpg",
+//     coverImageUrl: "https://cdn2.thecatapi.com/images/700.jpg"
+//   }
+// ]);
+import { useAccountStore } from '@/stores/AccountStore';
+import { useUtilsStore } from '@/stores/UtilsStore';
+import { type Association } from '@/interfaces/userInterface';
+import defaultBanner from '../assets/default-banner.svg';
+
+const showToast = useUtilsStore().showToast;
+const accountStore = useAccountStore();
+
+const assoList: Ref<Association[]> = ref([]);
+
+onMounted(async () => {
+  assoList.value = await accountStore.getAssoList();
+  if (!assoList.value) {
+    showToast("Erreur lors de la récupération des associations", false);
   }
-
-]);
-
+});
 </script>
-
 
 <template>
   <section class="container">
-    <div v-for="asso in assoList" :key="asso.title" class="asso-card">
-      <img :src="asso.coverImageUrl" alt="cover-img" class="cover">
-      <img :src="asso.imageUrl" alt="asso-img" class="img">
-      <h3>{{ asso.title }}</h3>
+    <div v-for="asso in assoList" :key="asso.name" class="asso-card">
+      <img :src="asso.banner_img || defaultBanner" alt="cover-img" class="cover">
+      <img :src="asso.profile_picture" alt="asso-img" class="img">
+      <h3>{{ asso.name }}</h3>
     </div>
   </section>
 </template>
@@ -133,14 +146,14 @@ const assoList: Ref<TODO[]> = ref([
       border: 2px solid #fff;
     }
 
-      h3 {
-        font-size: 12px;
-        font-weight: 700;
-        color: #373646;
-        text-align: center;
-        margin: 5px 0 10px 0;
-      }
-    
+    h3 {
+      font-size: 12px;
+      font-weight: 700;
+      color: #373646;
+      text-align: center;
+      margin: 5px 0 10px 0;
+    }
+
   }
 }
 </style>

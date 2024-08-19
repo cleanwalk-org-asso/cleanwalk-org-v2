@@ -77,5 +77,10 @@ export const useAccountStore = defineStore('account', () => {
         apiHelper.kyPut('/users/association/' + CurrentUser.value!.id, asso as Record<string, unknown>, getAccessToken()!);
     };
 
-    return { setToken, logout, isLoggedIn, tokenLogin, CurrentUser, getAccessToken, modifyUser, changePassword, getOrganisationById, modifyAssociation }
+    const getAssoList = async () => {
+        const response: ApiResponse = await apiHelper.kyGet('/users/associations');
+        return response.data as unknown as Association[];
+    }
+
+    return { setToken, logout, isLoggedIn, tokenLogin, CurrentUser, getAccessToken, modifyUser, changePassword, getOrganisationById, modifyAssociation, getAssoList }
 })

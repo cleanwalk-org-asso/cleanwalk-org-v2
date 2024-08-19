@@ -3,6 +3,12 @@ import navBar from '@/components/navBar.vue';
 import TopBar from '@/components/TopBar.vue';
 import SwithChoice from '@/components/SwithChoice.vue';
 import AssoList from '@/components/AssoList.vue';
+import { onMounted } from 'vue';
+
+onMounted(() => {
+    localStorage.setItem('discoverPage', 'associations');
+});
+
 </script>
 <template>
     <TopBar pageName="Découvrir"/>

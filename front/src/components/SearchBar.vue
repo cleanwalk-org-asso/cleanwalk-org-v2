@@ -3,12 +3,10 @@ import { ref, type Ref} from 'vue';
 import iconInfo from './icons/icon-info.vue';
 import iconLeftArrow from './icons/icon-left-arrow.vue';
 import iconSearch from './icons/icon-search.vue';
-import { tr } from 'date-fns/locale';
 
 const inputActive = ref(true);
 const searchInput = ref('');
 </script>
-
 
 <template>
     <div class="top-bar">

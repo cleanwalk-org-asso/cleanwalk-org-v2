@@ -3,6 +3,12 @@ import navBar from '@/components/navBar.vue';
 import TopBar from '@/components/TopBar.vue';
 import SwithChoice from '@/components/SwithChoice.vue';
 import ArticlesList from '@/components/ArticlesList.vue';
+import { onMounted } from 'vue';
+
+onMounted(() => {
+    localStorage.setItem('discoverPage', 'articles');
+});
+
 </script>
 <template>
     <TopBar page-name="Découvrir" />
