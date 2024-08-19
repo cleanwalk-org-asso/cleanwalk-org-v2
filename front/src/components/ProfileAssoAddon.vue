@@ -22,7 +22,6 @@ onMounted(() => {
     if (!props.Asso) {
         return;
     }
-    console.log("Asso", props.Asso);
 });
 
 
