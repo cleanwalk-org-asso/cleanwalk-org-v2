@@ -1,0 +1,21 @@
+meta {
+  name: Put Organisation by id
+  type: http
+  seq: 5
+}
+
+put {
+  url: http://localhost:5000/users/association/41
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt-token}}
+}
+
+body:json {
+  {
+    "banner_img": "https://cdn.pixabay.com/photo/2016/08/03/09/04/universe-1566161_640.jpg"
+  }
+}

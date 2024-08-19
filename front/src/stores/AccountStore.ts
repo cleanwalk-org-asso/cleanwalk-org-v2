@@ -1,10 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue';
-import type {Ref} from 'vue';
-import type {User, Association} from '@/interfaces/userInterface';
+import type { Ref } from 'vue';
+import type { User, Association, modifyAssociation } from '@/interfaces/userInterface';
 import apiHelper from '@/helpers/apiHelper';
 import router from '@/router';
-import { inject } from 'vue';
 import type { ApiResponse } from '@/interfaces/apiResponseInterface';
 
 export const useAccountStore = defineStore('account', () => {
@@ -19,7 +18,7 @@ export const useAccountStore = defineStore('account', () => {
     }
 
     const getOrganisationById = async (organisationId: number) => {
-        const response:ApiResponse = await apiHelper.kyGet('/users/organisations/' + organisationId);
+        const response: ApiResponse = await apiHelper.kyGet('/users/association/' + organisationId);
         return response.data as unknown as Association;
     }
 
@@ -27,35 +26,36 @@ export const useAccountStore = defineStore('account', () => {
         isLoggedIn.value = false;
         localStorage.removeItem(tokenName);
         CurrentUser.value = undefined;
-        router.push({name: 'login'});
+        router.push({ name: 'login' });
     }
 
     async function tokenLogin(): Promise<boolean> {
         const token:string = getAccessToken() as string;
-        if(token != undefined) {
-            const response:ApiResponse = await apiHelper.kyPost('/users/token-login', {}, token);
-            if(response.success === true) {
-                isLoggedIn.value = true;
-                const user:User = {
-                    email: response.data.email as string,
-                    name: response.data.name as string,
-                    id: response.data.id as number,
-                    role: response.data.role as 'organisation' | 'user',
-                    profile_picture: response.data.profile_picture as string,
-                }
-                CurrentUser.value = user;
-            } else {
-                isLoggedIn.value = false;
-            }
-        } else {
-            
+        if (!token) {
             isLoggedIn.value = false;
+            return isLoggedIn.value;
         }
+        
+        const response:ApiResponse = await apiHelper.kyPost('/users/token-login', {}, token);
+        if (response.success !== true) {
+            isLoggedIn.value = false;
+            return isLoggedIn.value;
+        }
+        
+        isLoggedIn.value = true;
+        const user: User = {
+            email: response.data.email as string,
+            name: response.data.name as string,
+            id: response.data.id as number,
+            role: response.data.role as 'organisation' | 'user',
+            profile_picture: response.data.profile_picture as string,
+        }
+        CurrentUser.value = user;
         return isLoggedIn.value;
     }
 
-    const changePassword = async (userId:number, token:string, oldPassword: string, newPassword: string) => {
-        const response:ApiResponse = await apiHelper.kyPut('/users/password/' + userId, {
+    const changePassword = async (userId: number, token: string, oldPassword: string, newPassword: string) => {
+        const response: ApiResponse = await apiHelper.kyPut('/users/password/' + userId, {
             old_password: oldPassword,
             new_password: newPassword
         }, token);
@@ -73,5 +73,9 @@ export const useAccountStore = defineStore('account', () => {
         }, token);
     }
 
-    return { setToken, logout, isLoggedIn, tokenLogin, CurrentUser, getAccessToken, modifyUser, changePassword, getOrganisationById}
+    const modifyAssociation = (asso: modifyAssociation) => {
+        apiHelper.kyPut('/users/association/' + CurrentUser.value!.id, asso as Record<string, unknown>, getAccessToken()!);
+    };
+
+    return { setToken, logout, isLoggedIn, tokenLogin, CurrentUser, getAccessToken, modifyUser, changePassword, getOrganisationById, modifyAssociation }
 })

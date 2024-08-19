@@ -35,7 +35,7 @@ const signup = async ( ) => {
         email: email.value,
         password: password.value,
         name: name.value,
-        profile_picture: 'https://api.dicebear.com/8.x/fun-emoji/svg?seed=' + uuidv4(),
+        profile_picture: 'https://api.dicebear.com/9.x/initials/svg?seed=' + name.value,
         role_id: 2,
     });
     if(response.success === false) {
