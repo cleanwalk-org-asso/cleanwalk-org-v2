@@ -19,6 +19,9 @@ export const useAccountStore = defineStore('account', () => {
 
     const getOrganisationById = async (organisationId: number) => {
         const response: ApiResponse = await apiHelper.kyGet('/users/association/' + organisationId);
+        if (!response.success) {
+            return undefined;
+        }
         return response.data as unknown as Association;
     }
 

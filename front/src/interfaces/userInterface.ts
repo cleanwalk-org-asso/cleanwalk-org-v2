@@ -15,7 +15,7 @@ export interface modifyAssociation {
 }
 
 export interface Association {
-    user_id: number,
+    id: number,
     name: string,
     email: string,
     profile_picture: string,

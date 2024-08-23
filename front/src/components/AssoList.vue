@@ -102,11 +102,11 @@ onMounted(async () => {
 
 <template>
   <section class="container">
-    <div v-for="asso in assoList" :key="asso.name" class="asso-card">
+    <router-link :to="'/associations/'+ asso.id" v-for="asso in assoList" :key="asso.name" class="asso-card">
       <img :src="asso.banner_img || defaultBanner" alt="cover-img" class="cover">
       <img :src="asso.profile_picture" alt="asso-img" class="img">
       <h3>{{ asso.name }}</h3>
-    </div>
+    </router-link>
   </section>
 </template>
 
