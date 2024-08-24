@@ -36,6 +36,12 @@ const router = createRouter({
       component: () => import('../views/AssoListView.vue')
     },
     {
+      path: '/associations/:id',
+      name: 'association',
+      component: () => import('../views/PublicProfileAssoView.vue')
+
+    },
+    {
       path: '/menu',
       name: 'menu',
       component: () => import('../views/MenuView.vue')
