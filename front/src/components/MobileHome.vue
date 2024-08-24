@@ -13,6 +13,8 @@ import type { Cleanwalk } from "@/interfaces/cleanwalkInterface";
 import dateHelper from "@/helpers/dateHelper";
 import cleanwalkCard from './cards/CleanwalkListCard.vue';
 import { useAccountStore } from "@/stores/AccountStore";
+import greenMapIcon from "@/assets/green-map.svg";
+import blueMapIcon from "@/assets/blue-map.svg";
 
 const userImg = useAccountStore().CurrentUser?.profile_picture;
 
@@ -175,7 +177,7 @@ function mapClick() {
                 <div v-for="cleanwalk in cleanwalkStore.cleanwalksTab">
                     <l-marker @click="slideUp(cleanwalk.id!)" :lat-lng="L.latLng(cleanwalk.pos_lat, cleanwalk.pos_long)">
                         <l-icon :icon-size="[25, 41]" :icon-anchor="[12, 41]"
-                            :iconUrl="cleanwalk.host?.role_id === 1 ? 'https://firebasestorage.googleapis.com/v0/b/horrorfire-88d56.appspot.com/o/cw%2FGroup%20172.svg?alt=media&token=2b337af1-bed2-4491-834c-c2aeaf8be593' : 'https://firebasestorage.googleapis.com/v0/b/horrorfire-88d56.appspot.com/o/cw%2FGroup%20173.svg?alt=media&token=2c75133b-e73f-4cac-95fb-277e4516dfb7'">
+                            :iconUrl="cleanwalk.host?.role_id === 1 ? blueMapIcon : greenMapIcon">
                         </l-icon>
                     </l-marker>
                 </div>

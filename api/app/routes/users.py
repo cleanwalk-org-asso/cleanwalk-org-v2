@@ -3,7 +3,8 @@
 import datetime
 from flask import Blueprint, jsonify, request
 from flask_cors import CORS
-from app.models import db, User, Role, Organisation
+from sqlalchemy import desc, func
+from app.models import Cleanwalk, CleanwalkUser, db, User, Role, Organisation
 from app.utils import validate_api_key, hash_password, upload_img
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, get_jwt
 from sqlalchemy.exc import IntegrityError
@@ -66,30 +67,26 @@ def get_association(user_id):
     else:
         return jsonify({'message': 'User not found'}), 404
     
-    # route for get all organisations
-@users_bp.route('/organisations', methods=['GET'])
-def get_all_organisations():
-    organisations =  db.session.query(Organisation).join(User).all()
+# route for get associations order by RAND
+@users_bp.route('/associations', methods=['GET'])
+def get_organisations():
+    organisations = db.session.query(User, Organisation).join(Organisation, User.id == Organisation.user_id).filter(User.role_id == 2).order_by(func.rand()).all()
     if organisations:
         organisation_data = []
         for organisation in organisations:
-            user = User.query.get(organisation.user_id)
             organisation_data.append({
-                'id': user.id,
-                'name': user.name,
-                'email': user.email,
-                'description': organisation.description,
-                'web_site': organisation.web_site,
-                'social_medias': organisation.social_medias,
-                'banner_img': organisation.banner_img,
-                'profile_picture': user.profile_picture,
-                'role': user.role_id
+                'id': organisation.User.id,
+                'name': organisation.User.name,
+                'email': organisation.User.email,
+                'description': organisation.Organisation.description,
+                'web_site': organisation.Organisation.web_site,
+                'social_medias': organisation.Organisation.social_medias,
+                'banner_img': organisation.Organisation.banner_img,
+                'profile_picture': organisation.User.profile_picture
             })
         return jsonify(organisation_data)
     else:
         return jsonify({'message': 'Organisations not found'}), 404
-    
-
 
 # route for get all users
 @users_bp.route('', methods=['GET'])

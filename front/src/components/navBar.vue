@@ -10,9 +10,12 @@ import { useRoute } from 'vue-router';
 
 const currentPage = ref('');
 const route = useRoute();
+let discoverPageName:string = '';
 
+//local storage
 onMounted(() => {
     currentPage.value = route.name as string;
+    discoverPageName = localStorage.getItem('discoverPage') ?? 'associations';
 });
 
 
@@ -33,7 +36,7 @@ onMounted(() => {
                 </router-link>
             </li>
             <li :class="{ 'active': currentPage === 'articles' || currentPage === 'associations'}">
-                <router-link to="/articles" class="redirect">
+                <router-link :to="'/'+ discoverPageName" class="redirect">
                     <iconDiscover />
                     <div>Découvrir</div>
                 </router-link>

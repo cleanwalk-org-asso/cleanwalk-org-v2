@@ -1,139 +1,172 @@
 <script setup lang="ts">
-import { ref, type Ref} from 'vue';
-import iconInfo from './icons/icon-info.vue';
-import iconLeftArrow from './icons/icon-left-arrow.vue';
-import iconSearch from './icons/icon-search.vue';
-import { tr } from 'date-fns/locale';
+import { ref, defineProps, defineEmits } from 'vue'
+import iconInfo from './icons/icon-info.vue'
+import iconLeftArrow from './icons/icon-left-arrow.vue'
+import iconSearch from './icons/icon-search.vue'
+import { useAccountStore } from '@/stores/AccountStore'
 
-const inputActive = ref(true);
-const searchInput = ref('');
+const props = defineProps({
+  searchInput: String,
+})
+
+const emit = defineEmits(['updateSearch'])
+
+const accountStore = useAccountStore()
+const userImg = ref(accountStore.CurrentUser?.profile_picture)
+const inputActive = ref(false)
+
+function handleInput(event: Event) {
+  const target = event.target as HTMLInputElement; // Cast explicite de target en HTMLInputElement
+  emit('updateSearch', target.value); // Émet l'événement avec la nouvelle valeur
+}
+
+const backButton = () => {
+  inputActive.value = false
+  emit('updateSearch', '')}
 </script>
-
 
 <template>
     <div class="top-bar">
-            <img src="../assets/logo.svg" alt="logo" v-if="!inputActive">
-            <div class="search-bar" :class="{ 'active': inputActive, 'base': !inputActive }">
-                <button @click="inputActive = false">
-                    <iconLeftArrow />
-                </button>
-                <input @click="inputActive = true" name="search" type="text" placeholder="Rechercher une cleanwalk" v-model="searchInput" />
-                <label for="search" @click="inputActive = true">
-                    <iconSearch />
-                </label>
-            </div>
-            <button class="info">
-                <iconInfo />
+        <img class="logo" src="../assets/logo.svg" alt="logo" v-if="!inputActive" />
+        <div class="search-bar" :class="{ active: inputActive, base: !inputActive }">
+            <button @click="backButton()">
+                <iconLeftArrow />
             </button>
+            <input
+                @click="inputActive = true"
+                name="search"
+                type="text"
+                placeholder="Rechercher une cleanwalk"
+                :value="searchInput"
+                @input="handleInput"
+                autocomplete="off"
+            />
+            <label for="search" @click="inputActive = true">
+                <iconSearch />
+            </label>
         </div>
+        <RouterLink to="/menu/profile" class="pp" v-if="userImg">
+            <img :src="userImg" alt="user img" />
+        </RouterLink>
+        <button class="info" v-else>
+            <iconInfo />
+        </button>
+    </div>
 </template>
+
 
 <style scoped lang="scss">
 .top-bar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        z-index: 9998;
-        background-color: var(--color-primary);
-        display: flex;
-        padding: 20px 19px 20px;
-        justify-content: end;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    z-index: 9998;
+    background-color: var(--color-primary);
+    display: flex;
+    padding: 10px 19px 10px;
+    justify-content: end;
+    
+    .logo {
+        position: absolute;
+        left: 31px;
+        width: 104px;
+        margin-top: 10px;
+    }
+
+    .pp {
+        border-radius: 999px;
+        width: 38px;
+        height: 38px;
+        margin-left: 8px;
+        overflow: hidden;
 
         img {
-            position: absolute;
-            left: 31px;
-            width: 104px;
-            margin-top: 10px;
+            width: 100%;
+            height: 100%;
         }
+    }
+    .info {
+        background-color: #fff;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        width: 38px;
+        height: 38px;
+        margin-left: 8px;
 
-        .info {
+        svg {
+            stroke: #94a3b8;
+        }
+    }
+    .search-bar {
+        &.base {
             background-color: #fff;
             border-radius: 8px;
-            border: 1px solid #CBD5E1;
+            border: 1px solid #cbd5e1;
             width: 38px;
             height: 38px;
-            margin-left: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            input {
+                opacity: 0;
+                position: absolute;
+                width: 44px;
+                height: 44px;
+            }
+            button {
+                display: none;
+            }
+
+            label {
+                padding: 0 10px;
+            }
 
             svg {
-                stroke: #94A3B8;
+                stroke: #94a3b8;
+                width: 24px;
+                height: 24px;
+                margin: 5px 1px 0 0;
             }
-
         }
+        &.active {
+            flex-grow: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            stroke: #cbd5e1;
 
-        .search-bar {
-            &.base {
-                background-color: #fff;
-                border-radius: 8px;
-                border: 1px solid #CBD5E1;
-                width: 38px;
-                height: 38px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-
-                input {
-                    opacity: 0;
-                    position: absolute;
-                    width: 44px;
-                    height: 44px;
-                }
-                button {
-                    display: none;
-                }
-
-                label {
-                    padding: 0 10px;
-                }
-
-                svg {
-                    stroke: #94A3B8;
-                    width: 24px;
-                    height: 24px;
-                    margin: 5px 1px 0 0;
-                }
-
+            button {
+                padding: 0px 5px 0px 10px;
+                background: none;
             }
 
-            &.active {
-
-                flex-grow: 1;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
+            input {
+                width: 100%;
+                border: none;
+                outline: none;
+                font-size: 14px;
+                font-weight: 500;
+                color: #373646;
                 background-color: white;
-                border-radius: 8px;
-                border: 1px solid #CBD5E1;
-                stroke: #CBD5E1;
+                padding: 10px 0;
+            }
 
-                button {
-                    padding: 0px 5px 0px 10px;
-                    background: none;
-                }
+            label {
+                padding-top: 8px;
+                padding-right: 10px;
+            }
 
-                input {
-                    width: 100%;
-                    border: none;
-                    outline: none;
-                    font-size: 14px;
-                    font-weight: 500;
-                    color: #373646;
-                    background-color: white;
-                    padding: 10px 0;
-                }
-
-                label {
-                    padding-top: 8px;
-                    padding-right: 10px;
-                }
-
-                svg {
-                    width: 20px;
-                    height: 20px;
-                    stroke: #94A3B8;
-                }
-
+            svg {
+                width: 20px;
+                height: 20px;
+                stroke: #94a3b8;
             }
         }
     }
+}
 </style>
