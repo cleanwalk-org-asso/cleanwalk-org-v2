@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { type Article } from '@/interfaces/articleInterface';
+import SearchBar from './SearchBar.vue';
 
 const articles: Article[] = [
   {
@@ -63,6 +64,7 @@ const articles: Article[] = [
 </script>
 
 <template>
+    <SearchBar />
     <div class="container">
         <div v-for="article in articles" :key="article.id" class="card">
             <img :src="article.imageUrl" alt="image de l'article" />
@@ -71,7 +73,6 @@ const articles: Article[] = [
               <div class="creation-date">{{ article.createdAt }}</div>
             </div>
         </div>
-
     </div>
 </template>
 
