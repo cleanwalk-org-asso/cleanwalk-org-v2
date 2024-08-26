@@ -8,6 +8,8 @@ from app.models import Cleanwalk, CleanwalkUser, db, User, Role, Organisation
 from app.utils import validate_api_key, hash_password, upload_img
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, get_jwt
 from sqlalchemy.exc import IntegrityError
+from app.utils import verify_google_token
+
 
 import os
 
@@ -113,13 +115,22 @@ def get_all_users():
 @users_bp.route('/<string:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     user = User.query.get(user_id)
-    
-    if user:
-        db.session.delete(user)
+    # check if is association
+    association = Organisation.query.filter_by(user_id=user_id).first()
+    # anonimyse the user
+    if association:
+        association.description = None
+        association.web_site = None
+        association.social_medias = None
+        association.banner_img = None
         db.session.commit()
-        return jsonify({'message': 'User deleted successfully'})
-    else:
-        return jsonify({'message': 'User not found'}), 404
+    if user:
+        user.name = "Utilisateur supprimé"
+        user.email = f"deleted_user_{user_id}@example.com"
+        user.google_id = None  # Ou une valeur anonyme si nécessaire
+        user.profile_picture = None
+        db.session.commit()
+
 
 #------------------------------------POST------------------------------------#
 # login route
@@ -144,6 +155,44 @@ def login():
             return jsonify({'message': 'Username or password incorrect'}), 401
     else:
         return jsonify({'message': 'Unknown email address'}), 404
+    
+# google login route
+@users_bp.route('/google-login', methods=['POST'])
+def google_login():
+    token = request.json.get('token')
+
+    # Utilise le helper pour vérifier le token
+    user_info = verify_google_token(token)
+
+    if user_info:
+        # Cherche l'utilisateur dans la base de données
+        user = User.query.filter_by(email=user_info['email']).first()
+
+        # Si l'utilisateur n'existe pas, créer un nouveau compte utilisateur
+        if not user:
+            user = User(
+                email=user_info['email'],
+                name=user_info['name'],
+                profile_picture=user_info['picture']
+            )
+            db.session.add(user)
+            db.session.commit()
+
+        # Génère un jeton JWT pour l'utilisateur (si tu utilises flask_jwt_extended)
+        access_token = create_access_token(identity=user.id)
+
+        return jsonify({
+            'access_token': access_token,
+            'user': {
+                'google_id': user_info['google_id'],
+                'email': user.email,
+                'name': user.name,
+                'profile_picture': user.profile_picture
+            }
+        })
+
+    else:
+        return jsonify({'error': 'Invalid token'}), 400
     
     
 #login with token route
@@ -213,8 +262,6 @@ def create_user():
         # Gérez l'erreur d'intégrité (adresse e-mail en double)
         db.session.rollback()  # Annuler la transaction
         return jsonify({'message': 'Email address already in use'}), 400
-
-# ...
 
 #------------------------------------PUT------------------------------------#
 # route for updating user by id
