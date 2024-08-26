@@ -6,7 +6,7 @@ import { useAccountStore } from '@/stores/AccountStore';
 import type { User } from '@/interfaces/userInterface';
 import { useRouter } from 'vue-router';
 import {useUtilsStore} from '@/stores/UtilsStore';
-
+import { GoogleLogin } from 'vue3-google-login';
 
 const router = useRouter();
 
@@ -15,6 +15,12 @@ const showToast = useUtilsStore().showToast;
 
 const email = ref("");
 const password = ref("");
+
+const callback = (response:any) => {
+  // This callback will be triggered when the user selects or login to
+  // his Google account from the popup
+  console.log("Handle the response", response)
+}
 
 const login = async ( ) => {
     if(!email.value) {
@@ -58,6 +64,8 @@ const login = async ( ) => {
         <h1>
             Se connecter
         </h1>
+    <GoogleLogin :callback="callback"/>
+
         <!-- <GoogleLogin :callback="callback" />
         <div class="or">
             <div class="line"></div>
