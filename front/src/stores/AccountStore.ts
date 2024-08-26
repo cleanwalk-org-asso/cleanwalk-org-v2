@@ -85,5 +85,22 @@ export const useAccountStore = defineStore('account', () => {
         return response.data as unknown as Association[];
     }
 
-    return { setToken, logout, isLoggedIn, tokenLogin, CurrentUser, getAccessToken, modifyUser, changePassword, getOrganisationById, modifyAssociation, getAssoList }
+    const googleLoginSingup = async (credential: string) => {
+        const response: ApiResponse = await apiHelper.kyPostWithoutToken('/users/google-login', {'token': credential});
+        if (response.success !== true) {
+            return false;
+        }
+        setToken(response.data.access_token as string);
+        isLoggedIn.value = true;
+        const user: User = {
+            email: response.data.email as string,
+            name: response.data.name as string,
+            id: response.data.id as number,
+            role: response.data.role as 'organisation' | 'user',
+            profile_picture: response.data.profile_picture as string,
+        }
+        return true;
+    }
+
+    return { setToken, logout, isLoggedIn, tokenLogin, CurrentUser, getAccessToken, modifyUser, changePassword, getOrganisationById, modifyAssociation, getAssoList, googleLoginSingup };
 })
