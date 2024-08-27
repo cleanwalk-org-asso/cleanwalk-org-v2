@@ -9,6 +9,7 @@ from app.utils import validate_api_key, hash_password, upload_img
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, get_jwt
 from sqlalchemy.exc import IntegrityError
 from app.utils import verify_google_token
+import uuid
 
 
 import os
@@ -159,21 +160,30 @@ def login():
 # google login route
 @users_bp.route('/google-login', methods=['POST'])
 def google_login():
-    token = request.json.get('token')
+    data = request.get_json()
+    required_keys = ['token', 'role_id']
+    if not all(key in data for key in required_keys):
+        return jsonify({'message': 'Request body is incomplete'}), 400
 
     # Utilise le helper pour vérifier le token
-    user_info = verify_google_token(token)
+    user_info = verify_google_token(data.token) # Retourne les informations de l'utilisateur si le token est valide
 
     if user_info:
         # Cherche l'utilisateur dans la base de données
-        user = User.query.filter_by(email=user_info['email']).first()
+        user = db.session.query(User, Role).join(Role, User.role_id == Role.id).filter(User.email == user_info.email).first()
 
         # Si l'utilisateur n'existe pas, créer un nouveau compte utilisateur
         if not user:
+            if data.role_id == 2: # si association
+                profile_picture = user_info['picture']
+            else:
+                profile_picture = "https://api.dicebear.com/8.x/fun-emoji/svg?seed="+str(uuid.uuid4())
             user = User(
                 email=user_info['email'],
                 name=user_info['name'],
-                profile_picture=user_info['picture']
+                profile_picture=profile_picture,
+                role_id=data.role_id,
+                created_at=datetime.datetime.now()
             )
             db.session.add(user)
             db.session.commit()
@@ -184,7 +194,6 @@ def google_login():
         return jsonify({
             'access_token': access_token,
             'user': {
-                'google_id': user_info['google_id'],
                 'email': user.email,
                 'name': user.name,
                 'profile_picture': user.profile_picture
