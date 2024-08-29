@@ -1,0 +1,17 @@
+meta {
+  name: google login
+  type: http
+  seq: 7
+}
+
+post {
+  url: http://localhost:5000/users/google-login
+  body: json
+  auth: bearer
+}
+
+body:json {
+  {
+    "token": ""
+  }
+}
