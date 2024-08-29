@@ -161,47 +161,60 @@ def login():
 @users_bp.route('/google-login', methods=['POST'])
 def google_login():
     data = request.get_json()
-    required_keys = ['token', 'role_id']
+    required_keys = ['token']
     if not all(key in data for key in required_keys):
         return jsonify({'message': 'Request body is incomplete'}), 400
 
     # Utilise le helper pour vérifier le token
-    user_info = verify_google_token(data.token) # Retourne les informations de l'utilisateur si le token est valide
+    user_info = verify_google_token(data['token'])  # Retourne les informations de l'utilisateur si le token est valide
 
     if user_info:
         # Cherche l'utilisateur dans la base de données
-        user = db.session.query(User, Role).join(Role, User.role_id == Role.id).filter(User.email == user_info.email).first()
+        user_role = db.session.query(User, Role).join(Role, User.role_id == Role.id).filter(User.email == user_info['email']).first()
 
         # Si l'utilisateur n'existe pas, créer un nouveau compte utilisateur
-        if not user:
-            if data.role_id == 2: # si association
-                profile_picture = user_info['picture']
+        if not user_role:
+            # Vérifie si role_id est fourni, sinon utilise un rôle par défaut (par exemple 1)
+            role_id = data.get('role_id', 1)
+
+            if role_id == 2:  # si association
+                profile_picture = user_info.get('picture')
             else:
-                profile_picture = "https://api.dicebear.com/8.x/fun-emoji/svg?seed="+str(uuid.uuid4())
+                profile_picture = "https://api.dicebear.com/8.x/fun-emoji/svg?seed=" + str(uuid.uuid4())
+                
             user = User(
                 email=user_info['email'],
                 name=user_info['name'],
                 profile_picture=profile_picture,
-                role_id=data.role_id,
+                role_id=role_id,
                 created_at=datetime.datetime.now()
             )
             db.session.add(user)
             db.session.commit()
 
+            # Rechercher à nouveau pour obtenir l'objet User avec le rôle
+            user_role = db.session.query(User, Role).join(Role, User.role_id == Role.id).filter(User.email == user_info['email']).first()
+
+        user, role = user_role
+        role_name = 'association' if role.id == 2 else 'user'
+
         # Génère un jeton JWT pour l'utilisateur (si tu utilises flask_jwt_extended)
-        access_token = create_access_token(identity=user.id)
+        access_token = create_access_token(identity=user.id, additional_claims={'role': role_name})
 
         return jsonify({
             'access_token': access_token,
             'user': {
+                'id': user.id,
                 'email': user.email,
                 'name': user.name,
-                'profile_picture': user.profile_picture
+                'profile_picture': user.profile_picture,
+                'role': role_name
             }
         })
 
     else:
         return jsonify({'error': 'Invalid token'}), 400
+
     
     
 #login with token route
@@ -228,7 +241,6 @@ def tokenLogin():
 @users_bp.route('', methods=['POST'])
 def create_user():
     data = request.get_json(silent=True) # Get JSON data from the request
-    print(data)
     if not data:
         return jsonify({'message': 'Request body is empty or not a valid JSON'}), 400
 
@@ -299,8 +311,6 @@ def update_user_password(user_id):
 
     if user:
         data = request.get_json()
-        print("my datata",data)
-
         # Check if the old password is correct
         if user.password == hash_password(data.get('old_password'), user.salt):
             # Update user password
@@ -344,4 +354,3 @@ def update_association(user_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'message': 'Failed to update association', 'error': str(e)}), 500
-

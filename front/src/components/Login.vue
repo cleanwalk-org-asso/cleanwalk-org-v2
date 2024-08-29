@@ -15,11 +15,11 @@ const showToast = useUtilsStore().showToast;
 import { type CallbackTypes  } from 'vue3-google-login';
 
 const email = ref("");
+
 const password = ref("");
 
-const callback: CallbackTypes.CredentialCallback = async(response) => {
-  console.log("Credential JWT string", response.credential);
-  await accountStore.googleLoginSingup(response.credential);
+const callbackGoogleLogin: CallbackTypes.CredentialCallback = async(response) => {
+    await accountStore.googleLoginSingup(response.credential);
 };
 
 const login = async ( ) => {
@@ -64,7 +64,7 @@ const login = async ( ) => {
         <h1>
             Se connecter
         </h1>
-        <GoogleLogin :callback="callback" />
+        <GoogleLogin :callback="callbackGoogleLogin" />
         <div class="or">
             <div class="line"></div>
             <span>ou</span>

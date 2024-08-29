@@ -92,13 +92,9 @@ export const useAccountStore = defineStore('account', () => {
         }
         setToken(response.data.access_token as string);
         isLoggedIn.value = true;
-        const user: User = {
-            email: response.data.email as string,
-            name: response.data.name as string,
-            id: response.data.id as number,
-            role: response.data.role as 'organisation' | 'user',
-            profile_picture: response.data.profile_picture as string,
-        }
+        router.push({ path: '/' });
+        CurrentUser.value = response.data.user as User;
+        isLoggedIn.value = true;
         return true;
     }
 
