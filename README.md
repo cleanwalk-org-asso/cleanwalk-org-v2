@@ -9,51 +9,63 @@ Cleanwalk.org is a website to find clean walks all over France.
 
 ## Requirements
 
-You only need Docker to launch the app.
+- Docker and docker compose [install link ->](https://docs.docker.com/engine/install/)
+- MySQL DataBase
+- node.js [install link ->](https://nodejs.org/fr)
+- *(optional)* python3 [install link ->](https://www.python.org/downloads/)
 
-### Linux
-
-- [Docker Engine installation steps](https://docs.docker.com/engine/install/debian/#install-using-the-repository)
-- [Docker Desktop (DEB package)](https://desktop.docker.com/linux/main/amd64/docker-desktop-4.26.1-amd64.deb?utm_source=docker&utm_medium=webreferral&utm_campaign=docs-driven-download-linux-amd64) (optional)
-
-### macOS
-
-- [Apple Silicon package](https://desktop.docker.com/mac/main/arm64/Docker.dmg?utm_source=docker&utm_medium=webreferral&utm_campaign=docs-driven-download-mac-arm64)
-- [Intel Chip package](https://desktop.docker.com/mac/main/amd64/Docker.dmg?utm_source=docker&utm_medium=webreferral&utm_campaign=docs-driven-download-mac-amd64)
-
-### Windows
-
-- [Windows Installer](https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe)
+## environement
+Create a `.env` file in the `api` and `front` directories and follow the `.env.example` schema.
 
 ## How to launch
-
-Copy the `stash.env.example` file to `stash.env` and fill the required fields, same with `api/.env.example` to `api/.env`.
 
 ### Developement
 
 To launch the app on dev environnement, use the docker compose tool at the root directory of the project.
 
-Dev script:
-
-```bash
-./scripts/compose-dev.sh
-```
-
-Direct command to not use the dev compose file:
+**API ->**
 
 ```bash
 docker compose up -d
 ```
+or <br />
+- go in **api** Directory -> `cd api`
+- install
+```bash
+pip install -r requirements.txt
+```
+- launch
+```bash
+docker compose up -d
+```
 
-To shutdown all stack or just a specific one:
+To down **API**
 
 ```bash
 docker compose down
 ```
 
-## Production
+<div style="color:#f1c232">⚠️ Tips : with docker Adminer is launched on port :8080 </div>
 
-### config nginx proxy manager
+**Frontend ->**
+- go in **api** Directory -> `cd api`
+- install
+```bash
+npm install
+```
+- run on port 5173
+```bash
+npm run dev
+```
+
+### Production
+
+#### lauch
+```bash
+docker-compose -f "docker-compose.prod.yml" up -d --build
+```
+
+###"" config nginx proxy manager
 
 **first login**: connect to @server_ip:81
 - username: admin@example.com
