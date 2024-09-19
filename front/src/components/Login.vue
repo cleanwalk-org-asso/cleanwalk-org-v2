@@ -87,6 +87,8 @@ const login = async ( ) => {
 
 
     .container {
+        position: relative;
+        top: 5rem;
         display: flex;
         flex-direction: column;
         align-items: center;
