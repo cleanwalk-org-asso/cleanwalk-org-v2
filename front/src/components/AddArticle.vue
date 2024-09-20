@@ -27,10 +27,25 @@ let editorOptions = {
 
 let articleContent: string | Delta = '';
 
-// Using number instead of boolean because of Volar's bug
-let editorIsReady: number = 0;
+let editorIsReady: boolean = false;
 
-function publishArticle(): void {
+function uploadToDatabase(): void {
+    // @ts-ignore: Property 'checked' does not exist on type 'HTMLElement'. ts-plugin(2339) => False positive
+    const articleIsDraft: string = document.getElementById('article-is-draft')?.checked;
+
+    console.log(articleContent);
+    console.log(articleIsDraft);
+
+    return;
+}
+
+function editorIsReadyHandler(): void {
+    editorIsReady = true;
+
+    return;
+}
+
+function publishArticleHandler(): void {
     if (!editorIsReady) {
         return;
     }
@@ -48,22 +63,12 @@ function publishArticle(): void {
 
     return;
 }
-
-function uploadToDatabase(): void {
-    // @ts-ignore: Property 'checked' does not exist on type 'HTMLElement'. ts-plugin(2339) => False positive
-    const articleIsDraft: string = document.getElementById('article-is-draft')?.checked;
-
-    console.log(articleContent);
-    console.log(articleIsDraft);
-
-    return;
-}
 </script>
 
 <template>
     <div id="add-article-component">
         <div id="article-editor">
-            <QuillEditor :options="editorOptions" v-model:content="articleContent" @ready="editorIsReady = 1" />
+            <QuillEditor :options="editorOptions" v-model:content="articleContent" @ready="editorIsReadyHandler" />
         </div>
 
         <div id="article-is-draft-container">
@@ -74,7 +79,7 @@ function uploadToDatabase(): void {
             </label>
         </div>
 
-        <button id="article-pub-button" @click="publishArticle">Publier</button>
+        <button id="article-pub-button" @click="publishArticleHandler">Publier</button>
     </div>
 </template>
 
