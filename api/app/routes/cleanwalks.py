@@ -91,10 +91,9 @@ def get_cleanwalk_by_id(cleanwalk_id):
 # Route for get all Cleanwalks
 
 @cleanwalks_bp.route('', methods=['GET'])
-
 def get_all_cleanwalks():
     now = func.now()  # Use current server time; ensure that the server time zone matches your requirements
-    two_months_later = func.date_add(now, text("interval 2 month"))  # Calculate the date 2 months from now
+    two_months_later = now + text("interval '2 month'")  # Calculate the date 2 months from now
 
     cleanwalks = db.session.query(
         Cleanwalk.id.label('cleanwalk_id'),
@@ -114,7 +113,7 @@ def get_all_cleanwalks():
         User, CleanwalkUser.user_id == User.id
     ).filter(
         CleanwalkUser.is_host == True,
-        Cleanwalk.date_begin + func.interval(Cleanwalk.duration, 'MINUTE') > now,
+        Cleanwalk.date_begin + Cleanwalk.duration * text("interval '1 minute'") > now,
         Cleanwalk.date_begin <= two_months_later
     ).all()
 
@@ -135,6 +134,7 @@ def get_all_cleanwalks():
     } for cw in cleanwalks] if cleanwalks else []
 
     return jsonify(cleanwalk_data)
+
 
 #------------------------------------POST------------------------------------#
 
