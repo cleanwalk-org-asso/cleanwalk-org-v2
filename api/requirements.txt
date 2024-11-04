@@ -1,6 +1,5 @@
 Flask-SQLAlchemy
 Flask-JWT-Extended
-pymysql
 python-dotenv
 flask-uploads
 flask-cors
@@ -9,5 +8,7 @@ Werkzeug>=2.0.3
 gunicorn==20.1.0
 requests
 google-auth
+psycopg2-binary
+
 
 
