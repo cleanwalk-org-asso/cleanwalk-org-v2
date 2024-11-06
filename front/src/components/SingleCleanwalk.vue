@@ -199,7 +199,7 @@ const getActionButtonText = (): string => {
         <!-- Lien vers OpenStreetMap -->
         <a :href="`https://www.openstreetmap.org/?mlat=${currentCleanwalk?.pos_lat}&mlon=${currentCleanwalk?.pos_long}`"
           target="_blank">
-          <img src="../assets/Openstreetmap_logo.png" alt="google map logo">
+          <img src="../assets/osm_logo.webp" alt="google map logo">
           <h4>Ouvrir dans OpenStreetMap</h4>
         </a>
       </div>
