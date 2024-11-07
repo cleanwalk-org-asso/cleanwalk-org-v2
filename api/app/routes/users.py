@@ -5,11 +5,13 @@ from flask import Blueprint, jsonify, request
 from flask_cors import CORS
 from sqlalchemy import desc, func
 from app.models import Cleanwalk, CleanwalkUser, db, User, Role, Organisation
-from app.utils import validate_api_key, hash_password, upload_img
+from app.utils import validate_api_key, hash_password, upload_img, send_reset_email
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, get_jwt
 from sqlalchemy.exc import IntegrityError
 from app.utils import verify_google_token
 import uuid
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+
 
 
 import os
@@ -45,8 +47,10 @@ def get_user(user_id):
             'profile_picture': user.User.profile_picture,
             'role': user.Role.role
         }
+        print(user_data)
         return jsonify(user_data)
     else:
+        print("User not found")
         return jsonify({'message': 'User not found'}), 404
     
 # route for get association by user id
@@ -138,6 +142,7 @@ def delete_user(user_id):
 @users_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()  # Obtenir les données JSON de la requête
+    print(data)
 
     email = data.get('email')
     res = db.session.query(User, Role).join(Role, User.role_id == Role.id).filter(User.email == email).first()
@@ -155,6 +160,7 @@ def login():
         else:
             return jsonify({'message': 'Username or password incorrect'}), 401
     else:
+        print("Unknown email address")
         return jsonify({'message': 'Unknown email address'}), 404
     
 # google login route
@@ -303,7 +309,7 @@ def update_user(user_id):
     else:
         return jsonify({'message': 'User not found'}), 404
     
-# route for updating user password by id
+# # route for updating user password by id
 @users_bp.route('/password/<string:user_id>', methods=['PUT'])
 @jwt_required()
 def update_user_password(user_id):
@@ -320,7 +326,7 @@ def update_user_password(user_id):
         else:
             return jsonify({'message': 'Old password is incorrect'}), 400
         
-# route for updating association by user id
+# # route for updating association by user id
 @users_bp.route('/association/<string:user_id>', methods=['PUT'])
 @jwt_required()
 def update_association(user_id):
@@ -354,3 +360,43 @@ def update_association(user_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'message': 'Failed to update association', 'error': str(e)}), 500
+    
+# Route pour envoyer l'email de réinitialisation de mot de passe
+@users_bp.route('/send-reset-email', methods=['POST'])
+def send_reset_email_route():
+    data = request.get_json()
+    email = data.get('email')
+
+    if not email:
+        return jsonify({'error': 'Email requis'}), 400
+
+    try:
+        # Envoyer l'email de réinitialisation
+        send_reset_email(email)
+        return jsonify({'message': 'Email de réinitialisation envoyé'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# # Route pour réinitialiser le mot de passe avec le token
+# @users_bp.route('/reset-password/<token>', methods=['POST'])
+# def reset_password(token):
+#     try:
+#         # Charger l'email depuis le token
+#         email = serializer.loads(token, salt='reset-password-salt', max_age=3600)
+#     except SignatureExpired:
+#         return jsonify({'message': 'Le lien de réinitialisation a expiré.'}), 400
+#     except BadSignature:
+#         return jsonify({'message': 'Lien de réinitialisation invalide.'}), 400
+
+#     data = request.get_json()
+#     new_password = data.get('new_password')
+
+#     if not new_password:
+#         return jsonify({'error': 'Nouveau mot de passe requis'}), 400
+
+#     # Logique pour mettre à jour le mot de passe (exemple à adapter)
+#     # Par exemple : user = User.query.filter_by(email=email).first()
+#     # user.set_password(new_password)
+#     # db.session.commit()
+
+#     return jsonify({'message': 'Mot de passe réinitialisé avec succès'}), 200

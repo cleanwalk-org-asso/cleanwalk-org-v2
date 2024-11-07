@@ -1,0 +1,17 @@
+meta {
+  name: send_reset_email
+  type: http
+  seq: 8
+}
+
+post {
+  url: http://localhost:5000/users/send-reset-email
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "frin.arthur@gmail.com"
+  }
+}

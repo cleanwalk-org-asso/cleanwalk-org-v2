@@ -5,6 +5,10 @@ from werkzeug.utils import secure_filename
 import os
 from google.oauth2 import id_token
 from google.auth.transport import requests
+from flask_mail import Message
+from flask import url_for
+from . import mail
+from itsdangerous import URLSafeTimedSerializer
 
 CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 
@@ -45,3 +49,24 @@ def upload_img(image):
         return filename
     else:
         return None
+    
+
+# Créer une instance du sérialiseur pour les tokens
+serializer = URLSafeTimedSerializer(os.getenv("JWT_SECRET_KEY"))
+
+def send_reset_email(user_email):
+    # Générer un token pour la réinitialisation de mot de passe
+    token = serializer.dumps(user_email, salt='reset-password-salt')
+
+    # Générer un lien pour réinitialiser le mot de passe
+    reset_link = f"{current_app.config['FRONTEND_URL']}/reset-password/{token}"
+
+    msg = Message("Réinitialisation de votre mot de passe",
+                  sender=current_app.config['MAIL_DEFAULT_SENDER'],
+                  recipients=[user_email])
+
+    msg.body = f"Pour réinitialiser votre mot de passe, veuillez cliquer sur le lien suivant : {reset_link}\n" \
+               f"Ce lien expirera dans une heure."
+
+    # Envoyer le mail
+    mail.send(msg)
