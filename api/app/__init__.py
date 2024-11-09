@@ -35,6 +35,7 @@ def create_app():
     app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
     app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
     app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@demo.com')
+    app.config['RESET_PASSWORD_SALT'] = os.getenv('RESET_PASSWORD_SALT')
 
     # Initialiser les extensions
     db.init_app(app)

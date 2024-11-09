@@ -1,5 +1,3 @@
-# users_bp.py (ou le nom de votre Blueprint)
-
 import datetime
 from flask import Blueprint, jsonify, request
 from flask_cors import CORS
@@ -11,29 +9,31 @@ from sqlalchemy.exc import IntegrityError
 from app.utils import verify_google_token
 import uuid
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
-
-
-
 import os
 
 users_bp = Blueprint('users', __name__)
 
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+RESET_PASSWORD_SALT = os.getenv("RESET_PASSWORD_SALT")
+
+serializer = URLSafeTimedSerializer(JWT_SECRET_KEY)
+
 @users_bp.before_request
 def check_api_key():
-    if request.method == 'OPTIONS': # Handle preflight requests to enable CORS
+    if request.method == 'OPTIONS':  # Handle preflight requests to enable CORS
         return
     
-    api_key = request.headers.get('X-API-Key')  # Get the api key from the header
+    api_key = request.headers.get('X-API-Key')  # Get the API key from the header
     
-    # Verify the api key
+    # Verify the API key
     if not validate_api_key(api_key):
-        return jsonify({'message': 'Invalide API KEY'}), 401
+        return jsonify({'message': 'Invalid API KEY'}), 401
 
 # Secure routes
 
 #------------------------------------GET------------------------------------#
 
-# route for get user by id
+# Route to get user by id
 @users_bp.route('/<string:user_id>', methods=['GET'])
 def get_user(user_id):
     user = db.session.query(User, Role).join(Role, User.role_id == Role.id).filter(User.id == user_id).first()
@@ -53,28 +53,28 @@ def get_user(user_id):
         print("User not found")
         return jsonify({'message': 'User not found'}), 404
     
-# route for get association by user id
+# Route to get association by user id
 @users_bp.route('/association/<string:user_id>', methods=['GET'])
 def get_association(user_id):
     user = db.session.query(User, Organisation).join(Organisation, User.id == Organisation.user_id).filter(User.id == user_id).first()
 
     if user:
         user_data = {
-            'id':user.User.id,
-            'name':user.User.name,
-            'email':user.User.email,
-            'description':user.Organisation.description,
-            'web_site':user.Organisation.web_site,
-            'social_mediass':user.Organisation.social_medias,
-            'banner_img':user.Organisation.banner_img,
-            'profile_picture':user.User.profile_picture,
-            'role':user.User.role_id
+            'id': user.User.id,
+            'name': user.User.name,
+            'email': user.User.email,
+            'description': user.Organisation.description,
+            'web_site': user.Organisation.web_site,
+            'social_medias': user.Organisation.social_medias,
+            'banner_img': user.Organisation.banner_img,
+            'profile_picture': user.User.profile_picture,
+            'role': user.User.role_id
         }
         return jsonify(user_data)
     else:
         return jsonify({'message': 'User not found'}), 404
     
-# route for get associations order by RAND
+# Route to get associations ordered by RAND
 @users_bp.route('/associations', methods=['GET'])
 def get_organisations():
     organisations = db.session.query(User, Organisation).join(Organisation, User.id == Organisation.user_id).filter(User.role_id == 2).order_by(func.rand()).all()
@@ -95,7 +95,7 @@ def get_organisations():
     else:
         return jsonify({'message': 'Organisations not found'}), 404
 
-# route for get all users
+# Route to get all users
 @users_bp.route('', methods=['GET'])
 def get_all_users():
     users = db.session.query(User, Role).join(Role, User.role_id == Role.id)
@@ -116,13 +116,13 @@ def get_all_users():
 
 #------------------------------------DELETE------------------------------------#
 
-# route for delete user by id
+# Route to delete user by id
 @users_bp.route('/<string:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     user = User.query.get(user_id)
-    # check if is association
+    # Check if user is an association
     association = Organisation.query.filter_by(user_id=user_id).first()
-    # anonimyse the user
+    # Anonymize the user
     if association:
         association.description = None
         association.web_site = None
@@ -130,18 +130,18 @@ def delete_user(user_id):
         association.banner_img = None
         db.session.commit()
     if user:
-        user.name = "Utilisateur supprimé"
+        user.name = "Deleted User"
         user.email = f"deleted_user_{user_id}@example.com"
-        user.google_id = None  # Ou une valeur anonyme si nécessaire
+        user.google_id = None  # Or an anonymous value if necessary
         user.profile_picture = None
         db.session.commit()
 
-
 #------------------------------------POST------------------------------------#
-# login route
+
+# Login route
 @users_bp.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()  # Obtenir les données JSON de la requête
+    data = request.get_json()  # Get JSON data from the request
     print(data)
 
     email = data.get('email')
@@ -163,7 +163,7 @@ def login():
         print("Unknown email address")
         return jsonify({'message': 'Unknown email address'}), 404
     
-# google login route
+# Google login route
 @users_bp.route('/google-login', methods=['POST'])
 def google_login():
     data = request.get_json()
@@ -171,19 +171,19 @@ def google_login():
     if not all(key in data for key in required_keys):
         return jsonify({'message': 'Request body is incomplete'}), 400
 
-    # Utilise le helper pour vérifier le token
-    user_info = verify_google_token(data['token'])  # Retourne les informations de l'utilisateur si le token est valide
+    # Use helper to verify the token
+    user_info = verify_google_token(data['token'])  # Returns user info if the token is valid
 
     if user_info:
-        # Cherche l'utilisateur dans la base de données
+        # Search for the user in the database
         user_role = db.session.query(User, Role).join(Role, User.role_id == Role.id).filter(User.email == user_info['email']).first()
 
-        # Si l'utilisateur n'existe pas, créer un nouveau compte utilisateur
+        # If the user does not exist, create a new user account
         if not user_role:
-            # Vérifie si role_id est fourni, sinon utilise un rôle par défaut (par exemple 1)
+            # Check if role_id is provided, otherwise use a default role (e.g., 1)
             role_id = data.get('role_id', 1)
 
-            if role_id == 2:  # si association
+            if role_id == 2:  # If association
                 profile_picture = user_info.get('picture')
             else:
                 profile_picture = "https://api.dicebear.com/8.x/fun-emoji/svg?seed=" + str(uuid.uuid4())
@@ -198,13 +198,13 @@ def google_login():
             db.session.add(user)
             db.session.commit()
 
-            # Rechercher à nouveau pour obtenir l'objet User avec le rôle
+            # Search again to get the User object with the role
             user_role = db.session.query(User, Role).join(Role, User.role_id == Role.id).filter(User.email == user_info['email']).first()
 
         user, role = user_role
         role_name = 'association' if role.id == 2 else 'user'
 
-        # Génère un jeton JWT pour l'utilisateur (si tu utilises flask_jwt_extended)
+        # Generate a JWT token for the user (if using flask_jwt_extended)
         access_token = create_access_token(identity=user.id, additional_claims={'role': role_name})
 
         return jsonify({
@@ -221,9 +221,7 @@ def google_login():
     else:
         return jsonify({'error': 'Invalid token'}), 400
 
-    
-    
-#login with token route
+# Login with token route
 @users_bp.route('/token-login', methods=['POST'])
 @jwt_required()
 def tokenLogin():
@@ -238,15 +236,15 @@ def tokenLogin():
             'email': res.User.email, 
             'name': res.User.name,
             'profile_picture': res.User.profile_picture, 
-            "role":claims["role"]
+            "role": claims["role"]
         }), 200
     else:
-        return jsonify({'message': 'invalide token'}), 401
+        return jsonify({'message': 'Invalid token'}), 401
 
-# route for creating a new user
+# Route for creating a new user
 @users_bp.route('', methods=['POST'])
 def create_user():
-    data = request.get_json(silent=True) # Get JSON data from the request
+    data = request.get_json(silent=True)  # Get JSON data from the request
     if not data:
         return jsonify({'message': 'Request body is empty or not a valid JSON'}), 400
 
@@ -262,9 +260,8 @@ def create_user():
     password = hash_password(data.get('password'), salt)
     role_id = data.get('role_id')
     
-
     try:
-        # Essayez de créer le nouvel utilisateur
+        # Try to create the new user
         new_user = User(
             name=name,
             email=email,
@@ -277,7 +274,7 @@ def create_user():
         db.session.add(new_user)
         db.session.commit()
 
-        if role_id == 2: # If the user is an organisation create association table
+        if role_id == 2:  # If the user is an organisation, create association table
             new_association = Organisation(user_id=new_user.id)
             db.session.add(new_association)
             db.session.commit()
@@ -286,13 +283,13 @@ def create_user():
 
     except IntegrityError as e:
         print(e, "ErrorIntegrity")
-        # Gérez l'erreur d'intégrité (adresse e-mail en double)
-        db.session.rollback()  # Annuler la transaction
+        # Handle integrity error (duplicate email address)
+        db.session.rollback()  # Rollback the transaction
         return jsonify({'message': 'Email address already in use'}), 400
 
 #------------------------------------PUT------------------------------------#
-# route for updating user by id
 
+# Route for updating user by id
 @users_bp.route('/<string:user_id>', methods=['PUT'])
 @jwt_required()
 def update_user(user_id):
@@ -309,7 +306,7 @@ def update_user(user_id):
     else:
         return jsonify({'message': 'User not found'}), 404
     
-# # route for updating user password by id
+# Route for updating user password by id
 @users_bp.route('/password/<string:user_id>', methods=['PUT'])
 @jwt_required()
 def update_user_password(user_id):
@@ -326,32 +323,32 @@ def update_user_password(user_id):
         else:
             return jsonify({'message': 'Old password is incorrect'}), 400
         
-# # route for updating association by user id
+# Route for updating association by user id
 @users_bp.route('/association/<string:user_id>', methods=['PUT'])
 @jwt_required()
 def update_association(user_id):
-    # Récupérer l'utilisateur
+    # Retrieve the user
     user = User.query.get(user_id)
     
     if not user:
         return jsonify({'message': 'User not found'}), 404
 
-    # Vérifier si l'utilisateur est une organisation
+    # Check if the user is an organisation
     association = Organisation.query.filter_by(user_id=user_id).first()
     
     if not association:
         return jsonify({'message': 'Association not found'}), 404
 
-    # Obtenir les données de la requête JSON
+    # Get data from the request JSON
     data = request.get_json()
     
-    # Mettre à jour les champs de l'association si fournis
+    # Update association fields if provided
     association.description = data.get('description', association.description)
     association.web_site = data.get('web_site', association.web_site)
     association.social_medias = data.get('social_medias', association.social_medias)
     association.banner_img = data.get('banner_img', association.banner_img)
     
-    # Mettre à jour les champs de l'utilisateur si fournis
+    # Update user fields if provided
     user.profile_picture = data.get('profile_picture', user.profile_picture)
     
     try:
@@ -361,42 +358,58 @@ def update_association(user_id):
         db.session.rollback()
         return jsonify({'message': 'Failed to update association', 'error': str(e)}), 500
     
-# Route pour envoyer l'email de réinitialisation de mot de passe
+# Route to send reset password email
 @users_bp.route('/send-reset-email', methods=['POST'])
 def send_reset_email_route():
     data = request.get_json()
     email = data.get('email')
 
     if not email:
-        return jsonify({'error': 'Email requis'}), 400
+        return jsonify({'error': 'Email required'}), 400
 
     try:
-        # Envoyer l'email de réinitialisation
+        # Send reset email
         send_reset_email(email)
-        return jsonify({'message': 'Email de réinitialisation envoyé'}), 200
+        return jsonify({'message': 'Reset email sent'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# # Route pour réinitialiser le mot de passe avec le token
-# @users_bp.route('/reset-password/<token>', methods=['POST'])
-# def reset_password(token):
-#     try:
-#         # Charger l'email depuis le token
-#         email = serializer.loads(token, salt='reset-password-salt', max_age=3600)
-#     except SignatureExpired:
-#         return jsonify({'message': 'Le lien de réinitialisation a expiré.'}), 400
-#     except BadSignature:
-#         return jsonify({'message': 'Lien de réinitialisation invalide.'}), 400
+# Route to reset password with token
+@users_bp.route('/reset-password/<token>', methods=['POST'])
+def reset_password(token):
+    try:
+        # Load email from token
+        email = serializer.loads(token, salt=RESET_PASSWORD_SALT, max_age=1200)  # 20 minutes
+    except SignatureExpired:
+        return jsonify({'message': 'The reset link has expired.'}), 400
+    except BadSignature:
+        return jsonify({'message': 'Invalid reset link.'}), 400
 
-#     data = request.get_json()
-#     new_password = data.get('new_password')
+    # Check if the user exists
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
 
-#     if not new_password:
-#         return jsonify({'error': 'Nouveau mot de passe requis'}), 400
+    # Get the new password from the request
+    data = request.get_json()
+    new_password = data.get('new_password')
 
-#     # Logique pour mettre à jour le mot de passe (exemple à adapter)
-#     # Par exemple : user = User.query.filter_by(email=email).first()
-#     # user.set_password(new_password)
-#     # db.session.commit()
+    if not new_password:
+        return jsonify({'error': 'New password required'}), 400
 
-#     return jsonify({'message': 'Mot de passe réinitialisé avec succès'}), 200
+    # Generate a new salt and hash the password
+    salt = os.urandom(16)
+    hashed_password = hash_password(new_password, salt)
+
+    # Update the user with the new password
+    user.password = hashed_password
+    user.salt = salt
+
+    try:
+        # Commit changes to the database
+        db.session.commit()
+        return jsonify({'message': 'Password reset successfully'}), 200
+    except Exception as e:
+        # Rollback in case of error to avoid leaving the database in an inconsistent state
+        db.session.rollback()
+        return jsonify({'message': 'Error updating password', 'error': str(e)}), 500
