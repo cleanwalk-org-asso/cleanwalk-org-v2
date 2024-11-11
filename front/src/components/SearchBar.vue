@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, defineProps, defineEmits } from 'vue'
+import { ref } from 'vue'
 import iconInfo from './icons/icon-info.vue'
 import iconLeftArrow from './icons/icon-left-arrow.vue'
 import iconSearch from './icons/icon-search.vue'
