@@ -161,7 +161,6 @@ const conseils = ref([
 </script>
 
 <template>
-    <Toast />
     <section class="section">
         <div class="progression-bar">
             <div class="progression-bar-inner" :style="{ width: progress * 100 / 6 + '%' }"></div>

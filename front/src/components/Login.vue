@@ -91,7 +91,6 @@ const login = async () => {
     padding: 0 2rem;
     width: 100%;
     height: 100vh;
-    max-width: 30rem;
     justify-content: space-evenly;
 
     .login {
@@ -188,8 +187,6 @@ form {
 
 @media (min-width: 1024px) {
     .login-container {
-        width: 50%;
-        max-width: 100%;
         padding-left: clamp(2rem, 8%, 10rem);
         padding-right: clamp(2rem, 8%, 10rem);
 
