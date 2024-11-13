@@ -20,18 +20,18 @@ jobs:
 
     - name: Backup current state
       env:
-        VPS_IP: ${{ secrets.VPS_IP }}
+        VPS_CONNECTION: ${{ secrets.VPS_CONNECTION }}
       run: |
-        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null VPS_CONNECTION '
+        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null VPS_CONNECTION  '
           rm -rf /home/cleanwalk/cleanwalk-backup &&
           cp -r /home/cleanwalk/cleanwalk-org-v2 /home/cleanwalk/cleanwalk-backup
         '
 
     - name: Deploy to VPS
       env:
-        VPS_IP: ${{ secrets.VPS_IP }}
+        VPS_CONNECTION: ${{ secrets.VPS_CONNECTION }}
       run: |
-        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$VPS_IP '
+        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null VPS_CONNECTION '
           cd /home/cleanwalk-org-v2 &&
           git pull origin release &&
           docker compose -f docker-compose.prod.yml down &&
@@ -41,18 +41,18 @@ jobs:
     - name: Cleanup backup
       if: success()
       env:
-        VPS_IP: ${{ secrets.VPS_IP }}
+        VPS_CONNECTION: ${{ secrets.VPS_CONNECTION }}
       run: |
-        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$VPS_IP '
+        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null VPS_CONNECTION '
           rm -rf /home/cleanwalk/cleanwalk-backup
         '
 
     - name: Rollback (if needed)
       if: failure()
       env:
-        VPS_IP: ${{ secrets.VPS_IP }}
+        VPS_CONNECTION: ${{ secrets.VPS_CONNECTION }}
       run: |
-        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$VPS_IP '
+        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null VPS_CONNECTION '
           cd /home/cleanwalk/cleanwalk-backup &&
           docker compose -f docker-compose.prod.yml up -d --build
         '
