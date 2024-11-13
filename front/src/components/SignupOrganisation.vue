@@ -55,7 +55,6 @@ const signup = async ( ) => {
 </script>
 
 <template>
-    <Toast />
     <section class="container">
 
         <h1>
