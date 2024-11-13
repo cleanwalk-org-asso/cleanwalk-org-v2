@@ -1,0 +1,99 @@
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import apiHelper from '@/helpers/apiHelper';
+import { useUtilsStore } from '@/stores/UtilsStore';
+
+const showToast = useUtilsStore().showToast;
+const email = ref<string>('');
+const router = useRouter();
+
+const emailForgotPassword = async () => {
+  try {
+    const response = await apiHelper.kyPostWithoutToken( "/users/send-reset-email", {
+        email: email.value,
+    });
+    if (response.success) {
+      showToast("Demande de réinitialisation du mot de passe réussie. Veuillez vérifier votre email.", true);
+      router.push('/login');
+    } else {
+      showToast("Erreur lors de la demande de réinitialisation du mot de passe. Veuillez vérifier l'email ou essayer à nouveau.", false);
+      }
+  } catch (error) {
+    console.error(error);
+    showToast("Erreur lors de la demande de réinitialisation du mot de passe. Veuillez vérifier l'email ou essayer à nouveau.", false);
+  }
+};
+</script>
+
+<template>
+  <div class="request-password-reset">
+    <h2>Demander une réinitialisation du mot de passe</h2>
+    <form @submit.prevent="emailForgotPassword">
+      <div class="container">
+        <label for="email">Email :</label>
+        <input id="email" v-model="email" type="email" placeholder="Entrer votre email" required />
+      </div>
+      <button type="submit" class="button-primary">Demander la réinitialisation</button>
+    </form>
+  </div>
+</template>
+
+<style scoped lang="scss">
+.request-password-reset {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 5rem;
+}
+
+form {
+  width: clamp(300px, 50%, 500px);
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+label {
+  font-size: 12px;
+  font-weight: 500;
+  position: relative;
+  margin-bottom: -18px;
+  background-color: #fff;
+  width: fit-content;
+  margin-left: 13px;
+  margin-top: 5px;
+  color: #94A3B8;
+}
+
+input {
+  border: 1px solid #94A3B8;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 0.5rem;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  width: 100%;
+
+  &::placeholder {
+    color: #94A3B8;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+button {
+  margin-top: 1rem;
+  width: 100%;
+  padding: 0.5rem 0;
+}
+</style>

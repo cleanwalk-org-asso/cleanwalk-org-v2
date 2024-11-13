@@ -5,6 +5,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
+from flask_mail import Mail 
+
 from datetime import timedelta
 
 # Charger les variables d'environnement
@@ -12,6 +14,7 @@ load_dotenv()
 
 # Initialiser l'extension SQLAlchemy
 db = SQLAlchemy()
+mail = Mail()
 
 def create_app():
     app = Flask(__name__)
@@ -23,9 +26,20 @@ def create_app():
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=30)
     app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER')
     app.config['UPLOADS_URL'] = os.getenv('UPLOADS_URL')
+    app.config['FRONTEND_URL'] = os.getenv('FRONTEND_URL')
+
+    # Configurer Flask-Mail
+    app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
+    app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
+    app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'True').lower() in ['true', '1', 'yes']
+    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+    app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@demo.com')
+    app.config['RESET_PASSWORD_SALT'] = os.getenv('RESET_PASSWORD_SALT')
 
     # Initialiser les extensions
     db.init_app(app)
+    mail.init_app(app)
     JWTManager(app)
 
     # Enregistrer les blueprints

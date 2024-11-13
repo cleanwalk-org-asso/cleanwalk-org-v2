@@ -18,6 +18,7 @@ class Organisation(db.Model):
     web_site = db.Column(db.String(255), nullable=True)
     social_medias = db.Column(db.JSON, nullable=True)
     banner_img = db.Column(db.String(255), nullable=True)
+    last_event = db.Column(db.TIMESTAMP, nullable=True)
 
     # Relation vers User
     user = db.relationship('User', backref=db.backref('organisation', uselist=False))
@@ -71,4 +72,4 @@ class Category(db.Model):
 class Categorie_article(db.Model):
     __tablename__ = 'categories_article'
     id_category = db.Column(db.Integer,db.ForeignKey('categories.id'), primary_key=True)
-    id_article = db.Column(db.Integer,db.ForeignKey('users.id'), primary_key=True)
+    id_article = db.Column(db.Integer,db.ForeignKey('articles.id'), primary_key=True)

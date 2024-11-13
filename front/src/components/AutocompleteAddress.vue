@@ -11,7 +11,7 @@
   </template>
   
   <script setup lang="ts">
-  import { ref, watch, defineEmits, defineProps } from 'vue';
+  import { ref, watch } from 'vue';
   import ky from 'ky';
   
   // Interface pour les suggestions d'adresse
