@@ -23,8 +23,8 @@ jobs:
         VPS_IP: ${{ secrets.VPS_IP }}
       run: |
         ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$VPS_IP '
-          rm -rf /home/cleanwalk-backup &&
-          cp -r /home/cleanwalk-org-v2 /home/cleanwalk-backup
+          rm -rf /home/cleanwalk/cleanwalk-backup &&
+          cp -r /home/cleanwalk/cleanwalk-org-v2 /home/cleanwalk/cleanwalk-backup
         '
 
     - name: Deploy to VPS
@@ -44,7 +44,7 @@ jobs:
         VPS_IP: ${{ secrets.VPS_IP }}
       run: |
         ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$VPS_IP '
-          rm -rf /home/cleanwalk-backup
+          rm -rf /home/cleanwalk/cleanwalk-backup
         '
 
     - name: Rollback (if needed)
@@ -53,6 +53,6 @@ jobs:
         VPS_IP: ${{ secrets.VPS_IP }}
       run: |
         ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$VPS_IP '
-          cd /home/cleanwalk-backup &&
+          cd /home/cleanwalk/cleanwalk-backup &&
           docker compose -f docker-compose.prod.yml up -d --build
         '
