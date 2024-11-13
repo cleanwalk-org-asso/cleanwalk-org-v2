@@ -9,7 +9,6 @@ const email = ref<string>('');
 const router = useRouter();
 
 const emailForgotPassword = async () => {
-  console.log(email.value);
   try {
     const response = await apiHelper.kyPostWithoutToken( "/users/send-reset-email", {
         email: email.value,
