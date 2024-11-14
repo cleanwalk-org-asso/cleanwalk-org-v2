@@ -222,7 +222,7 @@ function mapClick() {
                     </div>
                     <div class="right">
                         <img :src="selectedCleanwalk.host!.profile_picture" alt="profile_picture">
-                        <div>{{ selectedCleanwalk.host!.name }}</div>
+                        <div class="name">{{ selectedCleanwalk.host!.name }}</div>
                     </div>
                 </router-link>
             </div>
@@ -471,6 +471,8 @@ main {
                     display: flex;
                     stroke: black;
                     flex-direction: column;
+                    width: 80%;
+                    line-height: 0.7rem;
 
                     .top {
                         display: flex;
@@ -483,7 +485,6 @@ main {
                         display: flex;
                         align-items: center;
                         gap: 10px;
-
                     }
                 }
 
@@ -492,6 +493,9 @@ main {
                     display: flex;
                     align-items: center;
                     flex-direction: column;
+                    width: 20%;
+                    overflow: hidden;
+                    line-height: 0.7rem;
 
                     img {
                         width: 38px;
@@ -500,8 +504,10 @@ main {
                         margin-bottom: 10px;
                     }
 
-                    div {
-                        font-size: 12px;
+                    .name {
+                        font-size: 0.7rem;
+                        text-overflow: ellipsis;
+                        max-width: 100%;
                         text-align: center;
                     }
                 }

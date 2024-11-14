@@ -26,11 +26,6 @@ const router = createRouter({
       component: () => import('../views/AddCleanwalkView.vue')
     },
     {
-      path: '/articles',
-      name: 'articles',
-      component: () => import('../views/ArticlesView.vue')
-    },
-    {
       path: '/associations',
       name: 'associations',
       component: () => import('../views/AssoListView.vue')
