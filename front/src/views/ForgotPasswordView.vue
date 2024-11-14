@@ -38,7 +38,6 @@ const emailForgotPassword = async () => {
     </form>
   </div>
 </template>
-
 <style scoped lang="scss">
 .request-password-reset {
   width: 100%;
@@ -47,10 +46,6 @@ const emailForgotPassword = async () => {
   align-items: center;
   justify-content: center;
   padding-top: 5rem;
-}
-
-form {
-  width: clamp(300px, 50%, 500px);
 }
 
 .container {

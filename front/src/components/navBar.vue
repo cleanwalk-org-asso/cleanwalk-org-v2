@@ -35,7 +35,7 @@ onMounted(() => {
                     <div>Ajouter</div>
                 </router-link>
             </li>
-            <li :class="{ 'active': currentPage === 'articles' || currentPage === 'associations'}">
+            <li :class="{ 'active': currentPage === 'associations' || currentPage === 'associations'}">
                 <router-link :to="'/'+ discoverPageName" class="redirect">
                     <iconDiscover />
                     <div>Découvrir</div>
