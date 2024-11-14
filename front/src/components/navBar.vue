@@ -30,7 +30,7 @@ onMounted(() => {
                 </router-link>
             </li>
             <li :class="{ 'active': currentPage.includes('add')}">
-                <router-link to="/add" class="redirect">
+                <router-link to="/add/cleanwalk" class="redirect">
                     <iconAdd />
                     <div>Ajouter</div>
                 </router-link>

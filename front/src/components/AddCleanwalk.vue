@@ -21,6 +21,8 @@ const createCleanwalk = useCleanwalkStore().createCleanwalk;
 const dragDropRef = ref(null as any);
 const progress = ref(1);
 
+const tiles = defineProps<{titles: string[]}>();
+
 // New Cleanwalk state
 let newCleanwalk: Ref<CleanwalkCreation> = ref({
     name: "",
@@ -145,14 +147,7 @@ const getConseil = () => {
     }
 };
 
-const titles = ref([
-    'Nom de votre évènement',
-    'Lieu de votre évènement',
-    'Date et horaire',
-    'Description de votre évènement ',
-    'Ajouter une image',
-    'Aperçu de votre cleanwalk'
-]);
+
 
 const conseils = ref([
     'Avant de lancer votre ramassage, pensez à consulter le guide du ramasseur pour connaître les règles d’or d’une bonne organisation.',
@@ -388,5 +383,14 @@ const conseils = ref([
             }
         }
     }
+}
+
+@media (min-width: 1024px) {
+
+    .container {
+        padding-left: clamp(2rem, 20vw, 10rem);
+        padding-right: clamp(2rem, 20vw, 10rem);
+    }
+
 }
 </style>
