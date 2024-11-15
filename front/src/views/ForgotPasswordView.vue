@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import apiHelper from '@/helpers/apiHelper';
+import apiService from '@/services/apiService';
 import { useUtilsStore } from '@/stores/UtilsStore';
 
 const showToast = useUtilsStore().showToast;
@@ -10,7 +10,7 @@ const router = useRouter();
 
 const emailForgotPassword = async () => {
   try {
-    const response = await apiHelper.kyPostWithoutToken( "/users/send-reset-email", {
+    const response = await apiService.kyPostWithoutToken( "/users/send-reset-email", {
         email: email.value,
     });
     if (response.success) {

@@ -11,7 +11,7 @@ import { useCleanwalkStore } from '@/stores/CleanwalkStore';
 import { onMounted, ref, type Ref } from 'vue';
 import { useRoute } from 'vue-router';
 import router from '@/router';
-import dateHelper from '@/helpers/dateHelper';
+import dateService from '@/services/dateService';
 import { useAccountStore } from '@/stores/AccountStore';
 import LeaveCwPopup from './LeaveCwPopup.vue';
 import TopBar from './TopBar.vue';
@@ -77,7 +77,7 @@ const cancel = () => {
 
 const getDate = () => {
   if (currentCleanwalk.value && currentCleanwalk.value.date_begin && currentCleanwalk.value.duration) {
-    return dateHelper.getCleanwalkWrittenDate(new Date(currentCleanwalk.value.date_begin), currentCleanwalk.value.duration);
+    return dateService.getCleanwalkWrittenDate(new Date(currentCleanwalk.value.date_begin), currentCleanwalk.value.duration);
   }
 }
 

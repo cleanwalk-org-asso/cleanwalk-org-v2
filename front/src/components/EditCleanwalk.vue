@@ -5,12 +5,12 @@ import TopBar from './TopBar.vue';
 import { useAccountStore } from '@/stores/AccountStore';
 import type { SingleCleanwalk } from '@/interfaces/cleanwalkInterface';
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
-import dateHelper from '@/helpers/dateHelper'; // Assurez-vous d'importer correctement
+import dateService from '@/services/dateService'; // Assurez-vous d'importer correctement
 import dragDrop from './dragDrop.vue';
 import AutocompleteAddress from './AutocompleteAddress.vue';
 import { format, parse } from 'date-fns';
 import { useUtilsStore } from '@/stores/UtilsStore';
-import apiHelper from '@/helpers/apiHelper';
+import apiService from '@/services/apiService';
 
 const showToast = useUtilsStore().showToast;
 
@@ -43,7 +43,7 @@ onMounted(async () => {
   if (!currentCleanwalk.value) {
     router.push('/');
   } else {
-    const { dateDay, hourBegin, hourEnd } = dateHelper.getDayAndHourBegginEndByDate(currentCleanwalk.value.date_begin, currentCleanwalk.value.duration);
+    const { dateDay, hourBegin, hourEnd } = dateService.getDayAndHourBegginEndByDate(currentCleanwalk.value.date_begin, currentCleanwalk.value.duration);
     dateCleanwalk.value.dateDay = format(parse(dateDay, 'dd-MM-yyyy', new Date()), 'yyyy-MM-dd');
     dateCleanwalk.value.hourBegin = hourBegin;
     dateCleanwalk.value.hourEnd = hourEnd;
@@ -52,18 +52,18 @@ onMounted(async () => {
 
 const getWrittenDate = () => {
   if (currentCleanwalk.value && currentCleanwalk.value.date_begin && currentCleanwalk.value.duration) {
-    return dateHelper.getCleanwalkWrittenDate(new Date(currentCleanwalk.value.date_begin), currentCleanwalk.value.duration);
+    return dateService.getCleanwalkWrittenDate(new Date(currentCleanwalk.value.date_begin), currentCleanwalk.value.duration);
   }
 }
 
 const validate = async() => {
   if (dateCleanwalk.value.dateDay && dateCleanwalk.value.hourBegin && dateCleanwalk.value.hourEnd) {
-    const date = dateHelper.getDateBegginAndDuration(dateCleanwalk.value.dateDay, dateCleanwalk.value.hourBegin, dateCleanwalk.value.hourEnd);
+    const date = dateService.getDateBegginAndDuration(dateCleanwalk.value.dateDay, dateCleanwalk.value.hourBegin, dateCleanwalk.value.hourEnd);
     currentCleanwalk.value!.date_begin = date!.date_begin;
     currentCleanwalk.value!.duration = date!.duration;
   }
   await Upload();
-  const res = await apiHelper.kyPut(`/cleanwalks/${currentCleanwalk.value!.id}`,
+  const res = await apiService.kyPut(`/cleanwalks/${currentCleanwalk.value!.id}`,
         {
             name: currentCleanwalk.value!.name,
             pos_lat: currentCleanwalk.value!.pos_lat,

@@ -10,7 +10,7 @@ import { useCleanwalkStore } from '@/stores/CleanwalkStore';
 import iconClock from './icons/icon-clock.vue';
 import iconMiniMap from './icons/icon-mini-map.vue';
 import type { Cleanwalk } from "@/interfaces/cleanwalkInterface";
-import dateHelper from "@/helpers/dateHelper";
+import dateService from "@/services/dateService";
 import cleanwalkCard from './cards/CleanwalkListCard.vue';
 import { useAccountStore } from "@/stores/AccountStore";
 import greenMapIcon from "@/assets/green-map.svg";
@@ -213,7 +213,7 @@ function mapClick() {
                     <div class="left">
                         <div class="top">
                             <icon-clock />
-                            <div>{{ dateHelper.getCleanwalkWrittenDate( new Date(selectedCleanwalk.date_begin), selectedCleanwalk.duration) }}</div>
+                            <div>{{ dateService.getCleanwalkWrittenDate( new Date(selectedCleanwalk.date_begin), selectedCleanwalk.duration) }}</div>
                         </div>
                         <div class="bot">
                             <iconMiniMap />

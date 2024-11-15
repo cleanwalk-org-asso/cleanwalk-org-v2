@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import apiHelper from '@/helpers/apiHelper';
+import apiService from '@/services/apiService';
 import { useAccountStore } from '@/stores/AccountStore';
 import type { User } from '@/interfaces/userInterface';
 import { useUtilsStore } from '@/stores/UtilsStore';
@@ -32,7 +32,7 @@ const login = async () => {
     }
 
     // Call the login API
-    const response = await apiHelper.kyPostWithoutToken("/users/login", {
+    const response = await apiService.kyPostWithoutToken("/users/login", {
         email: email.value,
         password: password.value
     });

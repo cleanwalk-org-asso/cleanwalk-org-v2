@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import apiHelper from '@/helpers/apiHelper';
+import apiService from '@/services/apiService';
 import { useUtilsStore } from '@/stores/UtilsStore';
 
 const newPassword = ref<string>('');
@@ -18,7 +18,7 @@ const resetPassword = async () => {
     return;
   }
   try {
-    const response = await apiHelper.kyPostWithoutToken(`/users/reset-password/${token}`, {
+    const response = await apiService.kyPostWithoutToken(`/users/reset-password/${token}`, {
       new_password: newPassword.value
     });
     if (response.success) {

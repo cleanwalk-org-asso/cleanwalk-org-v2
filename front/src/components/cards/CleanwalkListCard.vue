@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import iconMiniMap from '../icons/icon-mini-map.vue';
 import iconClock from '../icons/icon-clock.vue';
 import type { Cleanwalk } from '@/interfaces/cleanwalkInterface';
-import dateHelper from '@/helpers/dateHelper';
+import dateService from '@/services/dateService';
 
 //define props
 const props = defineProps<{
@@ -18,7 +18,7 @@ const props = defineProps<{
         <div class="title">{{ cleanwalk.name }}</div>
         <div class="flex">
             <icon-clock />
-            <div>{{ dateHelper.getCleanwalkWrittenDate(new Date(cleanwalk.date_begin), cleanwalk.duration) }}</div>
+            <div>{{ dateService.getCleanwalkWrittenDate(new Date(cleanwalk.date_begin), cleanwalk.duration) }}</div>
         </div>
         <div class="flex">
             <iconMiniMap />
