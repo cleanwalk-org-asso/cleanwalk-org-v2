@@ -6,6 +6,8 @@ import iconMiniMap from './icons/icon-mini-map.vue';
 import iconClock from './icons/icon-clock.vue';
 import dragDrop from './dragDrop.vue';
 import dateService from '@/services/dateService';
+import BaseInput from './base/BaseInput.vue';
+import BaseTextarea from './base/BaseTextarea.vue';
 
 // Import the composable
 const {
@@ -46,23 +48,17 @@ const getConseil = () => {
       <div class="container">
         <div class="top">
           <h1>{{ tiles.titles[progress - 1] }}</h1>
-          <input v-model="newCleanwalk.name" v-if="progress === 1" type="text" placeholder="Saisissez le nom de votre évènement">
+          <BaseInput v-model="newCleanwalk.name" v-if="progress === 1" name="name" type="text" label="Nom de la cleanwalk" placeholder="Saisissez le nom de votre évènement" />
           
           <div v-if="progress === 2" class="autocomplete-container">
             <AutocompleteAddress v-model:query="newCleanwalk.address" @select-suggestion="handleSelectAddress" />
           </div>
+          <BaseInput v-if="progress === 3" v-model="dateCleanwalk.dateDay" name="date" type="date" label="Date de l'évènement" />
+
+          <BaseInput v-if="progress === 3" v-model="dateCleanwalk.hourBegin" name="hourBegin" type="time" label="Heure de début" />
   
-          <label v-if="progress === 3" class="label" for="date">Date de l'évènement</label>
-          <input id="date" v-model="dateCleanwalk.dateDay" v-if="progress === 3" type="date">
-  
-          <label v-if="progress === 3" class="label" for="hourBegin">Heure de début</label>
-          <input id="hourBegin" v-model="dateCleanwalk.hourBegin" v-if="progress === 3" type="time">
-  
-          <label v-if="progress === 3" class="label" for="hourEnd">Heure de fin</label>
-          <input id="hourEnd" v-model="dateCleanwalk.hourEnd" v-if="progress === 3" type="time">
-  
-          <textarea v-if="progress === 4" v-model="newCleanwalk.description" name="description" id="description" cols="30" rows="10" placeholder="Saisissez une description précise de votre évènement"></textarea>
-  
+          <BaseInput v-if="progress === 3" v-model="dateCleanwalk.hourEnd" name="hourEnd" type="time" label="Heure de fin" />
+          <BaseTextarea v-if="progress === 4" v-model="newCleanwalk.description" name="description" id="description" :rows="4" />  
           <dragDrop ref="dragDropRef" v-if="progress >= 5" :auto-upload="false" format="card" />
   
           <div v-if="progress === 6" class="preview">

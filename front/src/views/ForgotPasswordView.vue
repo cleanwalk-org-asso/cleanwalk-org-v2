@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import apiService from '@/services/apiService';
 import { useUtilsStore } from '@/stores/UtilsStore';
+import BaseInput from '@/components/base/BaseInput.vue';
 
 const showToast = useUtilsStore().showToast;
 const email = ref<string>('');
@@ -32,7 +33,7 @@ const emailForgotPassword = async () => {
     <form @submit.prevent="emailForgotPassword">
       <div class="container">
         <label for="email">Email :</label>
-        <input id="email" v-model="email" type="email" placeholder="Entrer votre email" required />
+        <BaseInput id="email" name="email" v-model="email" type="email" placeholder="Entrer votre email" />
       </div>
       <button type="submit" class="button-primary">Demander la réinitialisation</button>
     </form>
@@ -66,26 +67,6 @@ label {
   margin-top: 5px;
   color: #94A3B8;
 }
-
-input {
-  border: 1px solid #94A3B8;
-  border-radius: 8px;
-  padding: 12px;
-  margin-top: 0.5rem;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  width: 100%;
-
-  &::placeholder {
-    color: #94A3B8;
-  }
-
-  &:focus {
-    outline: none;
-  }
-}
-
 button {
   margin-top: 1rem;
   width: 100%;

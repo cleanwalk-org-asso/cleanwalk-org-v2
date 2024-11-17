@@ -11,6 +11,8 @@ import AutocompleteAddress from './AutocompleteAddress.vue';
 import { format, parse } from 'date-fns';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import apiService from '@/services/apiService';
+import BaseInput from './base/BaseInput.vue';
+import BaseTextarea from './base/BaseTextarea.vue';
 
 const showToast = useUtilsStore().showToast;
 
@@ -117,19 +119,14 @@ const handleSelectAddress = (addressData: { address: string, lat: string, lon: s
     <div class="banner">
       <dragDrop ref="dragDropRef" :current-img="currentCleanwalk.img_url" format="card" />
     </div>
-    <label for="name">Nom de la cleanwalk</label>
-    <input id="name" type="text" v-model="currentCleanwalk.name">
-    <label for="address">Adresse</label>
+    <BaseInput v-model="currentCleanwalk.name" name="name" type="text" label="Nom de la cleanwalk" placeholder="Saisissez le nom de votre évènement" />
     <AutocompleteAddress v-model:query="currentCleanwalk.address"
     @select-suggestion="handleSelectAddress" />
     <label for="description">Description</label>
-    <textarea name="description" v-model="currentCleanwalk.description" id="description"></textarea>
-    <label class="label" for="date">date de l'évènement</label>
-    <input id="date" v-model="dateCleanwalk.dateDay" type="date">
-    <label class="label" for="hourBegin">heure de début</label>
-    <input id="hourBegin" v-model="dateCleanwalk.hourBegin" type="time">
-    <label class="label" for="hourEnd">heure de fin</label>
-    <input id="hourEnd" v-model="dateCleanwalk.hourEnd" type="time">
+    <BaseTextarea name="descrition" v-model="currentCleanwalk.description" id="description" :rows="4"></BaseTextarea>
+    <BaseInput v-model="dateCleanwalk.dateDay" name="date" type="date" label="Date de l'évènement" />
+    <BaseInput v-model="dateCleanwalk.hourBegin" name="hourBegin" type="time" label="Heure de début" />
+    <BaseInput v-model="dateCleanwalk.hourEnd" name="hourEnd" type="time" label="Heure de fin" />
 
     <button @click="validate()" class="validate button-primary">
       Valider
@@ -149,38 +146,5 @@ const handleSelectAddress = (addressData: { address: string, lat: string, lon: s
   margin: 0 auto;
   padding: 0.5rem 1rem;
   margin-top: 2rem;
-}
-
-label {
-  font-size: 12px;
-  font-weight: 500;
-  position: relative;
-  margin-bottom: -18px;
-  background-color: #fff;
-  width: fit-content;
-  margin-left: 13px;
-  margin-top: 5px;
-  color: #94A3B8;
-  z-index: 99;
-}
-
-input,
-textarea {
-  border: 1px solid #94A3B8;
-  border-radius: 8px;
-  padding: 12px;
-  margin-top: 0.5rem;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  width: 100%;
-
-  &::placeholder {
-    color: #94A3B8;
-  }
-
-  &:focus {
-    outline: none;
-  }
 }
 </style>
