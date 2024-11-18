@@ -28,7 +28,7 @@ watchEffect(() => {
 </script>
 
 <template>
-    <TopBar back-url="/add" page-name="Ajouter une cleanwalk" />
+    <TopBar v-if="!isDesktop" back-url="/add" page-name="Ajouter une cleanwalk" />
     <MobileAddCleanwalk v-if="!isDesktop" :titles="titles" />
     <DesktopAddCleanwalk v-if="isDesktop" :titles="titles" />
     <navBar />

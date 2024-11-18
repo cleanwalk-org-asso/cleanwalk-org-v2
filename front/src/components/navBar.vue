@@ -50,6 +50,20 @@ onMounted(() => {
             </li>
         </ul>
     </nav>
+    <nav class="nav-desktop">
+        <img src="../assets/logo.svg" alt="logo cleanwalk.org" class="logo">
+        <div class="links">
+            <router-link class="link" to="/" :class="{ 'active': currentPage === 'home' || currentPage === 'cleanwalk'}">Accueil</router-link>
+            <router-link class="link" to="/add/cleanwalk" :class="{ 'active': currentPage.includes('add')}">Ajouter cleanwalk</router-link>
+            <router-link class="link" :to="'/'+ discoverPageName" :class="{ 'active': currentPage === 'associations' || currentPage === 'associations'}">Découvrir</router-link>
+            <router-link class="link" to='/menu' :class="{ 'active': currentPage.includes('menu')}">Menu</router-link>
+        </div>
+        <div class="infos">
+            <router-link to="/login">Se connecter</router-link>
+            <router-link to="/signup">S'inscrire</router-link>
+        </div>
+
+    </nav>
 
 </template>
 
@@ -117,7 +131,42 @@ onMounted(() => {
                 }
             }
         }
+    }
 
-        
+    .nav-desktop {
+        display: none;
+    }
+
+    @media (min-width: 1024px) {
+        .nav {
+            display: none;
+        }
+
+        .nav-desktop {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--color-primary);
+            color: #fff;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 5.5rem;
+            width: 100%;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .link {
+            font-weight: 700;
+            margin: 0 1px;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+
+            &.active {
+                background-color: #fff;
+                color: var(--text-color-primary);
+            }
+
+        }
     }
 </style>
