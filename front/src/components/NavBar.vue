@@ -3,14 +3,16 @@ import iconAdd from '@/components/icons/icon-add.vue';
 import iconDiscover from '@/components/icons/icon-discover.vue';
 import iconMap from '@/components/icons/icon-map.vue';
 import iconBurger from '@/components/icons/icon-burger.vue';
-// import { useAccountStore } from '@/stores/AccountStore';
-
+import { useAccountStore } from '@/stores/AccountStore';
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { useDevice } from '@/composables/useDevice';
 
 const currentPage = ref('');
 const route = useRoute();
 let discoverPageName:string = '';
+const { isMobile } = useDevice(); // Utilisation du composable pour détecter mobile/desktop
+const user = useAccountStore().CurrentUser;
 
 //local storage
 onMounted(() => {
@@ -21,7 +23,7 @@ onMounted(() => {
 
 </script>
 <template>
-    <nav class="nav">
+    <nav class="nav" v-if="isMobile">
         <ul class="container" :class="{ 'shadow': currentPage !== 'home'}">
             <li :class="{ 'active': currentPage === 'home' || currentPage === 'cleanwalk'}">
                 <router-link to="/" class="redirect">
@@ -44,13 +46,12 @@ onMounted(() => {
             <li :class="{ 'active': currentPage.includes('menu')}" >
                 <router-link to='/menu' class="redirect">
                     <iconBurger />
-                    <!-- <img v-else :src="currenUserProfilePicture" class="pp" alt="profile picture" /> -->
                     <div>Menu</div>
                 </router-link>
             </li>
         </ul>
     </nav>
-    <nav class="nav-desktop">
+    <nav class="nav-desktop" v-else>
         <img src="../assets/logo.svg" alt="logo cleanwalk.org" class="logo">
         <div class="links">
             <router-link class="link" to="/" :class="{ 'active': currentPage === 'home' || currentPage === 'cleanwalk'}">Accueil</router-link>
@@ -58,7 +59,13 @@ onMounted(() => {
             <router-link class="link" :to="'/'+ discoverPageName" :class="{ 'active': currentPage === 'associations' || currentPage === 'associations'}">Découvrir</router-link>
             <router-link class="link" to='/menu' :class="{ 'active': currentPage.includes('menu')}">Menu</router-link>
         </div>
-        <div class="infos">
+        <div v-if="user">
+            <router-link to="/menu/profile" class="account">
+                <div>{{ user.name }}</div>
+                <img :src="user.profile_picture" alt="profile_picture">
+            </router-link>
+        </div>
+        <div class="infos"v-else>
             <router-link to="/login">Se connecter</router-link>
             <router-link to="/signup">S'inscrire</router-link>
         </div>
@@ -134,18 +141,10 @@ onMounted(() => {
     }
 
     .nav-desktop {
-        display: none;
-    }
-
-    @media (min-width: 1024px) {
-        .nav {
-            display: none;
-        }
-
-        .nav-desktop {
             display: flex;
             justify-content: space-between;
             background-color: var(--color-primary);
+            width: 100vw;
             color: #fff;
             position: fixed;
             top: 0;
@@ -154,7 +153,7 @@ onMounted(() => {
             width: 100%;
             align-items: center;
             padding: 0 2rem;
-        }
+        
 
         .link {
             font-weight: 700;
@@ -168,5 +167,32 @@ onMounted(() => {
             }
 
         }
+
+        .account {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+
+            img {
+                width: 46px;
+                height: 46px;
+                border-radius: 999px;
+                border: 1px solid #fff;
+            }
+            div {
+                font-weight: 700;
+            }
+        }
+
+        .infos {
+            display: flex;
+            gap: 1rem;
+
+            div {
+                font-weight: 700;
+            }
+        }
+        
+        
     }
 </style>

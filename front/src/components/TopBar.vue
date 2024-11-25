@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import iconLeftArrow from './icons/icon-left-arrow.vue';
 import iconInfo from './icons/icon-info.vue';
+import { useDevice } from '@/composables/useDevice';
+
+const { isMobile } = useDevice();
+
 
 const props = defineProps({
   backUrl: String,
@@ -10,7 +14,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <div class="top-bar">
+  <div class="top-bar" v-if="isMobile" >
     <router-link class="back" :to="backUrl" v-if="backUrl">
       <iconLeftArrow />
     </router-link>
