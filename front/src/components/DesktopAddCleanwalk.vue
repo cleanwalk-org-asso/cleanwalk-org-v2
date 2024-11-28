@@ -77,39 +77,76 @@ const back = () => {
       <h2>Informations générales</h2>
       <div class="form">
         <div v-if="progress === 1">
-          <BaseInput v-model="newCleanwalk.name" name="text" type="text" label="cleanwalk-name" placeholder="Saisissez le nom de votre événement" />
+          <BaseInput v-model="newCleanwalk.name" name="text" type="text" label="cleanwalk-name"
+            placeholder="Saisissez le nom de votre événement" />
           <AutocompleteAddress v-model:query="newCleanwalk.address" @select-suggestion="handleSelectAddress" />
         </div>
-        
+
       </div>
       <div class="help">
         <h3>Aide</h3>
         <p>{{ getConseil() }}</p>
-  
       </div>
+    </div>
+    <div class="btn-container">
+      <button class="btn back" @click="back" v-if="progress !== 6">Précédent</button>
+      <button class="btn next btn" @click="next">Suivant</button>
     </div>
 
     <div class="progress">
       <h3>Progression</h3>
-      <div class="progression-bar">
-        
-
-      </div>
+      <ul class="progression-bar">
+        <li :class="{ active: progress === 1 }">Informations générales</li>
+        <li :class="{ active: progress === 2 }">Dates et horaires</li>
+        <li :class="{ active: progress === 3 }">Description</li>
+        <li :class="{ active: progress === 4 }">Photo et visuel</li>
+        <li :class="{ active: progress === 5 }">Aperçu</li>
+      </ul>
     </div>
   </section>
 </template>
 
 <style lang="scss" scoped>
+.btn-container {
+  display: flex;
+  justify-content: space-between;
+  position: absolute;
+  bottom: 6.4rem;
+  gap: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  flex-grow: 1;
+  width: 40rem;
+
+  .btn {
+    flex: 1;
+    padding: 1.25rem;
+    font-weight: 700;
+    font-size: 1.125rem;
+    border-radius: 8px;
+
+    &.back {
+      border: solid 1px #65707F;
+      background-color: #F8FAFD;
+    }
+
+    &.next {
+      background-color: var(--color-primary);
+      color: #fff;
+    }
+  }
+}
+
 .section {
   padding-top: 10rem;
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: space-evenly;
 }
 
 .container {
   width: clamp(20rem, 80%, 40rem);
-  
+
   h1 {
     font-size: 2rem;
     font-weight: 700;
@@ -117,13 +154,14 @@ const back = () => {
     width: 100%;
     text-align: center;
   }
-  
+
   h2 {
     font-size: 1.5rem;
     font-weight: 700;
     width: 100%;
     text-align: left;
   }
+
   .form {
     display: flex;
     flex-direction: column;
@@ -135,14 +173,57 @@ const back = () => {
   }
 
   .help {
-    border : 1px solid #CBD5E1;
+    border: 1px solid #CBD5E1;
     border-radius: 8px;
     background-color: #E1F4F8;
     padding: 1.5rem;
 
   }
 
+}
+
+.progress {
+  padding-top: 1.3rem;
+
+  h3 {
+    width: 100%;
+    text-align: left;
+    font-weight: 700;
+    padding-bottom: 0.5rem;
+  }
+
+  .progression-bar {
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    padding: 0.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    li {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 1.125rem;
+
+      &.active {
+        background-color: #E1F4F8;
+        border: 1px solid #CBD5E1;
+      }
+    }
+  }
+
+
 
 }
 
+@media screen and (min-width: 1500px) {
+  .progress {
+    position: absolute;
+    transform: translateX(250%);
+  }
+}
 </style>
