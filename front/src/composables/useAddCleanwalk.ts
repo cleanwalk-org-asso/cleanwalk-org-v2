@@ -8,7 +8,6 @@ import { useAccountStore } from '@/stores/AccountStore';
 
 export function useCleanwalkForm() {
   // References and local state
-  const progress = ref(1);
   const dragDropRef = ref(null as any);
   
   // Data for the new cleanwalk
@@ -93,52 +92,14 @@ export function useCleanwalkForm() {
     }
   };
 
-  // Handling next and previous buttons
-  const next = () => {
-    if (progress.value === 1 && !newCleanwalk.value.name) {
-      showToast('Please enter a name for your event', false);
-      return;
-    }
-    if (progress.value === 2 && !newCleanwalk.value.address) {
-      showToast('Please enter an address for your event', false);
-      return;
-    }
-    if (progress.value === 3) {
-      setDate();
-      if (!newCleanwalk.value.date_begin || !newCleanwalk.value.duration || newCleanwalk.value.duration < 0) {
-        showToast('Please enter a valid start and end time', false);
-        return;
-      }
-    }
-    if (progress.value === 4 && !newCleanwalk.value.description) {
-      showToast('Please enter a description for your event', false);
-      return;
-    }
-    if (progress.value === 6) {
-      upload();
-      return;
-    }
 
-    progress.value += 1;
-  };
-
-  const back = () => {
-    if (progress.value === 1) {
-      router.push('/add');
-      return;
-    }
-    progress.value -= 1;
-  };
 
   return {
-    progress,
     dragDropRef,
     newCleanwalk,
     dateCleanwalk,
     handleSelectAddress,
     setDate,
     upload,
-    next,
-    back
   };
 }

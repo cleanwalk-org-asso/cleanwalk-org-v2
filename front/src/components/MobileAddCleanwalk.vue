@@ -8,19 +8,59 @@ import dragDrop from './dragDrop.vue';
 import dateService from '@/services/dateService';
 import BaseInput from './base/BaseInput.vue';
 import BaseTextarea from './base/BaseTextarea.vue';
+import { useUtilsStore } from '@/stores/UtilsStore';
+import router from '@/router';
+
+const showToast = useUtilsStore().showToast;
 
 // Import the composable
 const {
-  progress,
   dragDropRef,
   newCleanwalk,
   dateCleanwalk,
   handleSelectAddress,
   setDate,
-  upload,
-  next,
-  back
+  upload
 } = useCleanwalkForm(); // Destructure the composable to access the data and methods
+
+const progress = ref(1);
+
+  // Handling next and previous buttons
+  const next = () => {
+    if (progress.value === 1 && !newCleanwalk.value.name) {
+      showToast('Please enter a name for your event', false);
+      return;
+    }
+    if (progress.value === 2 && !newCleanwalk.value.address) {
+      showToast('Please enter an address for your event', false);
+      return;
+    }
+    if (progress.value === 3) {
+      setDate();
+      if (!newCleanwalk.value.date_begin || !newCleanwalk.value.duration || newCleanwalk.value.duration < 0) {
+        showToast('Please enter a valid start and end time', false);
+        return;
+      }
+    }
+    if (progress.value === 4 && !newCleanwalk.value.description) {
+      showToast('Please enter a description for your event', false);
+      return;
+    }
+    if (progress.value === 6) {
+      upload();
+      return;
+    }
+
+    progress.value += 1;
+  };
+
+  const back = () => {
+    if (progress.value === 1) {
+      router.push('/add');
+      return;
+    }
+    progress.value -= 1;
+  };
 
 const tiles = defineProps<{ titles: string[] }>();
 
