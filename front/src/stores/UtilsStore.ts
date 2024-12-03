@@ -9,8 +9,6 @@ export const useUtilsStore = defineStore('utils', () => {
         isSuccess: false,
         isVisible: false,
     });
-        
-
 
     const showToast = (error: string, isSuccess: boolean, ) => {
         toast.value.isVisible = true;

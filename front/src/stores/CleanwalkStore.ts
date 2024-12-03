@@ -1,5 +1,5 @@
-import NominatimHelper from '@/helpers/nominatimHelper';
-import apiHelper from '@/helpers/apiHelper';
+import nominatimService from '@/services/nominatimService';
+import apiService from '@/services/apiService';
 import type { Cleanwalk, CleanwalkCreation, SingleCleanwalk } from '@/interfaces/cleanwalkInterface';
 import router from '@/router';
 import { defineStore } from 'pinia'
@@ -22,7 +22,7 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
     async function getAllCleanwalks() {
         const route = '/cleanwalks'; // Assure-toi que cette route est correcte et complète
         try {
-            const result = await apiHelper.kyGet(route);
+            const result = await apiService.kyGet(route);
             if (result.success && result.data) {
                 // Convertit les données seulement si elles existent et la requête a réussi
                 cleanwalksTab.value = result.data as unknown as Cleanwalk[];
@@ -42,7 +42,7 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
         if(userId) {
             url += '?user_id=' + userId;
         }
-        const result = await apiHelper.kyGet(url);
+        const result = await apiService.kyGet(url);
         if(result.success && result.data) {
             return result.data as unknown as SingleCleanwalk;
         }
@@ -55,7 +55,7 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
             router.push('/login');
             return undefined;
         }
-        const result = await apiHelper.kyPost(route, cleanwalk as unknown as Record<string, unknown>, token);
+        const result = await apiService.kyPost(route, cleanwalk as unknown as Record<string, unknown>, token);
         if(result != undefined) {
             return result.data as unknown as CleanwalkCreation;
         }
@@ -63,7 +63,7 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
     }
 
     async function updateCleanwalk(cleanwalk: Cleanwalk, token:string): Promise<Cleanwalk|undefined> {
-        const result = await apiHelper.kyPut(route + '/' + cleanwalk.id, cleanwalk as unknown as Record<string, unknown>, token);
+        const result = await apiService.kyPut(route + '/' + cleanwalk.id, cleanwalk as unknown as Record<string, unknown>, token);
         if(result != undefined) {
             return result.data as unknown as Cleanwalk;
         }
@@ -71,7 +71,7 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
     }
 
     async function joinCleanwalk(cleanwalkId: number, token:string, nb_participants:number, user_id:number): Promise<boolean> {
-        const result = await apiHelper.kyPost(route + '/join', {
+        const result = await apiService.kyPost(route + '/join', {
             cleanwalk_id: cleanwalkId,
             user_id: user_id,
             nb_person: nb_participants
@@ -83,7 +83,7 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
     }
 
     async function leaveCleanwalk(cleanwalkId: number, token:string, user_id:number): Promise<boolean> {
-        const result = await apiHelper.kyDelete(route + '/leave', {
+        const result = await apiService.kyDelete(route + '/leave', {
             cleanwalk_id: cleanwalkId,
             user_id: user_id
         }, token);

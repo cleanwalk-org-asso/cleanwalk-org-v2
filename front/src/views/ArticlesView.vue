@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import navBar from '@/components/navBar.vue';
+import navBar from '@/components/NavBar.vue';
 import SwithChoice from '@/components/SwithChoice.vue';
 import ArticlesList from '@/components/ArticlesList.vue';
 import { onMounted } from 'vue';

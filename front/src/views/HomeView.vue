@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import MobileHome from '@/components/MobileHome.vue';
-import navBar from '@/components/navBar.vue';
+import navBar from '@/components/NavBar.vue';
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
 import { onMounted } from 'vue';
 
