@@ -53,11 +53,23 @@ const props = defineProps({
     font-weight: 500;
     position: relative;
     margin-bottom: -18px;
-    background-color: #fff;
     width: fit-content;
     margin-left: 13px;
     margin-top: 5px;
     color: #94A3B8;
+    position: relative;
+    z-index: 1;
+
+    &::before { // line under the label for hide the input border
+      content: '';
+      background-color: #fff;
+      width: 110%;
+      height: 1px;
+      position: absolute;
+      bottom: 9px;
+      left: -5%;
+      z-index: -1;
+    }
   }
 
   .textarea {

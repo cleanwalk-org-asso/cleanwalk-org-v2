@@ -48,19 +48,19 @@ export function useCleanwalkForm() {
     if (!dateCleanwalk.value.dateDay || !dateCleanwalk.value.hourBegin || !dateCleanwalk.value.hourEnd) {
       return;
     }
-    let startDate = set(parse(dateCleanwalk.value.dateDay, 'yyyy-MM-dd', new Date()), {
+    const startDate = set(parse(dateCleanwalk.value.dateDay, 'yyyy-MM-dd', new Date()), {
       hours: parseInt(dateCleanwalk.value.hourBegin.split(':')[0]),
       minutes: parseInt(dateCleanwalk.value.hourBegin.split(':')[1]),
     });
 
-    let formattedStartDate = format(startDate, 'yyyy-MM-dd HH:mm:ss');
+    const formattedStartDate = format(startDate, 'yyyy-MM-dd HH:mm:ss');
 
-    let endDate = set(parse(dateCleanwalk.value.dateDay, 'yyyy-MM-dd', new Date()), {
+    const endDate = set(parse(dateCleanwalk.value.dateDay, 'yyyy-MM-dd', new Date()), {
       hours: parseInt(dateCleanwalk.value.hourEnd.split(':')[0]),
       minutes: parseInt(dateCleanwalk.value.hourEnd.split(':')[1]),
     });
 
-    let duration = differenceInMinutes(endDate, startDate);
+    const duration = differenceInMinutes(endDate, startDate);
 
     newCleanwalk.value.date_begin = formattedStartDate;
     newCleanwalk.value.duration = duration;

@@ -2,13 +2,21 @@
 import { ref, type Ref } from 'vue';
 import { useCleanwalkForm } from '@/composables/useAddCleanwalk'; // Import the composable
 import AutocompleteAddress from './AutocompleteAddress.vue';
-import iconMiniMap from './icons/icon-mini-map.vue';
-import iconClock from './icons/icon-clock.vue';
 import dragDrop from './dragDrop.vue';
-import dateService from '@/services/dateService';
 import BaseInput from './base/BaseInput.vue';
 import router from '@/router';
 import { useUtilsStore } from '@/stores/UtilsStore';
+import BaseTextarea from './base/BaseTextarea.vue';
+
+
+const titles = ref([
+    'Nom de votre évènement',
+    'Lieu de votre évènement',
+    'Date et horaire',
+    'Description de votre évènement ',
+    'Ajouter une image',
+    'Aperçu de votre cleanwalk'
+]);
 
 
 const showToast = useUtilsStore().showToast;
@@ -22,13 +30,15 @@ const {
   upload,
 } = useCleanwalkForm(); // Destructure the composable to access the data and methods
 
-const tiles = defineProps<{ titles: string[] }>();
-
 const progress = ref(1);
 
 // Advice messages for the user
 const conseils = ref([
-  'Choisissez un titre court pour votre ramassage, qui permettra de donner une idée globale de votre événement pour intéresser les potentiels participants. Ne vous perdez pas dans les détails (heure, matériel, etc.) que vous pourrez inscrire dans la suite de ce formulaire. Si une activité est associée à votre ramassage (running, randonnée, …), vous pouvez l’indiquer dans le titre pour que cela soit mis en avant.'
+  'Choisissez un titre court pour votre ramassage, qui permettra de donner une idée globale de votre événement pour intéresser les potentiels participants. Ne vous perdez pas dans les détails (heure, matériel, etc.) que vous pourrez inscrire dans la suite de ce formulaire. Si une activité est associée à votre ramassage (running, randonnée, …), vous pouvez l’indiquer dans le titre pour que cela soit mis en avant.',
+  'Choisissez ici la date, la durée de votre ramassage (activités annexes comprises - goûter, pique-nique, …)',
+  'Utilisez cet espace pour donner toute information complémentaire aux potentiels participants : matériel à apporter, parcours prévu, état des lieux, précisions sur le point de rendez-vous, etc.',
+  'Vous avez la possibilité d’ajouter une image ou un visuel pour illustrer votre événement. Si vous ne choisissez pas d’image, une image par défaut sera appliquée automatiquement.',
+  'Avant de publier votre Cleanwalk, assurez-vous d’avoir vérifié chaque champ du formulaire. Si vous souhaitez apporter des modifications, cliquez sur le bouton de modification. Une fois que tout est en ordre, cliquez sur le bouton "Publier". Vous pourrez toujours ajuster les détails de votre Cleanwalk plus tard depuis votre compte.'
 ]);
 
 const getConseil = () => {
@@ -53,6 +63,9 @@ const next = () => {
     return;
   }
   if (progress.value === 5) {
+    if (!dragDropRef.value.imageSrc) {
+      return;
+    }
     upload();
     return;
   }
@@ -74,12 +87,23 @@ const back = () => {
   <section class="section">
     <div class="container">
       <h1>Organiser un ramassage</h1>
-      <h2>Informations générales</h2>
+      <h2>{{ titles[progress - 1] }}</h2>
       <div class="form">
         <div v-if="progress === 1">
           <BaseInput v-model="newCleanwalk.name" name="text" type="text" label="cleanwalk-name"
             placeholder="Saisissez le nom de votre événement" />
           <AutocompleteAddress v-model:query="newCleanwalk.address" @select-suggestion="handleSelectAddress" />
+        </div>
+        <div v-if="progress === 2">
+          <BaseInput v-if="progress === 2" v-model="dateCleanwalk.dateDay" name="date" type="date" label="Date de l'évènement" />
+          <BaseInput v-if="progress === 2" v-model="dateCleanwalk.hourBegin" name="hourBegin" type="time" label="Heure de début" />
+          <BaseInput v-if="progress === 2" v-model="dateCleanwalk.hourEnd" name="hourEnd" type="time" label="Heure de fin" />
+        </div>
+        <BaseTextarea v-if="progress === 3" v-model="newCleanwalk.description" name="description" id="description" label="Description" :rows="4" />  
+        <dragDrop ref="dragDropRef" v-if="progress >= 4" :auto-upload="false" format="card" />
+        <div v-if="progress === 2">
+          test
+
         </div>
 
       </div>
@@ -87,10 +111,11 @@ const back = () => {
         <h3>Aide</h3>
         <p>{{ getConseil() }}</p>
       </div>
-    </div>
-    <div class="btn-container">
-      <button class="btn back" @click="back" v-if="progress !== 6">Précédent</button>
-      <button class="btn next btn" @click="next">Suivant</button>
+      <div class="btn-container">
+        <button class="btn back" @click="back" v-if="progress !== 1">Précédent</button>
+        <div class="btn" v-else></div>
+        <button class="btn next btn" @click="next">Suivant</button>
+      </div>
     </div>
 
     <div class="progress">
@@ -110,13 +135,10 @@ const back = () => {
 .btn-container {
   display: flex;
   justify-content: space-between;
-  position: absolute;
-  bottom: 6.4rem;
   gap: 2.5rem;
-  left: 50%;
-  transform: translateX(-50%);
   flex-grow: 1;
   width: 40rem;
+  margin-top: 1.5rem;
 
   .btn {
     flex: 1;
@@ -138,9 +160,8 @@ const back = () => {
 }
 
 .section {
-  padding-top: 10rem;
+  padding-top: 14vh;
   display: flex;
-  align-items: center;
   justify-content: space-evenly;
 }
 
@@ -150,7 +171,7 @@ const back = () => {
   h1 {
     font-size: 2rem;
     font-weight: 700;
-    margin-bottom: 3rem;
+    margin-bottom: 1vh;
     width: 100%;
     text-align: center;
   }
@@ -178,13 +199,16 @@ const back = () => {
     background-color: #E1F4F8;
     padding: 1.5rem;
 
+    h3 {
+      font-weight: 700;
+    }
+
   }
 
 }
 
 .progress {
-  padding-top: 1.3rem;
-
+  padding-top: 3.9rem;
   h3 {
     width: 100%;
     text-align: left;
@@ -225,5 +249,18 @@ const back = () => {
     position: absolute;
     transform: translateX(250%);
   }
+}
+
+@media screen and (min-height: 800px) {
+  .btn-container {
+    position: absolute;
+    bottom: 5vh;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 0;
+
+
+  }
+  
 }
 </style>

@@ -174,7 +174,7 @@ function mapClick() {
             <l-map ref="map" v-model:zoom="zoom" v-model:center="center" @ready="setMapEvents" :min-zoom="5"
                 @click="mapClick()" :useGlobalLeaflet="false">
                 <l-tile-layer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="base"></l-tile-layer>
-                <div v-for="cleanwalk in cleanwalkStore.cleanwalksTab">
+                <div v-for="cleanwalk in cleanwalkStore.cleanwalksTab" :key="cleanwalk.id">
                     <l-marker @click="slideUp(cleanwalk.id!)" :lat-lng="L.latLng(cleanwalk.pos_lat, cleanwalk.pos_long)">
                         <l-icon :icon-size="[25, 41]" :icon-anchor="[12, 41]"
                             :iconUrl="cleanwalk.host?.role_id === 1 ? blueMapIcon : greenMapIcon">
