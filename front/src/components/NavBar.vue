@@ -153,6 +153,7 @@ onMounted(() => {
             width: 100%;
             align-items: center;
             padding: 0 2rem;
+            z-index: 9998;
         
 
         .link {
