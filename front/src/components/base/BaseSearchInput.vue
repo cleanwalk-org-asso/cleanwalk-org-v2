@@ -43,7 +43,7 @@ const props = defineProps({
 
     .input {
         width: 100%;
-        border: 1px solid #94A3B8;
+        border: 1px solid #CBD5E1;
         border-radius: 8px;
         padding: 12px;
         padding-right: 40px; // Ajout d'un padding pour l'icône

@@ -19,13 +19,20 @@ const defaultCover = '/src/assets/default_cover.webp'
     <div class="cleanwalk">
         <div class="left">
             <div class="title">{{ cleanwalk.name }}</div>
-            <div class="flex">
-                <icon-clock />
-                <div>{{ dateService.getCleanwalkWrittenDate(new Date(cleanwalk.date_begin), cleanwalk.duration) }}</div>
+
+            <div class="date-location"> 
+                <div>
+                    <icon-clock />
+                    <div>{{ dateService.getCleanwalkWrittenDate(new Date(cleanwalk.date_begin), cleanwalk.duration) }}</div>
+                </div>
+                <div>
+                    <iconMiniMap />
+                    <div>{{ cleanwalk.address }}</div>
+                </div>
             </div>
-            <div class="flex">
-                <iconMiniMap />
-                <div>{{ cleanwalk.address }}</div>
+            <div class="author">
+                {{ cleanwalk.host!.name }}
+
             </div>
         </div>
         <img :src="cleanwalk.img_url ?? defaultCover" alt="cleanwalk">
@@ -34,7 +41,7 @@ const defaultCover = '/src/assets/default_cover.webp'
 
 <style lang="scss" scoped>
 .cleanwalk {
-    border: 1px solid #65707F;
+    border: 1px solid #CBD5E1;
     border-radius: 12px;
     padding: 10px;
     background-color: #fff;
@@ -44,18 +51,36 @@ const defaultCover = '/src/assets/default_cover.webp'
     display: flex;
     justify-content: space-between;
 
-    .title {
-        font-size: 16px;
-        font-style: normal;
-        font-weight: 500;
-        color: #373646;
+    .left {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+
+        .title {
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 500;
+            color: #373646;
+        }
+    
+        .date-location {
+            display: flex;
+            flex-direction: column;
+            div {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+        }
+
+        .author {
+            background-color: #F2F2F2;
+            width: fit-content;
+            padding: 0 0.75rem;
+            border-radius: 999px;
+        }
     }
 
-    .flex {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
 
     img {
         width: 136px;

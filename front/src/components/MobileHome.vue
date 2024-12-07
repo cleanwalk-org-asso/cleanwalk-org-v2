@@ -381,6 +381,7 @@ main {
 
         .container {
             width: 100%;
+            padding: 5%;
             height: 100%;
             display: flex;
             flex-direction: column;
