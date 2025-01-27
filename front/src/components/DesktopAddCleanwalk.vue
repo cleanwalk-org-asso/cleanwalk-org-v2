@@ -7,15 +7,17 @@ import BaseInput from './base/BaseInput.vue';
 import router from '@/router';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import BaseTextarea from './base/BaseTextarea.vue';
+import dateService from '@/services/dateService';
+import IconClock from './icons/icon-clock.vue';
+import IconMiniMap from './icons/icon-mini-map.vue';
 
 
 const titles = ref([
-    'Nom de votre évènement',
-    'Lieu de votre évènement',
-    'Date et horaire',
-    'Description de votre évènement ',
-    'Ajouter une image',
-    'Aperçu de votre cleanwalk'
+  'Nom et lieu de l\'évènement',
+  'Date et horaire',
+  'Description de votre évènement ',
+  'Ajouter une image',
+  'Aperçu de votre cleanwalk'
 ]);
 
 
@@ -95,16 +97,33 @@ const back = () => {
           <AutocompleteAddress v-model:query="newCleanwalk.address" @select-suggestion="handleSelectAddress" />
         </div>
         <div v-if="progress === 2">
-          <BaseInput v-if="progress === 2" v-model="dateCleanwalk.dateDay" name="date" type="date" label="Date de l'évènement" />
-          <BaseInput v-if="progress === 2" v-model="dateCleanwalk.hourBegin" name="hourBegin" type="time" label="Heure de début" />
-          <BaseInput v-if="progress === 2" v-model="dateCleanwalk.hourEnd" name="hourEnd" type="time" label="Heure de fin" />
+          <BaseInput v-if="progress === 2" v-model="dateCleanwalk.dateDay" name="date" type="date"
+            label="Date de l'évènement" />
+          <BaseInput v-if="progress === 2" v-model="dateCleanwalk.hourBegin" name="hourBegin" type="time"
+            label="Heure de début" />
+          <BaseInput v-if="progress === 2" v-model="dateCleanwalk.hourEnd" name="hourEnd" type="time"
+            label="Heure de fin" />
         </div>
-        <BaseTextarea v-if="progress === 3" v-model="newCleanwalk.description" name="description" id="description" label="Description" :rows="4" />  
+        <BaseTextarea v-if="progress === 3" v-model="newCleanwalk.description" name="description" id="description"
+          label="Description" :rows="4" />
         <dragDrop ref="dragDropRef" v-if="progress >= 4" :auto-upload="false" format="card" />
-        <div v-if="progress === 2">
-          test
-
+        <div v-if="progress === 5" class="preview">
+          <h3>{{ newCleanwalk.name }}</h3>
+          <div class="date-locate">
+            <div class="divtop">
+              <IconClock />
+              <div>
+                {{ dateService.getCleanwalkWrittenDate(new Date(newCleanwalk.date_begin), newCleanwalk.duration) }}
+              </div>
+            </div>
+            <div class="bot">
+              <IconMiniMap />
+              <div>{{ newCleanwalk.address }}</div>
+            </div>
+          </div>
+          <p>{{ newCleanwalk.description }}</p>
         </div>
+
 
       </div>
       <div class="help">
@@ -209,6 +228,7 @@ const back = () => {
 
 .progress {
   padding-top: 3.9rem;
+
   h3 {
     width: 100%;
     text-align: left;
@@ -261,6 +281,6 @@ const back = () => {
 
 
   }
-  
+
 }
 </style>

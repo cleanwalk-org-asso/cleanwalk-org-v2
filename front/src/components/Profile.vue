@@ -268,5 +268,11 @@ const changeUserPP = () => {
     object-fit: cover;
     margin-top: 78px;
   }
+
+  @media (min-width: 768px) {
+        width: 40rem;
+        margin: 0 auto;
+        padding-top: 2rem;
+    }
 }
 </style>

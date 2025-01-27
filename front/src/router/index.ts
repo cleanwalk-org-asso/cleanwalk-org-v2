@@ -95,7 +95,7 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
     await useAccountStore().tokenLogin();
   }
 
-  if (routesRequiringAuth.includes(to.name as string) && !useAccountStore().isLoggedIn && isMobile) {
+  if (routesRequiringAuth.includes(to.name as string) && !useAccountStore().isLoggedIn) {
     next({ name: 'login' }); // Redirige vers la page de login
   } else {
     next(); // Continue vers la route demandée

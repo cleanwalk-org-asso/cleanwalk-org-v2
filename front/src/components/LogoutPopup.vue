@@ -13,8 +13,8 @@ defineProps({
 </script>
 
 <template>
-    <div v-if="isVisible" class="popup">
-        <div class="popup-content">
+    <div v-if="isVisible" class="popup" @click="togglePopup!">
+        <div class="popup-content" @click.stop>
             <div class="cross"><iconCross @click="togglePopup!" /></div>
             <h2>Se déconnecter</h2>
             <p>Etes vous certain de vouloir vous déconnecter ?</p>
@@ -25,6 +25,7 @@ defineProps({
         </div>
     </div>
 </template>
+
 
 <style scoped lang="scss">
 .popup {
@@ -46,6 +47,8 @@ defineProps({
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         padding: 1rem;
         margin: 1.5rem;
+        position: relative;
+        z-index: 1001;
 
         .cross {
             display: flex;

@@ -105,6 +105,7 @@ const currentUser = accountStore.CurrentUser!;
         align-items: center;
         padding: 1rem;
         border-radius: 8px;
+        margin-top: 2remw;
 
         &.unlog {
             color: var(--color-primary);
@@ -158,6 +159,12 @@ const currentUser = accountStore.CurrentUser!;
         .arrow {
             stroke: #94A3B8;
         }
+    }
+
+    @media (min-width: 768px) {
+        width: 40rem;
+        margin: 0 auto;
+        padding-top: 8rem;
     }
 
 
