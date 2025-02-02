@@ -10,6 +10,9 @@ const props = defineProps<{
     cleanwalk: Cleanwalk
 }>()
 
+console.log(props.cleanwalk)
+
+
 const defaultCover = '/src/assets/default_cover.webp'
 
 

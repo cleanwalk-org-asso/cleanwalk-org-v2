@@ -3,39 +3,46 @@
 import { useCleanwalkMap } from '@/composables/useCleanwalkMap';
 import { LMap, LTileLayer, LMarker, LIcon } from "@vue-leaflet/vue-leaflet";
 import L, { LatLng, LatLngBounds, Map, type PointExpression } from "leaflet";
-import { ref, type Ref } from 'vue';
+import { ref, watch, type Ref } from 'vue';
 import greenMapIcon from "@/assets/green-map.svg";
 import blueMapIcon from "@/assets/blue-map.svg";
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
 import BaseSearchInput from './base/BaseSearchInput.vue';
 import CleanwalkListCard from './cards/CleanwalkListCard.vue';
 import CleanwalkSoloCard from './cards/CleanwalkSoloCard.vue';
+import type { Cleanwalk } from '@/interfaces/cleanwalkInterface';
 
 const cleanwalkStore = useCleanwalkStore();
 
 const {
     mapInstance,
     filteredCleanwalks,
-    selectedCleanwalk,
     searchInput,
     setMapEvents,
-    setSelectedCleanwalk,
     mapClick,
 } = useCleanwalkMap();
 
-
-
-const draggableCard = ref<HTMLElement | null>(null);
 let zoom = ref(6);
 let center: Ref<PointExpression> = ref([47.2, 2.333333]);
 
-const showSoloCW = (id: number) => {
-    setSelectedCleanwalk(id);
-    const card = document.getElementById(`cleanwalk-${id}`);
-    if (card) {
-        card.scrollIntoView({ behavior: "smooth", block: "center" });
+const selectedCleanwalk: Ref<Cleanwalk | null> = ref(null); //only for Desktop page
+
+watch(filteredCleanwalks, (newVal) => {
+    if (newVal.length === 1) {
+        selectedCleanwalk.value = newVal[0];
+    } else {
+        selectedCleanwalk.value = null;
     }
+});
+
+const showSoloCW = (id: number) => {
+    selectedCleanwalk.value = cleanwalkStore.cleanwalksTab.find((cleanwalk) => cleanwalk.id === id) ?? null;
 };
+
+const restetCleanwalkSelection = () => {
+    searchInput.value = '';
+    selectedCleanwalk.value = null;
+}
 
 </script>
 
@@ -51,13 +58,17 @@ const showSoloCW = (id: number) => {
                             :iconUrl="cleanwalk.host?.role_id === 1 ? blueMapIcon : greenMapIcon">
                         </l-icon>
                     </l-marker>
-                    <CleanwalkSoloCard :cleanwalk="cleanwalk" v-if="filteredCleanwalks.length === 1"/>
                 </div>
             </l-map>
         </div>
 
         <div class="cleanwalk-container">
             <BaseSearchInput v-model="searchInput" name="search" placeholder="Rechercher une cleanwalk" />
+            <div v-if="filteredCleanwalks.length === 0">
+                <div class="no-results">
+                    Aucune cleanwalk trouvée
+                </div>
+            </div>
             <div class="container" ref="cleanwalkListContainer">
                 <router-link v-for="cleanwalk in filteredCleanwalks"
                     :to="{ name: 'cleanwalk', params: { id: cleanwalk.id } }" :key="cleanwalk.id" class="listContainer">
@@ -65,6 +76,7 @@ const showSoloCW = (id: number) => {
                 </router-link>
             </div>
         </div>
+        <CleanwalkSoloCard :onClose="restetCleanwalkSelection" :cleanwalk="selectedCleanwalk" v-if="selectedCleanwalk"/>
     </main>
 </template>
 

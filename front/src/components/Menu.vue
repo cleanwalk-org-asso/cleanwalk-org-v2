@@ -8,7 +8,7 @@ import iconPaperPlane from '@/components/icons/icon-paper-plane.vue';
 import iconLogout from '@/components/icons/icon-logout.vue';
 import { useAccountStore } from '@/stores/AccountStore';
 import { ref } from 'vue';
-import LogoutPopup from './LogoutPopup.vue';
+import LogoutPopup from './popups/LogoutPopup.vue';
 const accountStore = useAccountStore();
 
 const isPopupVisible = ref(false);

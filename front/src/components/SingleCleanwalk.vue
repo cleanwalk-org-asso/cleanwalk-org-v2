@@ -13,7 +13,7 @@ import { useRoute } from 'vue-router';
 import router from '@/router';
 import dateService from '@/services/dateService';
 import { useAccountStore } from '@/stores/AccountStore';
-import LeaveCwPopup from './LeaveCwPopup.vue';
+import LeaveCwPopup from './popups/LeaveCwPopup.vue';
 import TopBar from './TopBar.vue';
 
 const cleanwalkStore = useCleanwalkStore();

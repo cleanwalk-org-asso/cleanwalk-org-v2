@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import iconCross from './icons/icon-cross.vue';
+import iconCross from '../icons/icon-cross.vue';
 
 // Define props
 const props = defineProps<{
