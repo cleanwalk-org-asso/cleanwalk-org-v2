@@ -1,7 +1,6 @@
 from flask import Blueprint, request, jsonify
 from werkzeug.utils import secure_filename
 from flask import current_app as app
-from app.utils import validate_api_key
 import uuid
 import os
 
@@ -17,15 +16,6 @@ def allowed_file(filename):
 
 upload_bp = Blueprint('upload', __name__)
 
-@upload_bp.before_request
-def check_api_key():
-    if request.method == 'OPTIONS': # Handle preflight requests to enable CORS
-        return
-    api_key = request.headers.get('X-API-Key')  # Get the api key from the header
-    
-    # Verify the api key
-    if not validate_api_key(api_key):
-        return jsonify({'message': 'Invalide API KEY'}), 401
 
 @upload_bp.route('', methods=['POST'])
 def upload_file():

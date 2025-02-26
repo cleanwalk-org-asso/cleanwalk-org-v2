@@ -1,21 +1,8 @@
 from flask import Blueprint, jsonify, request
 from app.models import db, Article, Categorie_article, Category
 from sqlalchemy import func
-from app.utils import validate_api_key
 
 articles_bp = Blueprint('articles', __name__)
-
-@articles_bp.before_request
-def check_api_key():
-    if request.method == 'OPTIONS': # Handle preflight requests to enable CORS
-        return
-    api_key = request.headers.get('X-API-Key')  # Get the api key from the header
-    
-    # Verify the api key
-    if not validate_api_key(api_key):
-        return jsonify({'message': 'Invalide API KEY'}), 401
-
-# Secure routes
 
 # ------------------------------------GET------------------------------------#
 

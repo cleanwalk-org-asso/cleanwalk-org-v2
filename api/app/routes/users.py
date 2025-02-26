@@ -1,9 +1,8 @@
 import datetime
 from flask import Blueprint, jsonify, request
-from flask_cors import CORS
-from sqlalchemy import desc, func
-from app.models import Cleanwalk, CleanwalkUser, db, User, Role, Organisation
-from app.utils import validate_api_key, hash_password, upload_img, send_reset_email
+from sqlalchemy import  func
+from app.models import  db, User, Role, Organisation
+from app.utils import hash_password, send_reset_email
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, get_jwt
 from sqlalchemy.exc import IntegrityError
 from app.utils import verify_google_token
@@ -18,18 +17,7 @@ RESET_PASSWORD_SALT = os.getenv("RESET_PASSWORD_SALT")
 
 serializer = URLSafeTimedSerializer(JWT_SECRET_KEY)
 
-@users_bp.before_request
-def check_api_key():
-    if request.method == 'OPTIONS':  # Handle preflight requests to enable CORS
-        return
-    
-    api_key = request.headers.get('X-API-Key')  # Get the API key from the header
-    
-    # Verify the API key
-    if not validate_api_key(api_key):
-        return jsonify({'message': 'Invalid API KEY'}), 401
 
-# Secure routes
 
 #------------------------------------GET------------------------------------#
 

@@ -6,9 +6,9 @@ import os
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from flask_mail import Message
-from flask import url_for
-from . import mail
+from .extensions import mail
 from itsdangerous import URLSafeTimedSerializer
+from flask import request, jsonify
 
 CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
@@ -67,3 +67,20 @@ def send_reset_email(user_email):
 
     # Send the email
     mail.send(msg)
+    
+def check_api_key():
+    # Handle preflight requests to enable CORS
+    if request.method == 'OPTIONS': 
+        return
+    # Get the api key from the header
+    api_key = request.headers.get('X-API-Key')  
+    
+    # Missing API key
+    if not api_key:
+        return jsonify({'message': 'Missing API Key'}), 400
+    
+    # Verify the api key
+    if not validate_api_key(api_key):
+        return jsonify({'message': 'Invalide API KEY'}), 401
+    
+    return None

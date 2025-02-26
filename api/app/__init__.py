@@ -1,20 +1,16 @@
 # app/__init__.py
 from flask import Flask
-from flask_jwt_extended import JWTManager
-from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
-from flask_mail import Mail 
+from datetime import timedelta
+from .extensions import db, mail, jwt
+from app.views import before_request
 
 from datetime import timedelta
 
 # Charger les variables d'environnement
 load_dotenv()
-
-# Initialiser l'extension SQLAlchemy
-db = SQLAlchemy()
-mail = Mail()
 
 def create_app():
     app = Flask(__name__)
@@ -40,7 +36,7 @@ def create_app():
     # Initialiser les extensions
     db.init_app(app)
     mail.init_app(app)
-    JWTManager(app)
+    jwt.init_app(app)
 
     # Enregistrer les blueprints
     from app.routes.users import users_bp
@@ -56,5 +52,7 @@ def create_app():
     app.register_blueprint(cities_bp, url_prefix='/cities')
     app.register_blueprint(admin_bp, url_prefix='/admin')
     app.register_blueprint(upload_bp, url_prefix='/upload')
+    
+    app.before_request(before_request)
 
     return app

@@ -2,25 +2,12 @@
 
 from flask import Blueprint, jsonify, request
 from app.models import db, User, Role
-from app.utils import validate_api_key, hash_password
+from app.utils import hash_password
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, get_jwt
-
-import os
 
 
 admin_bp = Blueprint('admin', __name__)
 
-@admin_bp.before_request
-def check_api_key():
-    if request.method == 'OPTIONS': # Handle preflight requests to enable CORS
-        return
-    api_key = request.headers.get('X-API-Key')  # Get the api key from the header
-    
-    # Verify the api key
-    if not validate_api_key(api_key):
-        return jsonify({'message': 'Invalide API KEY'}), 401
-
-# Secure routes
 
 #------------------------------------GET------------------------------------#
 

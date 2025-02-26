@@ -1,26 +1,10 @@
-import datetime
 from flask import Blueprint, jsonify, request
-from flask_cors import CORS
 from flask_jwt_extended import jwt_required
 from sqlalchemy import func, text, and_
 from app.models import City, CleanwalkUser, User, db, Cleanwalk
-from app.utils import validate_api_key
 
 
 cleanwalks_bp = Blueprint('cleanwalks', __name__)
-
-
-@cleanwalks_bp.before_request
-def check_api_key():
-    if request.method == 'OPTIONS': # Handle preflight requests to enable CORS
-        return
-    api_key = request.headers.get('X-API-Key')  # Get the api key from the header
-    
-    # Verify the api key
-    if not validate_api_key(api_key):
-        return jsonify({'message': 'Invalide API KEY'}), 401
-
-# Secure routes
 
 #------------------------------------GET------------------------------------#
 
