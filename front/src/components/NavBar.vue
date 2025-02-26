@@ -75,7 +75,7 @@ onMounted(() => {
 </template>
 
 <style scoped lang="scss">
-    @import '@/assets/base.scss';
+    @use '@/assets/main.scss';
     .nav {
         position: fixed;
         bottom: 0;

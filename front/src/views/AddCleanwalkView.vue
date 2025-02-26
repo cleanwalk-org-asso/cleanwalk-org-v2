@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import navBar from '@/components/NavBar.vue';
 import TopBar from '@/components/TopBar.vue';
-import MobileAddCleanwalk from '@/components/MobileAddCleanwalk.vue';
-import DesktopAddCleanwalk from '@/components/DesktopAddCleanwalk.vue';
+import DesktopAddCleanwalk from '@/components/addCleanwalk/DesktopAddCleanwalk.vue';
+import MobileAddCleanwalk from '@/components/addCleanwalk/MobileAddCleanwalk.vue';
 import { useDevice } from '@/composables/useDevice';
 
 const { isMobile } = useDevice();

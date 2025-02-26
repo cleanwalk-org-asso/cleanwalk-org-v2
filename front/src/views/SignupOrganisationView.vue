@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import SignupOrganisation from '@/components/SignupOrganisation.vue';
+import SignupOrganisation from '@/components/auth/SignupOrganisation.vue';
 import SwithChoice from '@/components/SwithChoice.vue';
 
 </script>

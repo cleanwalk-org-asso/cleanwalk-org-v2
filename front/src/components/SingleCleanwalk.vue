@@ -227,7 +227,7 @@ const getActionButtonText = (): string => {
 </template>
 
 <style scoped lang="scss">
-@import '@/assets/base.scss';
+@use '@/assets/main.scss';
 
 
 main {

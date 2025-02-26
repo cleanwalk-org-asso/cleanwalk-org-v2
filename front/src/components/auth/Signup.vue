@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import Toast from './Toast.vue';
 import apiService from '@/services/apiService';
 import type { ApiResponse } from '@/interfaces/apiResponseInterface';
 import { v4 as uuidv4 } from 'uuid';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import router from '@/router';
-import BaseInput from './base/BaseInput.vue';
+import BaseInput from '@/components/base/BaseInput.vue';
 
 const showToast = useUtilsStore().showToast;
 

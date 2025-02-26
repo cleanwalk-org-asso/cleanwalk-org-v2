@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue';
 import { useCleanwalkForm } from '@/composables/useAddCleanwalk'; // Import the composable
-import AutocompleteAddress from './AutocompleteAddress.vue';
-import dragDrop from './dragDrop.vue';
-import BaseInput from './base/BaseInput.vue';
+import AutocompleteAddress from '@/components/AutocompleteAddress.vue';
+import dragDrop from '@/components/dragDrop.vue';
+import BaseInput from '@/components/base/BaseInput.vue';
 import router from '@/router';
 import { useUtilsStore } from '@/stores/UtilsStore';
-import BaseTextarea from './base/BaseTextarea.vue';
+import BaseTextarea from '@/components/base/BaseTextarea.vue';
 import dateService from '@/services/dateService';
-import IconClock from './icons/icon-clock.vue';
-import IconMiniMap from './icons/icon-mini-map.vue';
+import IconClock from '@/components/icons/icon-clock.vue';
+import IconMiniMap from '@/components/icons/icon-mini-map.vue';
 
 
 const titles = ref([
@@ -40,7 +40,6 @@ const conseils = ref([
   'Choisissez ici la date, la durée de votre ramassage (activités annexes comprises - goûter, pique-nique, …)',
   'Utilisez cet espace pour donner toute information complémentaire aux potentiels participants : matériel à apporter, parcours prévu, état des lieux, précisions sur le point de rendez-vous, etc.',
   'Vous avez la possibilité d’ajouter une image ou un visuel pour illustrer votre événement. Si vous ne choisissez pas d’image, une image par défaut sera appliquée automatiquement.',
-  'Avant de publier votre Cleanwalk, assurez-vous d’avoir vérifié chaque champ du formulaire. Si vous souhaitez apporter des modifications, cliquez sur le bouton de modification. Une fois que tout est en ordre, cliquez sur le bouton "Publier". Vous pourrez toujours ajuster les détails de votre Cleanwalk plus tard depuis votre compte.'
 ]);
 
 const getConseil = () => {
@@ -65,9 +64,6 @@ const next = () => {
     return;
   }
   if (progress.value === 5) {
-    if (!dragDropRef.value.imageSrc) {
-      return;
-    }
     upload();
     return;
   }
@@ -126,14 +122,14 @@ const back = () => {
 
 
       </div>
-      <div class="help">
+      <div v-if="progress<=4" class="help">
         <h3>Aide</h3>
         <p>{{ getConseil() }}</p>
       </div>
       <div class="btn-container">
-        <button class="btn back" @click="back" v-if="progress !== 1">Précédent</button>
+        <button class="btn back" @click="back()" v-if="progress !== 1">{{ progress === 5 ? 'Modifier' : 'Précédent' }}</button>
         <div class="btn" v-else></div>
-        <button class="btn next btn" @click="next">Suivant</button>
+        <button class="btn next btn" @click="next()">{{ progress === 5 ? 'Publier' : 'Suivant' }}</button>
       </div>
     </div>
 
