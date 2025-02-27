@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import os
 from datetime import timedelta
 from .extensions import db, mail, jwt
-from app.views import before_request
+from app.services import before_request
 
 from datetime import timedelta
 
