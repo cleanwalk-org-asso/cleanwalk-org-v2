@@ -11,6 +11,7 @@ import type { Association } from '@/interfaces/userInterface';
 import ProfileAssoAddon from './ProfileAssoAddon.vue';
 import BaseInput from './base/BaseInput.vue';
 import BaseTextarea from './base/BaseTextarea.vue';
+import LogoutButton from './buttons/LogoutButton.vue';
 
 const getToken = useAccountStore().getAccessToken;
 const showToast = useUtilsStore().showToast;
@@ -141,7 +142,7 @@ const changeUserPP = () => {
                 <BaseInput v-model="confirmNewMdp" name="confirmNewMdp" type="password" label="Confirmation du nouveau mot de passe" placeholder="Confirmez votre nouveau mot de passe" />
                 <button class="action-button" type="submit">Changer votre mot de passe</button>
             </form>
-            <button class="danger-button">Cloturer mon compte</button>
+            <LogoutButton />
         </div>
     </section>
 
