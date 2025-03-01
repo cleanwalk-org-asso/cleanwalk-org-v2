@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useCleanwalkForm } from '@/composables/useAddCleanwalk'; // Import the composable
-import AutocompleteAddress from '@/components/AutocompleteAddress.vue';
+import AutocompleteAddress from '@/components/base/AutocompleteAddress.vue';
 import iconMiniMap from '@/components/icons/icon-mini-map.vue';
 import iconClock from '@/components/icons/icon-clock.vue';
 import dragDrop from '@/components/dragDrop.vue';

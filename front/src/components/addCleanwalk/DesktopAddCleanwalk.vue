@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue';
 import { useCleanwalkForm } from '@/composables/useAddCleanwalk'; // Import the composable
-import AutocompleteAddress from '@/components/AutocompleteAddress.vue';
+import AutocompleteAddress from '@/components/base/AutocompleteAddress.vue';
 import dragDrop from '@/components/dragDrop.vue';
 import BaseInput from '@/components/base/BaseInput.vue';
 import router from '@/router';
@@ -88,9 +88,9 @@ const back = () => {
       <h2>{{ titles[progress - 1] }}</h2>
       <div class="form">
         <div v-if="progress === 1">
-          <BaseInput v-model="newCleanwalk.name" name="text" type="text" label="cleanwalk-name"
+          <BaseInput v-model="newCleanwalk.name" name="text" type="text" label="nom de la cleanwalk"
             placeholder="Saisissez le nom de votre événement" />
-          <AutocompleteAddress v-model:query="newCleanwalk.address" @select-suggestion="handleSelectAddress" />
+          <AutocompleteAddress v-model:query="newCleanwalk.address" label="adresse" @select-suggestion="handleSelectAddress" />
         </div>
         <div v-if="progress === 2">
           <BaseInput v-if="progress === 2" v-model="dateCleanwalk.dateDay" name="date" type="date"
