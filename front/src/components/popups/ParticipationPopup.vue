@@ -2,7 +2,7 @@
 import iconCross from '../icons/icon-cross.vue';
 import iconAdd from '../icons/icon-add.vue';
 import iconMinus from '../icons/icon-minus.vue';
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 
 const props = defineProps<{
   isVisible: boolean
@@ -12,6 +12,7 @@ const emit = defineEmits(['close', 'confirm']);
 
 const counterParticipate = ref(1);
 const isAnonyme = ref(false);
+const popupRef = ref<HTMLElement | null>(null);
 
 const counterAdd = () => {
   if (counterParticipate.value < 5) {
@@ -42,11 +43,29 @@ const resetForm = () => {
   counterParticipate.value = 1;
   isAnonyme.value = false;
 }
+
+// Handle clicks outside the popup
+const handleOutsideClick = (event: MouseEvent) => {
+  // Check if popup is visible and click is outside popup-validation
+  if (props.isVisible && popupRef.value && !popupRef.value.contains(event.target as Node)) {
+    emit('close');
+    resetForm();
+  }
+}
+
+// Set up and clean up click event listeners
+onMounted(() => {
+  document.addEventListener('mousedown', handleOutsideClick);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('mousedown', handleOutsideClick);
+});
 </script>
 
 <template>
   <div class="popup" v-if="isVisible">
-    <div class="popup-validation">
+    <div class="popup-validation" ref="popupRef">
       <div class="cross-container">
         <button class="cross" @click="cancel()">
           <iconCross />
@@ -94,6 +113,11 @@ const resetForm = () => {
     overflow: hidden;
     width: 90%;
     padding: 0 10%;
+
+    @media (min-width: 768px) {
+      width: 30rem;
+      padding: 0 3rem;
+    }
 
     .cross-container {
       display: flex;

@@ -12,10 +12,13 @@ import LeaveCwPopup from './popups/LeaveCwPopup.vue';
 import ParticipationPopup from './popups/ParticipationPopup.vue';
 import MapView from './map/MapView.vue';
 import TopBar from './TopBar.vue';
+import { useUtilsStore } from '@/stores/UtilsStore';
+import { tr } from 'date-fns/locale';
 
 const cleanwalkStore = useCleanwalkStore();
 const currenUserId = ref(useAccountStore().CurrentUser?.id);
 const token = ref(useAccountStore().getAccessToken());
+const showToast = useUtilsStore().showToast;
 
 let currentCleanwalk: Ref<SingleCleanwalk | undefined> = ref(undefined);
 
@@ -61,6 +64,7 @@ const leaveCleanwalk = () => {
   }
   cleanwalkStore.leaveCleanwalk(currentCleanwalk.value.id, token.value, currenUserId.value);
   currentCleanwalk.value.is_user_participant = false;
+  showToast('Désinscription réussie', true);
   toogleLeaveCwPopup();
 }
 
@@ -71,6 +75,8 @@ const handleJoinCleanwalk = (data: { participantCount: number, isAnonymous: bool
   }
   cleanwalkStore.joinCleanwalk(currentCleanwalk.value?.id, token.value, data.participantCount, currenUserId.value);
   currentCleanwalk.value.is_user_participant = true;
+  showToast('Inscription réussie', true);
+  toggleParticipationPopup();
 }
 
 const actionButton = () => {
