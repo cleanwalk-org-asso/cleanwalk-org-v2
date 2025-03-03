@@ -1,15 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import Toast from './Toast.vue';
 import apiService from '@/services/apiService';
 import type { ApiResponse } from '@/interfaces/apiResponseInterface';
-import { v4 as uuidv4 } from 'uuid';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import router from '@/router';
-import BaseInput from './base/BaseInput.vue';
+import BaseInput from '@/components/base/BaseInput.vue';
 
 const showToast = useUtilsStore().showToast;
-
 
 const email = ref("");
 const name = ref("");
@@ -18,7 +15,7 @@ const confirmPassword = ref("");
 
 const signup = async ( ) => {
     if(!name.value) {
-        showToast("Veuillez renseigner votre prénom", false);
+        showToast("Veuillez renseigner le nom de l'association", false);
         return;
     }
     if(!email.value) {
@@ -37,8 +34,8 @@ const signup = async ( ) => {
         email: email.value,
         password: password.value,
         name: name.value,
-        profile_picture: 'https://api.dicebear.com/8.x/fun-emoji/svg?seed=' + uuidv4(),
-        role_id: 1
+        profile_picture: 'https://api.dicebear.com/9.x/initials/svg?seed=' + name.value,
+        role_id: 2,
     });
     if(response.success === false) {
         showToast(response.data.message as string, false);
@@ -62,7 +59,6 @@ const signup = async ( ) => {
         <h1>
             Bienvenue sur la plateforme Cleanwalk.org
         </h1>
-
         <!-- <GoogleLogin :callback="callback" />
         <div class="or">
             <div class="line"></div>
@@ -70,7 +66,7 @@ const signup = async ( ) => {
             <div class="line"></div>
         </div> -->
         <form @submit.prevent="signup()">
-            <BaseInput v-model="name" label="Comment voulez vous qu'on vous appelle ?" name="name" type="text" placeholder="nom, prenom, pseudo ... ." />
+            <BaseInput v-model="name" label="Nom de votre association/Organisation ?" name="name" type="text" placeholder="Cleanwalk.org" />
             <BaseInput v-model="email" label="Email" name="email" type="email" placeholder="user@domain.fr" />
             <BaseInput v-model="password" label="Mot de passe" name="password" type="password" placeholder="Votre mot de passe" />
             <BaseInput v-model="confirmPassword" label="Confirmez le mot de passe" name="confirmPassword" type="password" placeholder="Votre mot de passe" />
@@ -128,12 +124,13 @@ const signup = async ( ) => {
         }
     }
 
-    form {
+    form {  
             margin-top: 3rem;
             display: flex;
             width: 100%;
             flex-direction: column;
             color: #94A3B8;
+    
             .action-button {
                 margin-top: 1.5rem;
             }

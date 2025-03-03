@@ -50,12 +50,17 @@ const router = createRouter({
     {
       path: '/signup',
       name: 'signup',
-      component: () => import('../views/SignupView.vue')
+      component: () => import('../views/SignupChoiceView.vue')
     },
     {
-      path: '/signup/organisation',
-      name: 'signupOrganisation',
-      component: () => import('../views/SignupOrganisationView.vue')
+      path: '/signup/asso',
+      name: 'signupAsso',
+      component: () => import('../views/SignupAssoView.vue')
+    },
+    {
+      path: '/signup/perso',
+      name: 'signupPerso',
+      component: () => import('../views/SignupView.vue')
     },
     {
       path: '/logout',
@@ -95,7 +100,7 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
     await useAccountStore().tokenLogin();
   }
 
-  if (routesRequiringAuth.includes(to.name as string) && !useAccountStore().isLoggedIn && isMobile) {
+  if (routesRequiringAuth.includes(to.name as string) && !useAccountStore().isLoggedIn) {
     next({ name: 'login' }); // Redirige vers la page de login
   } else {
     next(); // Continue vers la route demandée

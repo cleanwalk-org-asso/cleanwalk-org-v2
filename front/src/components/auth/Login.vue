@@ -5,7 +5,7 @@ import { useAccountStore } from '@/stores/AccountStore';
 import type { User } from '@/interfaces/userInterface';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import { GoogleLogin } from 'vue3-google-login';
-import BaseInput from './base/BaseInput.vue';
+import BaseInput from '@/components/base/BaseInput.vue';
 
 const router = useRouter();
 

@@ -2,23 +2,23 @@
 import type { Cleanwalk, SingleCleanwalk } from '@/interfaces/cleanwalkInterface'
 import iconClock from './icons/icon-clock.vue';
 import iconMiniMap from './icons/icon-mini-map.vue';
-import iconLeftArrow from './icons/icon-left-arrow.vue';
-import iconInfo from './icons/icon-info.vue';
-import iconCross from './icons/icon-cross.vue';
-import iconAdd from './icons/icon-add.vue';
-import iconMinus from './icons/icon-minus.vue';
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
-import { onMounted, ref, type Ref } from 'vue';
+import { onMounted, ref, type Ref, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import router from '@/router';
 import dateService from '@/services/dateService';
 import { useAccountStore } from '@/stores/AccountStore';
-import LeaveCwPopup from './LeaveCwPopup.vue';
+import LeaveCwPopup from './popups/LeaveCwPopup.vue';
+import ParticipationPopup from './popups/ParticipationPopup.vue';
+import MapView from './map/MapView.vue';
 import TopBar from './TopBar.vue';
+import { useUtilsStore } from '@/stores/UtilsStore';
+import { tr } from 'date-fns/locale';
 
 const cleanwalkStore = useCleanwalkStore();
 const currenUserId = ref(useAccountStore().CurrentUser?.id);
 const token = ref(useAccountStore().getAccessToken());
+const showToast = useUtilsStore().showToast;
 
 let currentCleanwalk: Ref<SingleCleanwalk | undefined> = ref(undefined);
 
@@ -45,34 +45,10 @@ const toogleLeaveCwPopup = () => {
   showLeaveCwPopup.value = !showLeaveCwPopup.value;
 }
 
-let popupBool = ref(false);
-let counterParticipate = ref(1);
-let isAnonyme = ref(false);
+let showParticipationPopup = ref(false);
 
-const counterAdd = () => {
-  if (counterParticipate.value < 5) {
-    counterParticipate.value++;
-  }
-}
-
-const counterMinus = () => {
-  if (counterParticipate.value > 1) {
-    counterParticipate.value--;
-  }
-}
-
-const tooglePopup = () => {
-  popupBool.value = !popupBool.value;
-}
-
-const participate = () => {
-  tooglePopup();
-}
-
-const cancel = () => {
-  tooglePopup()
-  counterParticipate.value = 1;
-  isAnonyme.value = false;
+const toggleParticipationPopup = () => {
+  showParticipationPopup.value = !showParticipationPopup.value;
 }
 
 const getDate = () => {
@@ -81,7 +57,6 @@ const getDate = () => {
   }
 }
 
-
 const leaveCleanwalk = () => {
   if (!currentCleanwalk.value || !currenUserId.value || !token.value) {
     router.push('/login');
@@ -89,18 +64,19 @@ const leaveCleanwalk = () => {
   }
   cleanwalkStore.leaveCleanwalk(currentCleanwalk.value.id, token.value, currenUserId.value);
   currentCleanwalk.value.is_user_participant = false;
+  showToast('Désinscription réussie', true);
   toogleLeaveCwPopup();
 }
 
-const joinCleanwalk = () => {
-
+const handleJoinCleanwalk = (data: { participantCount: number, isAnonymous: boolean }) => {
   if (!currentCleanwalk.value || !currenUserId.value || !token.value) {
     router.push('/login');
     return;
   }
-  cleanwalkStore.joinCleanwalk(currentCleanwalk.value?.id, token.value, counterParticipate.value, currenUserId.value);
+  cleanwalkStore.joinCleanwalk(currentCleanwalk.value?.id, token.value, data.participantCount, currenUserId.value);
   currentCleanwalk.value.is_user_participant = true;
-  tooglePopup();
+  showToast('Inscription réussie', true);
+  toggleParticipationPopup();
 }
 
 const actionButton = () => {
@@ -120,10 +96,9 @@ const actionButton = () => {
   }
   if (currentCleanwalk.value.is_user_participant === false) {
     // join cleanwalk
-    participate();
+    toggleParticipationPopup();
     return;
   }
-
 }
 
 const getActionButtonText = (): string => {
@@ -139,44 +114,111 @@ const getActionButtonText = (): string => {
   return "";
 }
 
+// Add a function to check if we're on desktop
+const isDesktop = ref(false);
+// Add a function to check if we're on iOS
+const isIOS = ref(false);
+
+// Check screen size and device OS on mount and when window resizes
+const checkScreenSize = () => {
+  isDesktop.value = window.innerWidth >= 768;
+  // Check if device is iOS (iPhone, iPad, iPod)
+  isIOS.value = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+};
+
+onMounted(() => {
+  checkScreenSize();
+  window.addEventListener('resize', checkScreenSize);
+});
+
+// Clean up event listener
+onUnmounted(() => {
+  window.removeEventListener('resize', checkScreenSize);
+});
 </script>
 
 <template>
   <TopBar backUrl="/" pageName="Cleanwalk" />
   <LeaveCwPopup :isVisible="showLeaveCwPopup" :tooglePopup="toogleLeaveCwPopup" :leaveCw="leaveCleanwalk" />
-  <div class="popup" v-if="popupBool">
-    <div class="popup-validation">
-      <div class="cross-container">
-        <button class="cross" @click="cancel()">
-          <iconCross />
-        </button>
-      </div>
-      <h3>Validation de la participation au ramassage</h3>
-      <div class="warning">Maximum 5 personnes avec vous</div>
-      <div class="counter">
-        <button class="button-primary minus" @click="counterMinus()">
-          <iconMinus />
-        </button>
-        <div>{{ counterParticipate }}</div>
-        <button class="button-primary add" @click="counterAdd()">
-          <iconAdd />
-        </button>
-      </div>
-      <div class="anonyme">
-        <input type="checkbox" name="anonyme" id="anonyme" v-model="isAnonyme">
-        <label for="anonyme">participer en anonyme</label>
-      </div>
-      <div class="button-container">
-        <button @click="cancel()" class="cancel">Annuler</button>
-        <button @click="joinCleanwalk()" class="button-primary">Valider</button>
-      </div>
-    </div>
-  </div>
+  <ParticipationPopup :isVisible="showParticipationPopup" @close="toggleParticipationPopup" @confirm="handleJoinCleanwalk" />
+  
   <main>
     <div>
       <img v-if="currentCleanwalk" class="cover" :src="currentCleanwalk?.img_url" alt="" />
     </div>
-    <div class="container">
+
+    <div class="desktop-layout" v-if="isDesktop && currentCleanwalk">
+      <div class="container">
+        <h1>{{ currentCleanwalk?.name }}</h1>
+        <div class="date-location">
+          <div class="top">
+            <icon-clock />
+            <div>{{ getDate() }}</div>
+          </div>
+          <div class="bot">
+            <iconMiniMap />
+            <div>{{ currentCleanwalk?.address }}</div>
+          </div>
+        </div>
+        
+        <div class="map-links">
+          <!-- Conditionally show Apple Maps or Google Maps depending on device -->
+          <a v-if="isIOS" 
+             :href="`https://maps.apple.com/?q=${currentCleanwalk?.address}&ll=${currentCleanwalk?.pos_lat},${currentCleanwalk?.pos_long}`"
+             target="_blank">
+            <img src="../assets/appleMap.svg" alt="Apple Maps logo">
+            <h4>Ouvrir dans Plans</h4>
+          </a>
+          <a v-else 
+             :href="`https://www.google.com/maps/?q=${currentCleanwalk?.pos_lat},${currentCleanwalk?.pos_long}`"
+             target="_blank">
+            <img src="../assets/googleMap.svg" alt="Google Maps logo">
+            <h4>Ouvrir dans Google Maps</h4>
+          </a>
+          
+          <a :href="`https://www.openstreetmap.org/?mlat=${currentCleanwalk?.pos_lat}&mlon=${currentCleanwalk?.pos_long}`"
+            target="_blank">
+            <img src="../assets/osm_logo.webp" alt="OpenStreetMap logo">
+            <h4>Ouvrir dans OpenStreetMap</h4>
+          </a>
+        </div>
+        
+        <div v-if="currentCleanwalk?.host.author_id === currenUserId" class="participant-count">
+          {{ currentCleanwalk?.participant_count }} participant(s)
+        </div>
+        
+        <div class="orga">
+          <div class="left">
+            <div>organisé par:</div>
+            <h2> {{ currentCleanwalk?.host?.name }} </h2>
+          </div>
+          <div class="right" v-if="currentCleanwalk?.host?.profile_picture">
+            <img :src="currentCleanwalk.host.profile_picture" alt="profile-picture">
+          </div>
+        </div>
+        
+        <button class="button-primary" @click="actionButton()">
+          {{ getActionButtonText() }}
+        </button>
+        
+        <p class="description">
+          {{ currentCleanwalk?.description }}
+        </p>
+      </div>
+      
+      <div class="map-section">
+        <h3>Localisation</h3>
+        <div class="map-container">
+          <MapView 
+            v-if="currentCleanwalk?.pos_lat && currentCleanwalk?.pos_long"
+            :cleanwalk = "currentCleanwalk"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile layout -->
+    <div class="container" v-if="!isDesktop">
       <h1>{{ currentCleanwalk?.name }}</h1>
       <div class="date-location">
         <div class="top">
@@ -188,24 +230,34 @@ const getActionButtonText = (): string => {
           <div>{{ currentCleanwalk?.address }}</div>
         </div>
       </div>
+      
       <div class="map-links">
-        <!-- Lien vers Google Maps -->
-        <a :href="`https://www.google.com/maps/?q=${currentCleanwalk?.pos_lat},${currentCleanwalk?.pos_long}`"
-          target="_blank">
-          <img src="../assets/googleMap.svg" alt="google map logo">
+        <!-- Conditionally show Apple Maps or Google Maps depending on device -->
+        <a v-if="isIOS" 
+           :href="`https://maps.apple.com/?q=${currentCleanwalk?.address}&ll=${currentCleanwalk?.pos_lat},${currentCleanwalk?.pos_long}`"
+           target="_blank">
+          <img src="../assets/appleMap.svg" alt="Apple Maps logo">
+          <h4>Ouvrir dans Plans</h4>
+        </a>
+        <a v-else
+           :href="`https://www.google.com/maps/?q=${currentCleanwalk?.pos_lat},${currentCleanwalk?.pos_long}`"
+           target="_blank">
+          <img src="../assets/googleMap.svg" alt="Google Maps logo">
           <h4>Ouvrir dans Google Maps</h4>
         </a>
 
-        <!-- Lien vers OpenStreetMap -->
+        <!-- Always show OpenStreetMap -->
         <a :href="`https://www.openstreetmap.org/?mlat=${currentCleanwalk?.pos_lat}&mlon=${currentCleanwalk?.pos_long}`"
           target="_blank">
-          <img src="../assets/osm_logo.webp" alt="google map logo">
+          <img src="../assets/osm_logo.webp" alt="OpenStreetMap logo">
           <h4>Ouvrir dans OpenStreetMap</h4>
         </a>
       </div>
+      
       <div v-if="currentCleanwalk?.host.author_id === currenUserId">
         {{ currentCleanwalk?.participant_count }} participant(s)
       </div>
+      
       <div class="orga">
         <div class="left">
           <div>organisé par:</div>
@@ -215,23 +267,23 @@ const getActionButtonText = (): string => {
           <img :src="currentCleanwalk.host.profile_picture" alt="profile-picture">
         </div>
       </div>
+      
       <button class="button-primary" @click="actionButton()">
         {{ getActionButtonText() }}
       </button>
+      
       <p class="description">
         {{ currentCleanwalk?.description }}
       </p>
     </div>
-
   </main>
 </template>
 
 <style scoped lang="scss">
-@import '@/assets/base.scss';
-
+@use '@/assets/main.scss';
 
 main {
-  overflow: scroll;
+  overflow-y: auto;
 }
 
 .cover {
@@ -239,6 +291,42 @@ main {
   object-fit: cover;
   aspect-ratio: 21/9;
   margin-top: 58px;
+
+  @media (min-width: 768px) {
+    height: 20rem;
+    width: 100%;
+  }
+}
+
+.desktop-layout {
+  display: flex;
+  width: 90%;
+  max-width: 1200px;
+  margin: 2rem auto;
+  gap: 2rem;
+
+  .container {
+    flex: 1;
+    padding: 0;
+  }
+
+  .map-section {
+    flex: 1;
+    
+    h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--text-color-primary);
+    }
+
+    .map-container {
+      height: 400px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #ddd;
+    }
+  }
 }
 
 .container {
@@ -279,7 +367,6 @@ main {
       display: flex;
       align-items: center;
       gap: 10px;
-
     }
   }
 
@@ -314,6 +401,11 @@ main {
     }
   }
 
+  .participant-count {
+    margin-bottom: 1rem;
+    font-weight: 500;
+  }
+
   .orga {
     display: flex;
     background-color: var(--color-secondary);
@@ -341,7 +433,6 @@ main {
         object-fit: cover;
       }
     }
-
   }
 
   .button-primary {
@@ -359,134 +450,10 @@ main {
     text-align: left;
   }
 
-}
-
-.popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100dvh;
-  z-index: 999;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  .popup-validation {
-    background-color: #fff;
-    border-radius: 8px;
-    overflow: hidden;
-    width: 90%;
-    padding: 0 10%;
-
-    .cross-container {
-      display: flex;
-      justify-content: flex-end;
-      position: relative;
-      margin-right: -10%; // to compensate padding :( sorry
-
-      .cross {
-        background-color: transparent;
-        stroke: var(--text-color-primary);
-        padding: 13px 13px 0 0;
-        // styles for cross button
-      }
-    }
-
-    .warning {
-      padding: 40px 0 10px;
-      font-size: 12px;
-    }
-
-    h3 {
-      // styles for h3
-      font-size: 18px;
-      font-weight: 700;
-      text-align: center;
-      max-width: 230px;
-      margin: 0 auto;
-    }
-
-
-    .counter {
-      display: flex;
-      width: 100%;
-      justify-content: space-between;
-
-      button {
-        // styles for counter buttons
-        width: 50px;
-        height: 50px;
-        stroke: #fff;
-        padding-top: 4px;
-
-        &.add {
-          padding-top: 4px;
-
-          svg {
-            width: 32px;
-            height: 32px;
-          }
-        }
-
-      }
-
-      div {
-        // styles for counter div
-        font-size: 25px;
-        font-style: normal;
-        font-weight: 700;
-        line-height: 47px;
-        background-color: var(--color-secondary);
-        margin: 0 20px;
-        border-radius: 8px;
-        flex-grow: 1;
-        text-align: center;
-
-      }
-    }
-
-    .anonyme {
-      display: flex;
-      padding-top: 20px;
-      visibility: hidden; //provisoire
-      padding: 0;
-
-      input[type="checkbox"] {
-        // styles for checkbox
-        margin-right: 5px
-      }
-
-      label {
-        display: block;
-        font-size: 12px;
-        padding-top: 2px;
-      }
-    }
-
-    .button-container {
-      display: flex;
-      padding: 20px 0;
-
-      button {
-        font-weight: 500;
-        padding: 15px 0;
-        border-radius: 8px;
-
-        &.cancel {
-          // styles for cancel button
-          flex-grow: 0.25;
-          margin-right: 10px;
-          font-size: 16px;
-        }
-
-        &.button-primary {
-          // styles for primary button
-          flex-grow: 0.75;
-        }
-      }
-    }
+  @media (min-width: 768px) {
+    width: 100%;
+    margin: 0;
+    padding: 0;
   }
 }
 </style>
