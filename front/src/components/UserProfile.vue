@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { watch, ref, onMounted, type Ref } from 'vue';
-const backgroundImageUrl = ref('https://cdn2.thecatapi.com/images/1nk.jpg');
-import iconPhoto from '@/components/icons/icon-photo.vue';
 import { useAccountStore } from '@/stores/AccountStore';
 import router from '@/router';
 import iconShuffleArrow from './icons/icon-shuffle-arrow.vue';

@@ -13,13 +13,15 @@ const props = defineProps<{
 }>()
 
 
+
+
 const defaultCover = '/src/assets/default_cover.webp'
 
 </script>
 
 <template>
     <div class="solo-cw">
-        <img :src="cleanwalk.img_url ?? defaultCover" alt="cleanwalk">
+        <img :src="cleanwalk.img_url ?? defaultCover" alt="cleanwalk image">
         <div class="btn-container">
             <router-link class="btn" :to="{ name: 'cleanwalk', params: { id: cleanwalk.id } }">
                 <IconExternalLink />

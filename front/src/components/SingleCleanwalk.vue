@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Cleanwalk, SingleCleanwalk } from '@/interfaces/cleanwalkInterface'
+import type { SingleCleanwalk } from '@/interfaces/cleanwalkInterface'
 import iconClock from './icons/icon-clock.vue';
 import iconMiniMap from './icons/icon-mini-map.vue';
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
@@ -13,7 +13,6 @@ import ParticipationPopup from './popups/ParticipationPopup.vue';
 import MapView from './map/MapView.vue';
 import TopBar from './TopBar.vue';
 import { useUtilsStore } from '@/stores/UtilsStore';
-import { tr } from 'date-fns/locale';
 
 const cleanwalkStore = useCleanwalkStore();
 const currenUserId = ref(useAccountStore().CurrentUser?.id);
@@ -144,7 +143,7 @@ onUnmounted(() => {
   
   <main>
     <div>
-      <img v-if="currentCleanwalk" class="cover" :src="currentCleanwalk?.img_url" alt="" />
+      <img v-if="currentCleanwalk" class="cover" :src="currentCleanwalk?.img_url" alt="cover image" />
     </div>
 
     <div class="desktop-layout" v-if="isDesktop && currentCleanwalk">

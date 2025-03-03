@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Allow: /cleanwalk/
+Allow: /associations/
+
+# Disallow user-specific routes that shouldn't be indexed
+Disallow: /menu
+Disallow: /menu/profile
+Disallow: /add/cleanwalk
+Disallow: /cleanwalk/edit/
+Disallow: /reset-password/
+Disallow: /forgot-password
+Disallow: /logout
+
+# Sitemap location
+Sitemap: https://cleanwalk.org/sitemap.xml
