@@ -58,7 +58,7 @@ const togglePopup = () => {
     h3 {
       margin: 0 1rem;
       flex-grow: 1;
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 700;
     }
 

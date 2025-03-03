@@ -6,16 +6,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import router from '@/router';
 import BaseInput from '@/components/base/BaseInput.vue';
-import { GoogleLogin } from 'vue3-google-login';
-import { useAccountStore } from '@/stores/AccountStore';
-import { type CallbackTypes } from 'vue3-google-login';
+import IconPerson from '@/components/icons/icon-person.vue';
+import IconAsso from '@/components/icons/icon-asso.vue';
 
-const accountStore = useAccountStore();
 const showToast = useUtilsStore().showToast;
 
-const callbackGoogleLogin: CallbackTypes.CredentialCallback = async (response) => {
-    await accountStore.googleLoginSignup(response.credential);
-};
 
 const email = ref("");
 const name = ref("");
@@ -69,22 +64,24 @@ const signup = async ( ) => {
             Choisissez le type de compte qui vous correspond :
         </h1>
 
-        <GoogleLogin :callback="callbackGoogleLogin" />
+        <!-- <GoogleLogin :callback="callback" />
         <div class="or">
             <div class="line"></div>
             <span>ou</span>
-            <div class="line"></div>
-        </div>
-        <form @submit.prevent="signup()">
-            <BaseInput v-model="name" label="Comment voulez vous qu'on vous appelle ?" name="name" type="text" placeholder="nom, prenom, pseudo ... ." />
-            <BaseInput v-model="email" label="Email" name="email" type="email" placeholder="user@domain.fr" />
-            <BaseInput v-model="password" label="Mot de passe" name="password" type="password" placeholder="Votre mot de passe" />
-            <BaseInput v-model="confirmPassword" label="Confirmez le mot de passe" name="confirmPassword" type="password" placeholder="Votre mot de passe" />
-            <button class="action-button" type="submit">S' inscrire</button>
-            <router-link to="/login" class="go-login">
-                Vous utilisez déjà cleanwalk.org : <span>Connectez-vous</span>
+            <div class="line"></div> -->
+        <div class="choice-container">
+            <router-link to="/signup/perso" class="choice">
+                <IconPerson class="choice-icon" />
+                <span>Compte personnel</span>
             </router-link>
-        </form>
+            <router-link to="/signup/asso" class="choice">
+                <IconAsso class="choice-icon" />
+                <span>Compte association</span>
+            </router-link>
+        </div>
+        <router-link to="/login" class="go-login">
+            Vous utilisez déjà cleanwalk.org : <span>Connectez-vous</span>
+        </router-link>
         </section>
 </template>
 
@@ -97,14 +94,14 @@ const signup = async ( ) => {
         align-items: center;
         overflow: hidden;
         padding: 0 2rem;
+
         h1 {
             font-size: 24px;
             font-weight: 500;
             margin-bottom: 1rem;
         }
-    }
 
-    .go-login {
+        .go-login {
         color: var(--text-color-secondary);
         font-size: 12px;
         width: 100%;
@@ -119,32 +116,37 @@ const signup = async ( ) => {
         
         }
     }
-    .or {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 1rem 0;
-        span {
-            margin: 0 1rem;
-        }
-        .line {
-            width: 35vw;
-            height: 1px;
-            background-color: #747474;
+
+        .choice-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-direction: column;
+            .choice {
+                padding: 1rem 2rem;
+                border-radius: 5px;
+                border-radius: 8px;
+                border: 1px solid #CBD5E1;
+                background-color: var(--primary-color);
+                color: #373646;
+                font-weight: 700;
+                text-decoration: none;
+                font-size: 24px;
+                transition: all 0.3s;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                min-width: 26rem;
+                &:hover {
+                    background-color: var(--primary-color-dark);
+                }
+                
+                .choice-icon {
+                    width: 48px; 
+                    height: 48px;
+                }
+            }
         }
     }
 
-    form {
-            margin-top: 3rem;
-            display: flex;
-            width: 100%;
-            flex-direction: column;
-            color: #94A3B8;
-            .action-button {
-                margin-top: 1.5rem;
-            }
-        }
-        .danger-button {
-            margin-top: 3.5rem;
-        }
 </style>

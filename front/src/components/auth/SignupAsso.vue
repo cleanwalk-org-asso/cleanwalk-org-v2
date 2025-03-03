@@ -15,7 +15,7 @@ const confirmPassword = ref("");
 
 const signup = async ( ) => {
     if(!name.value) {
-        showToast("Veuillez renseigner votre prénom", false);
+        showToast("Veuillez renseigner le nom de l'association", false);
         return;
     }
     if(!email.value) {
