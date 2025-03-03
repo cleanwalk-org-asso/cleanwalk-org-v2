@@ -2,7 +2,7 @@
 import { ref, type Ref } from 'vue';
 import iconPhoto from './icons/icon-photo.vue';
 import { useAccountStore } from '@/stores/AccountStore';
-import apiHelper from '@/helpers/apiHelper';
+import apiService from '@/services/apiService';
 import type { ApiResponse } from '@/interfaces/apiResponseInterface';
 import { useUtilsStore } from '@/stores/UtilsStore';
 
@@ -76,7 +76,7 @@ const handleUpload = async (): Promise<string | undefined> => {
   if (fileInput.value?.files?.length && fileInput.value) {
     // Utilisez votre fonction d'aide pour uploader l'image
     const token = accountStore.getAccessToken();
-    const Response: ApiResponse = await apiHelper.uploadFile(fileInput.value.files[0], token!);
+    const Response: ApiResponse = await apiService.uploadFile(fileInput.value.files[0], token!);
     if (Response.success) {
       // showToast("Image uploaded successfully", true);
       removeImage();

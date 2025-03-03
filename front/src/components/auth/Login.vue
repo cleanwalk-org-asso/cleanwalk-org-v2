@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import apiHelper from '@/helpers/apiHelper';
+import apiService from '@/services/apiService';
 import { useAccountStore } from '@/stores/AccountStore';
 import type { User } from '@/interfaces/userInterface';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import { GoogleLogin } from 'vue3-google-login';
+import BaseInput from '@/components/base/BaseInput.vue';
 
 const router = useRouter();
 
@@ -18,7 +19,7 @@ const email = ref("");
 const password = ref("");
 
 const callbackGoogleLogin: CallbackTypes.CredentialCallback = async (response) => {
-    await accountStore.googleLoginSingup(response.credential);
+    await accountStore.googleLoginSignup(response.credential);
 };
 
 const login = async () => {
@@ -32,7 +33,7 @@ const login = async () => {
     }
 
     // Call the login API
-    const response = await apiHelper.kyPostWithoutToken("/users/login", {
+    const response = await apiService.kyPostWithoutToken("/users/login", {
         email: email.value,
         password: password.value
     });
@@ -57,29 +58,31 @@ const login = async () => {
 </script>
 
 <template>
-        <div class="login-container">
-            <div class="login">
-                <h1>
-                    Connectez-vous
-                </h1>
-                <GoogleLogin :callback="callbackGoogleLogin"/>
-                <div class="or">
-                    <div class="line"></div>
-                    <span>ou</span>
-                    <div class="line"></div>
-                </div>
-                <form @submit.prevent="login()">
-                    <label class="label" for="email">Email</label>
-                    <input v-model="email" class="input" name="mdp" type="email" placeholder="user@domain.fr">
-                    <label class="label" for="mdp">Mot de passe</label>
-                    <input v-model="password" class="input" name="mdp" type="password" placeholder="Votre mot de passe">
-                    <button class="action-button" type="submit">Se connecter</button>
-                </form>
+    <div class="login-container">
+        <div class="login">
+            <h1>
+                Connectez-vous
+            </h1>
+            <GoogleLogin :callback="callbackGoogleLogin" />
+            <div class="or">
+                <div class="line"></div>
+                <span>ou</span>
+                <div class="line"></div>
             </div>
-            <router-link to="/signup" class="go-signup">
-                Vous êtes nouveau chez cleanwalk.org : <span class="span">Inscrivez-vous</span>
+            <form @submit.prevent="login()">
+                <BaseInput v-model="email" name="email" type="email" label="Email" placeholder="Votre mot de passe" />
+                <BaseInput v-model="password" name="password" type="password" label="Mot de passe"
+                    placeholder="Votre mot de passe" />
+                <button class="action-button" type="submit">Se connecter</button>
+            </form>
+            <router-link to="/forgot-password" class="forgot-password">
+                Mot de passe oublié ?
             </router-link>
         </div>
+        <router-link to="/signup" class="go-signup">
+            Vous êtes nouveau chez cleanwalk.org : <span class="span">Inscrivez-vous</span>
+        </router-link>
+    </div>
 </template>
 
 <style scoped lang="scss">
@@ -88,16 +91,24 @@ const login = async () => {
     flex-direction: column;
     align-items: center;
     overflow: hidden;
-    padding: 0 2rem;
     width: 100%;
     height: 100vh;
     justify-content: space-evenly;
+    padding: 0 2rem;
 
     .login {
         width: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
+
+        .forgot-password {
+            width: 100%;
+            padding-top: 1rem;
+            text-align: right;
+            font-size: 0.8rem;
+            text-decoration: underline;
+        }
     }
 
     h1 {
@@ -145,37 +156,6 @@ form {
     flex-direction: column;
     color: #94A3B8;
 
-
-    .label {
-        font-size: 12px;
-        font-weight: 500;
-        position: relative;
-        margin-bottom: -18px;
-        background-color: #fff;
-        width: fit-content;
-        margin-left: 13px;
-        margin-top: 5px;
-
-    }
-
-    .input {
-        border: 1px solid #94A3B8;
-        border-radius: 8px;
-        padding: 12px;
-        margin-top: 0.5rem;
-        font-size: 14px;
-        font-style: normal;
-        font-weight: 500;
-
-        &::placeholder {
-            color: #94A3B8;
-        }
-
-        &:focus {
-            outline: none;
-        }
-    }
-
     .action-button {
         margin-top: 1.5rem;
     }
@@ -187,8 +167,7 @@ form {
 
 @media (min-width: 1024px) {
     .login-container {
-        padding-left: clamp(2rem, 8%, 10rem);
-        padding-right: clamp(2rem, 8%, 10rem);
+        padding-left: clamp(2rem, 10vw, 10rem);     padding-right: clamp(2rem, 10vw, 10rem);
 
     }
 }

@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import Toast from './Toast.vue';
-import apiHelper from '@/helpers/apiHelper';
+import apiService from '@/services/apiService';
 import type { ApiResponse } from '@/interfaces/apiResponseInterface';
-import { v4 as uuidv4 } from 'uuid';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import router from '@/router';
+import BaseInput from '@/components/base/BaseInput.vue';
 
 const showToast = useUtilsStore().showToast;
 
@@ -16,7 +15,7 @@ const confirmPassword = ref("");
 
 const signup = async ( ) => {
     if(!name.value) {
-        showToast("Veuillez renseigner votre prénom", false);
+        showToast("Veuillez renseigner le nom de l'association", false);
         return;
     }
     if(!email.value) {
@@ -31,7 +30,7 @@ const signup = async ( ) => {
         showToast("Les mots de passe ne correspondent pas", false);
         return;
     }
-    const response:ApiResponse = await apiHelper.kyPostWithoutToken( "/users", {
+    const response:ApiResponse = await apiService.kyPostWithoutToken( "/users", {
         email: email.value,
         password: password.value,
         name: name.value,
@@ -67,14 +66,10 @@ const signup = async ( ) => {
             <div class="line"></div>
         </div> -->
         <form @submit.prevent="signup()">
-            <label class="label" for="email">Nom de votre association/Organisation ?</label>
-            <input v-model="name" class="input" name="name" type="text" placeholder="Cleanwalk.org">
-            <label class="label" for="email">Email</label>
-            <input v-model="email" class="input" name="mdp" type="email" placeholder="user@domain.fr">
-            <label class="label" for="password">Mot de passe</label>
-            <input v-model="password" class="input" name="mdp" type="password" placeholder="Votre mot de passe">
-            <label class="label" for="password2">Mot de passe</label>
-            <input v-model="confirmPassword" class="input" name="mdp" type="password" placeholder="Votre mot de passe">
+            <BaseInput v-model="name" label="Nom de votre association/Organisation ?" name="name" type="text" placeholder="Cleanwalk.org" />
+            <BaseInput v-model="email" label="Email" name="email" type="email" placeholder="user@domain.fr" />
+            <BaseInput v-model="password" label="Mot de passe" name="password" type="password" placeholder="Votre mot de passe" />
+            <BaseInput v-model="confirmPassword" label="Confirmez le mot de passe" name="confirmPassword" type="password" placeholder="Votre mot de passe" />
             <button class="action-button" type="submit">S' inscrire</button>
             <router-link to="/login" class="go-login">
                 Vous utilisez déjà cleanwalk.org : <span>Connectez-vous</span>
@@ -135,36 +130,6 @@ const signup = async ( ) => {
             width: 100%;
             flex-direction: column;
             color: #94A3B8;
-    
-    
-            .label {
-                font-size: 12px;
-                font-weight: 500;
-                position: relative;
-                margin-bottom: -18px;
-                background-color: #fff;
-                width: fit-content;
-                margin-left: 13px;
-                margin-top: 5px;           
-    
-            }
-    
-            .input {
-                border: 1px solid #94A3B8;
-                border-radius: 8px;
-                padding: 12px;
-                margin-top: 0.5rem;
-                font-size: 14px;
-                font-style: normal;
-                font-weight: 500;
-    
-                &::placeholder {
-                    color: #94A3B8;
-                }
-                &:focus {
-                    outline: none;
-                }
-            }
     
             .action-button {
                 margin-top: 1.5rem;

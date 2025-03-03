@@ -9,6 +9,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import type { Association } from '@/interfaces/userInterface';
 import ProfileAssoAddon from './ProfileAssoAddon.vue';
+import BaseInput from './base/BaseInput.vue';
+import BaseTextarea from './base/BaseTextarea.vue';
+import LogoutButton from './buttons/LogoutButton.vue';
 
 const getToken = useAccountStore().getAccessToken;
 const showToast = useUtilsStore().showToast;
@@ -131,19 +134,15 @@ const changeUserPP = () => {
         </div>
         <div class="content">
             <h3>{{ currentUser?.email }}</h3>
-            <input class="input name" type="text" v-model="userName">
-            <textarea v-if="association" name="text" id="text" v-model="currentDescription" placeholder="Descrition"></textarea>
+            <BaseInput v-model="userName" name="name" type="text" label="Nom" placeholder="Votre nom" />
+            <BaseTextarea v-model="currentDescription" name="description" label="Description" placeholder="Votre description" />
             <form @submit.prevent="changePassword()">
-                <label class="label" for="mdp">Mot de passe actuel</label>
-                <input v-model="currentMdp" class="input" name="mdp" type="password" placeholder="Votre mot de passe">
-                <label class="label" for="mdp">Nouveau mot de passe</label>
-                <input v-model="newMdp" class="input" name="mdp" type="password" placeholder="Votre mot de passe">
-                <label class="label" for="mdp">Confirmation du nouveau mot de passe</label>
-                <input v-model="confirmNewMdp" class="input" name="mdp" type="password"
-                    placeholder="Votre mot de passe">
+                <BaseInput v-model="currentMdp" name="mdp" type="password" label="Mot de passe actuel" placeholder="Votre mot de passe" />
+                <BaseInput v-model="newMdp" name="newMdp" type="password" label="Nouveau mot de passe" placeholder="Votre nouveau mot de passe" />
+                <BaseInput v-model="confirmNewMdp" name="confirmNewMdp" type="password" label="Confirmation du nouveau mot de passe" placeholder="Confirmez votre nouveau mot de passe" />
                 <button class="action-button" type="submit">Changer votre mot de passe</button>
             </form>
-            <button class="danger-button">Cloturer mon compte</button>
+            <LogoutButton />
         </div>
     </section>
 
@@ -229,48 +228,6 @@ const changeUserPP = () => {
       margin-bottom: 1rem;
     }
 
-    .input,
-    textarea {
-      border: 1px solid #94A3B8;
-      border-radius: 8px;
-      padding: 12px;
-      margin-top: 0.5rem;
-      font-size: 14px;
-      font-style: normal;
-      font-weight: 500;
-      width: 100%;
-
-      &::placeholder {
-        color: #94A3B8;
-      }
-
-      &:focus {
-        outline: none;
-      }
-
-      &.name {
-        font-size: 18px;
-        font-style: normal;
-        font-weight: 500;
-        padding: 12px 0 8px 12px;
-      }
-    }
-
-    textarea {
-      height: 145px;
-    }
-
-    .label {
-      font-size: 12px;
-      font-weight: 500;
-      position: relative;
-      margin-bottom: -18px;
-      background-color: #fff;
-      width: fit-content;
-      margin-left: 13px;
-      margin-top: 5px;
-    }
-
     form {
       display: flex;
       width: 100%;
@@ -312,5 +269,11 @@ const changeUserPP = () => {
     object-fit: cover;
     margin-top: 78px;
   }
+
+  @media (min-width: 768px) {
+        width: 40rem;
+        margin: 0 auto;
+        padding-top: 2rem;
+    }
 }
 </style>

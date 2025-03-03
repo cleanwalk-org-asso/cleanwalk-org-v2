@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import apiHelper from '@/helpers/apiHelper';
+import apiService from '@/services/apiService';
 import { useUtilsStore } from '@/stores/UtilsStore';
+import BaseInput from '@/components/base/BaseInput.vue';
 
 const newPassword = ref<string>('');
 const confirmPassword = ref<string>('');
@@ -18,7 +19,7 @@ const resetPassword = async () => {
     return;
   }
   try {
-    const response = await apiHelper.kyPostWithoutToken(`/users/reset-password/${token}`, {
+    const response = await apiService.kyPostWithoutToken(`/users/reset-password/${token}`, {
       new_password: newPassword.value
     });
     if (response.success) {
@@ -38,14 +39,12 @@ const resetPassword = async () => {
     <h2>Réinitialiser votre mot de passe</h2>
     <form @submit.prevent="resetPassword">
       <div class="container">
-        <label for="new-password">Nouveau mot de passe :</label>
-        <input id="new-password" v-model="newPassword" type="password" placeholder="Entrer un nouveau mot de passe"
-          required />
+        <BaseInput label="Nouveau mot de passe" id="new-password" name="new-password" v-model="newPassword" type="password"
+          placeholder="Entrer un nouveau mot de passe" />
       </div>
       <div class="container">
-        <label for="confirm-password">Confirmer le mot de passe :</label>
-        <input id="confirm-password" v-model="confirmPassword" type="password"
-          placeholder="Confirmer le nouveau mot de passe" required />
+        <BaseInput label="Confirmer le mot de passe" id="confirm-password" name="confirm-password" v-model="confirmPassword" type="password"
+          placeholder="Confirmer le mot de passe" />
       </div>
       <button type="submit" class="button-primary">Réinitialiser le mot de passe</button>
     </form>
