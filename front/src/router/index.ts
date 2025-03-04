@@ -174,7 +174,6 @@ const routesRequiringAuth = ['profile', 'addCleanwalk'];
 // SEO - Update meta tags based on route
 router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
   // Authentication logic
-  const isMobile = window.innerWidth <= 768;
   if(!useAccountStore().isLoggedIn) {
     await useAccountStore().tokenLogin();
   }
