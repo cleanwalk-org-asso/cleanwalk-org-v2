@@ -5,12 +5,14 @@ import JsonLdEvent from '@/components/SEO/JsonLdEvent.vue';
 import { onMounted, watch, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
+import { useAccountStore } from '@/stores/AccountStore';
 import type { SingleCleanwalk as CleanwalkType } from '@/interfaces/cleanwalkInterface';
 
 const route = useRoute();
 const router = useRouter();
 const cleanwalkStore = useCleanwalkStore();
 const currentCleanwalk = ref<CleanwalkType | undefined>(undefined);
+const currenUserId = ref(useAccountStore().CurrentUser?.id);
 
 // Update meta tags when cleanwalk data is loaded
 const updateMetaTags = (cleanwalk: CleanwalkType) => {
@@ -49,7 +51,6 @@ const updateMetaTags = (cleanwalk: CleanwalkType) => {
       ogImage.setAttribute('content', cleanwalk.img_url);
     }
   }
-
   // Update canonical URL
   let canonicalUrl = document.querySelector('link[rel="canonical"]');
   if (!canonicalUrl) {
@@ -60,38 +61,41 @@ const updateMetaTags = (cleanwalk: CleanwalkType) => {
   canonicalUrl.setAttribute('href', `${window.location.origin}/cleanwalk/${cleanwalk.id}`);
 }
 
-onMounted(async () => {
-  const id = +route.params.id;
-  if (isNaN(id)) return;
+const fetchCleanwalkData = async (id: number) => {
+  if (isNaN(id)) {
+    router.push('/404');
+    return;
+  }
   
   try {
-    currentCleanwalk.value = await cleanwalkStore.getCleanwalkById(id);
+    currentCleanwalk.value = await cleanwalkStore.getCleanwalkById(id, currenUserId.value);
+    
     if (currentCleanwalk.value) {
       updateMetaTags(currentCleanwalk.value);
+    } else {
+      router.push('/404');
     }
   } catch (error) {
-    console.error("Failed to load cleanwalk data for SEO:", error);
+    console.error("Failed to load cleanwalk data:", error);
+    router.push('/404');
   }
+};
+
+onMounted(async () => {
+  const id = +route.params.id;
+  await fetchCleanwalkData(id);
 });
 
 // Watch for route changes to update meta tags when navigating between different cleanwalk pages
 watch(() => route.params.id, async (newId) => {
   const id = +newId;
-  if (isNaN(id)) return;
-  
-  try {
-    currentCleanwalk.value = await cleanwalkStore.getCleanwalkById(id);
-    if (currentCleanwalk.value) {
-      updateMetaTags(currentCleanwalk.value);
-    }
-  } catch (error) {
-    console.error("Failed to load cleanwalk data for SEO:", error);
-  }
+  await fetchCleanwalkData(id);
 });
 </script>
 
 <template>
-  <SingleCleanwalk />
+  <!-- Use v-model to create two-way binding -->
+  <SingleCleanwalk v-if="currentCleanwalk" v-model="currentCleanwalk" />
   <navBar />
   <!-- Add structured data JSON-LD for events -->
   <JsonLdEvent v-if="currentCleanwalk" :cleanwalk="currentCleanwalk" />

@@ -3,11 +3,12 @@ import PublicProfileAsso from '@/components/PublicProfileAsso.vue';
 import TopBar from '@/components/TopBar.vue';
 import JsonLdOrganization from '@/components/SEO/JsonLdOrganization.vue';
 import { onMounted, watch, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useAccountStore } from '@/stores/AccountStore';
 import type { Association } from '@/interfaces/userInterface';
 
 const route = useRoute();
+const router = useRouter();
 const accountStore = useAccountStore();
 const association = ref<Association | undefined>(undefined);
 
@@ -16,10 +17,10 @@ const updateMetaTags = (asso: Association) => {
   if (!asso) return;
   
   // Create descriptive title and description
-  const title = `${asso.name} | Environmental Organization | Cleanwalk.org`;
+  const title = `${asso.name} | Cleanwalk.org`;
   const description = asso.description ? 
     `${asso.description.substring(0, 150)}${asso.description.length > 150 ? '...' : ''}` : 
-    `Learn about ${asso.name} and their environmental cleanup initiatives on Cleanwalk.org`;
+    `Découvrez ${asso.name} et leurs initiatives de nettoyage environnemental sur Cleanwalk.org`;
   
   // Update document title
   document.title = title;
@@ -61,15 +62,23 @@ const updateMetaTags = (asso: Association) => {
 
 onMounted(async () => {
   const id = +route.params.id;
-  if (isNaN(id)) return;
+  if (isNaN(id)) {
+    router.push('/associations');
+    return;
+  }
   
   try {
-    association.value = await accountStore.getOrganisationById(id);
+    association.value = await accountStore.getOrganizationById(id);
     if (association.value) {
       updateMetaTags(association.value);
+    } else {
+      // Redirect to associations page if no association is found
+      router.push('/associations');
     }
   } catch (error) {
     console.error("Failed to load association data for SEO:", error);
+    // Redirect to associations page if there's an error loading the data
+    router.push('/associations');
   }
 });
 
@@ -79,19 +88,24 @@ watch(() => route.params.id, async (newId) => {
   if (isNaN(id)) return;
   
   try {
-    association.value = await accountStore.getOrganisationById(id);
+    association.value = await accountStore.getOrganizationById(id);
     if (association.value) {
       updateMetaTags(association.value);
+    } else {
+      // Redirect to associations page if no association is found
+      router.push('/associations');
     }
   } catch (error) {
     console.error("Failed to load association data for SEO:", error);
+    // Redirect to associations page if there's an error loading the data
+    router.push('/associations');
   }
 });
 </script>
 
 <template>
     <TopBar back-url="/associations" pageName="Association"/>
-    <PublicProfileAsso />
+    <PublicProfileAsso v-if="association" :asso="association" />
     <!-- Add structured data JSON-LD for organizations -->
     <JsonLdOrganization v-if="association" :organization="association" />
 </template>

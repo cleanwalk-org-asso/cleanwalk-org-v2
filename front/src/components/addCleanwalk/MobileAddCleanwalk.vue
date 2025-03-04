@@ -73,7 +73,7 @@ const titles = ref([
 
 // Advice messages for the user
 const conseils = ref([
-  'Avant de lancer votre ramassage, pensez à consulter le guide du ramasseur pour connaître les règles d’or d’une bonne organisation.',
+  'Avant de lancer votre ramassage, pensez à consulter le guide du ramasseur pour connaître les règles d’or d’une bonne Organization.',
   'L’ajout d’une photo est optionnel'
 ]);
 

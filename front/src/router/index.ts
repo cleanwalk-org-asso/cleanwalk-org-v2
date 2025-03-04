@@ -40,8 +40,8 @@ const router = createRouter({
       name: 'associations',
       component: () => import('../views/AssoListView.vue'),
       meta: {
-        title: 'Organisations Environnementales | Cleanwalk.org',
-        description: 'Découvrez des organisations et associations environnementales organisant des événements cleanwalk dans votre région.',
+        title: 'Organizations Environnementales | Cleanwalk.org',
+        description: 'Découvrez des organizations et associations environnementales organisant des événements cleanwalk dans votre région.',
         ogImage: '/default-banner.svg'
       }
     },
@@ -50,8 +50,8 @@ const router = createRouter({
       name: 'association',
       component: () => import('../views/PublicProfileAssoView.vue'),
       meta: {
-        title: 'Profil de l\'Organisation | Cleanwalk.org',
-        description: 'Découvrez cette organisation environnementale et leurs initiatives de nettoyage.',
+        title: 'Profil de l\'Organization | Cleanwalk.org',
+        description: 'Découvrez cette organization environnementale et leurs initiatives de nettoyage.',
         ogImage: '/default-banner.svg'
       }
     },
@@ -100,8 +100,8 @@ const router = createRouter({
       name: 'signupAsso',
       component: () => import('../views/SignupAssoView.vue'),
       meta: {
-        title: 'Inscription Organisation | Cleanwalk.org',
-        description: 'Enregistrez votre organisation environnementale sur Cleanwalk.org pour organiser des événements de nettoyage.',
+        title: 'Inscription Organization | Cleanwalk.org',
+        description: 'Enregistrez votre organization environnementale sur Cleanwalk.org pour organiser des événements de nettoyage.',
         ogImage: '/default-banner.svg'
       }
     },

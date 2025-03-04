@@ -81,7 +81,7 @@ const defaultCover = '/src/assets/default_cover.webp'
     img {
         width: 136px;
         height: 136px;
-        border-radius: 12px;
+        border-radius: 8px;
         margin-left: 10px;
         object-fit: cover;
     }

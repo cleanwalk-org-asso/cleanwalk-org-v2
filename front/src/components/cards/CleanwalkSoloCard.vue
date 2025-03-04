@@ -21,30 +21,30 @@ const defaultCover = '/src/assets/default_cover.webp'
 
 <template>
     <div class="solo-cw">
-        <img :src="cleanwalk.img_url ?? defaultCover" alt="cleanwalk image">
+        <img :src="props.cleanwalk.img_url ?? defaultCover" alt="cleanwalk image">
         <div class="btn-container">
-            <router-link class="btn" :to="{ name: 'cleanwalk', params: { id: cleanwalk.id } }">
+            <router-link class="btn" :to="{ name: 'cleanwalk', params: { id: props.cleanwalk.id } }">
                 <IconExternalLink />
             </router-link>
-            <button class="btn" @click="onClose()">
+            <button class="btn" @click="props.onClose()">
                 <IconCross />
             </button>
         </div>
         <div class="container">
             
             <div class="content">
-                <div class="title">{{ cleanwalk.name }}</div>
+                <div class="title">{{ props.cleanwalk.name }}</div>
                 <div class="date">
                     <icon-clock />
-                    <div>{{ dateService.getCleanwalkWrittenDate(new Date(cleanwalk.date_begin), cleanwalk.duration) }}
+                    <div>{{ dateService.getCleanwalkWrittenDate(new Date(props.cleanwalk.date_begin), props.cleanwalk.duration) }}
                     </div>
                 </div>
                 <div>
                     <iconMiniMap />
-                    <div>{{ cleanwalk.address }}</div>
+                    <div>{{ props.cleanwalk.address }}</div>
                 </div>
                 <p>
-                    {{ cleanwalk.description }}
+                    {{ props.cleanwalk.description }}
                 </p>
             </div>
 
@@ -54,7 +54,7 @@ const defaultCover = '/src/assets/default_cover.webp'
                         Organisé par:
                     </div>
                     <h3>
-                        {{ cleanwalk.host!.name }}
+                        {{ props.cleanwalk.host!.name }}
                     </h3>
                 </div>
                 <button class="action-button">

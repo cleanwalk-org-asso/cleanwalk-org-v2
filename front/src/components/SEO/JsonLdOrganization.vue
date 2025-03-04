@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import type { Association } from '@/interfaces/userInterface';
-import { computed } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+// Import your Organization interface
+
 
 const props = defineProps<{
   organization: Association;
 }>();
 
-// Create structured data for the organization
+// Create structured data for the Organization
 const structuredData = computed(() => {
   if (!props.organization) return {};
   
@@ -21,10 +23,37 @@ const structuredData = computed(() => {
     '@id': `${window.location.origin}/associations/${props.organization.id}#organization`
   };
 });
+
+// Handle script tag injection
+const scriptEl = ref<HTMLScriptElement | null>(null);
+
+// Use lifecycle hooks to manage the script element
+onMounted(() => {
+  // Create script element
+  scriptEl.value = document.createElement('script');
+  scriptEl.value.setAttribute('type', 'application/ld+json');
+  scriptEl.value.textContent = JSON.stringify(structuredData.value);
+  
+  // Add to document head
+  document.head.appendChild(scriptEl.value);
+});
+
+// Watch for changes to structured data
+watch(() => structuredData.value, (newValue) => {
+  if (scriptEl.value) {
+    scriptEl.value.textContent = JSON.stringify(newValue);
+  }
+}, { deep: true });
+
+// Clean up on component unmount
+onUnmounted(() => {
+  if (scriptEl.value && document.head.contains(scriptEl.value)) {
+    document.head.removeChild(scriptEl.value);
+  }
+});
 </script>
 
 <template>
-  <script type="application/ld+json">
-    {{ JSON.stringify(structuredData) }}
-  </script>
+  <!-- JSON-LD data is injected via script in the document head -->
+  <div style="display: none;"></div>
 </template>

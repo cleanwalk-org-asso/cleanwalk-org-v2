@@ -33,8 +33,8 @@ onMounted(async () => {
         router.push('/login');
         return;
     }
-    if (currentUser.value?.role === 'organisation') {
-        association.value = await accountStore.getOrganisationById(currentUser.value.id!);
+    if (currentUser.value?.role === 'organization') {
+        association.value = await accountStore.getOrganizationById(currentUser.value.id!);
         currentDescription.value = association.value?.description;
     }
 });
@@ -124,7 +124,7 @@ const changeUserPP = () => {
 
         <profile-asso-addon v-if="association" :Asso="association"/>
         
-        <div class="img-user" v-if="currentUser?.role !== 'organisation'">
+        <div class="img-user" v-if="currentUser?.role !== 'organization'">
             <img class="pp" :src="currentUser?.profile_picture" alt="cover-img">
             <div @click="changeUserPP()" class="icon-shuffle-arrow">
                 <iconShuffleArrow />
