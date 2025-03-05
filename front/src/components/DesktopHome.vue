@@ -20,7 +20,6 @@ const {
     selectedCleanwalk,
     setMapEvents,
     setSelectedCleanwalk,
-    isPointVisible,
     mapClick,
 } = useCleanwalkMap();
 

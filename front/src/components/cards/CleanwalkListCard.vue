@@ -1,14 +1,10 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
 import iconMiniMap from '../icons/icon-mini-map.vue';
 import iconClock from '../icons/icon-clock.vue';
 import type { Cleanwalk } from '@/interfaces/cleanwalkInterface';
 import dateService from '@/services/dateService';
-
-//define props
-const props = defineProps<{
-    cleanwalk: Cleanwalk
-}>()
+// Get cleanwalk from props
+const { cleanwalk } = defineProps<{ cleanwalk: Cleanwalk }>()
 
 const defaultCover = '/src/assets/default_cover.webp'
 
@@ -85,7 +81,7 @@ const defaultCover = '/src/assets/default_cover.webp'
     img {
         width: 136px;
         height: 136px;
-        border-radius: 12px;
+        border-radius: 8px;
         margin-left: 10px;
         object-fit: cover;
     }

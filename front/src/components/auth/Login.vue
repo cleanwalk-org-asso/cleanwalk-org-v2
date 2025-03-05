@@ -46,7 +46,7 @@ const login = async () => {
         name: response.data.name as string,
         id: response.data.id as number,
         profile_picture: response.data.profile_picture as string,
-        role: response.data.role as "organisation" | "user",
+        role: response.data.role as "organization" | "user",
     }
     accountStore.CurrentUser = user;
     router.push({ path: '/' });

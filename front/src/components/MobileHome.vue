@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import "leaflet/dist/leaflet.css";
 import { LMap, LTileLayer, LMarker, LIcon } from "@vue-leaflet/vue-leaflet";
-import L, { LatLng, LatLngBounds, Map, type PointExpression } from "leaflet";
-import { ref, type Ref, onMounted, nextTick, computed } from "vue";
+import L, { LatLng, LatLngBounds, type PointExpression } from "leaflet";
+import { ref, type Ref, onMounted, nextTick } from "vue";
 import iconLeftArrow from "@/components/icons/icon-left-arrow.vue";
 import iconSearch from "@/components/icons/icon-search.vue";
 import iconInfo from "./icons/icon-info.vue";

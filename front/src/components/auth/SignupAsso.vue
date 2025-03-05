@@ -66,7 +66,7 @@ const signup = async ( ) => {
             <div class="line"></div>
         </div> -->
         <form @submit.prevent="signup()">
-            <BaseInput v-model="name" label="Nom de votre association/Organisation ?" name="name" type="text" placeholder="Cleanwalk.org" />
+            <BaseInput v-model="name" label="Nom de votre association/Organization ?" name="name" type="text" placeholder="Cleanwalk.org" />
             <BaseInput v-model="email" label="Email" name="email" type="email" placeholder="user@domain.fr" />
             <BaseInput v-model="password" label="Mot de passe" name="password" type="password" placeholder="Votre mot de passe" />
             <BaseInput v-model="confirmPassword" label="Confirmez le mot de passe" name="confirmPassword" type="password" placeholder="Votre mot de passe" />

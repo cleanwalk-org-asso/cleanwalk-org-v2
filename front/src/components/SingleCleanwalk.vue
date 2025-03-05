@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import type { Cleanwalk, SingleCleanwalk } from '@/interfaces/cleanwalkInterface'
+import type { SingleCleanwalk } from '@/interfaces/cleanwalkInterface'
 import iconClock from './icons/icon-clock.vue';
 import iconMiniMap from './icons/icon-mini-map.vue';
-import { useCleanwalkStore } from '@/stores/CleanwalkStore';
-import { onMounted, ref, type Ref, onUnmounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { onMounted, ref, onUnmounted, computed } from 'vue';
 import router from '@/router';
 import dateService from '@/services/dateService';
 import { useAccountStore } from '@/stores/AccountStore';
@@ -13,88 +11,93 @@ import ParticipationPopup from './popups/ParticipationPopup.vue';
 import MapView from './map/MapView.vue';
 import TopBar from './TopBar.vue';
 import { useUtilsStore } from '@/stores/UtilsStore';
-import { tr } from 'date-fns/locale';
+import { useCleanwalkStore } from '@/stores/CleanwalkStore';
 
 const cleanwalkStore = useCleanwalkStore();
 const currenUserId = ref(useAccountStore().CurrentUser?.id);
 const token = ref(useAccountStore().getAccessToken());
 const showToast = useUtilsStore().showToast;
 
-let currentCleanwalk: Ref<SingleCleanwalk | undefined> = ref(undefined);
+// Define props with modelValue for two-way binding
+const props = defineProps<{ 
+  modelValue: SingleCleanwalk 
+}>();
 
-onMounted(async () => {
-  const id = +useRoute().params.id; // + to convert string to number
+// Define emit to update the parent's value
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: SingleCleanwalk): void
+}>();
 
-  // id is NaN if it's not a number
-  if (isNaN(id)) {
-    router.push('/404');
-    return;
-  }
-
-
-  currentCleanwalk.value = await cleanwalkStore.getCleanwalkById(id, useAccountStore().CurrentUser?.id);
-
-  if (!currentCleanwalk.value) {
-    router.push('/404');
-  }
-})
+// Create computed property for two-way binding
+const cleanwalk = computed({
+  get: () => props.modelValue,
+  set: (value) => emit('update:modelValue', value)
+});
 
 const showLeaveCwPopup = ref(false);
-
 const toogleLeaveCwPopup = () => {
   showLeaveCwPopup.value = !showLeaveCwPopup.value;
 }
 
 let showParticipationPopup = ref(false);
-
 const toggleParticipationPopup = () => {
   showParticipationPopup.value = !showParticipationPopup.value;
 }
 
 const getDate = () => {
-  if (currentCleanwalk.value && currentCleanwalk.value.date_begin && currentCleanwalk.value.duration) {
-    return dateService.getCleanwalkWrittenDate(new Date(currentCleanwalk.value.date_begin), currentCleanwalk.value.duration);
+  if (cleanwalk.value && cleanwalk.value.date_begin && cleanwalk.value.duration) {
+    return dateService.getCleanwalkWrittenDate(new Date(cleanwalk.value.date_begin), cleanwalk.value.duration);
   }
 }
 
-const leaveCleanwalk = () => {
-  if (!currentCleanwalk.value || !currenUserId.value || !token.value) {
+const leaveCleanwalk = async () => {
+  if (!cleanwalk.value || !currenUserId.value || !token.value) {
     router.push('/login');
     return;
   }
-  cleanwalkStore.leaveCleanwalk(currentCleanwalk.value.id, token.value, currenUserId.value);
-  currentCleanwalk.value.is_user_participant = false;
+  await cleanwalkStore.leaveCleanwalk(cleanwalk.value.id, token.value, currenUserId.value);
+  
+  // Update the cleanwalk object through the computed setter
+  const updatedCleanwalk = { ...cleanwalk.value };
+  updatedCleanwalk.is_user_participant = false;
+  cleanwalk.value = updatedCleanwalk;
+  
   showToast('Désinscription réussie', true);
   toogleLeaveCwPopup();
 }
 
-const handleJoinCleanwalk = (data: { participantCount: number, isAnonymous: boolean }) => {
-  if (!currentCleanwalk.value || !currenUserId.value || !token.value) {
+const handleJoinCleanwalk = async (data: { participantCount: number, isAnonymous: boolean }) => {
+  if (!cleanwalk.value || !currenUserId.value || !token.value) {
     router.push('/login');
     return;
   }
-  cleanwalkStore.joinCleanwalk(currentCleanwalk.value?.id, token.value, data.participantCount, currenUserId.value);
-  currentCleanwalk.value.is_user_participant = true;
+  await cleanwalkStore.joinCleanwalk(cleanwalk.value.id, token.value, data.participantCount, currenUserId.value);
+  
+  // Update the cleanwalk object through the computed setter
+  const updatedCleanwalk = { ...cleanwalk.value };
+  updatedCleanwalk.is_user_participant = true;
+  cleanwalk.value = updatedCleanwalk;
+  
   showToast('Inscription réussie', true);
   toggleParticipationPopup();
 }
 
 const actionButton = () => {
-  if (!currentCleanwalk.value || !currenUserId.value || !token.value) {
+  if (!cleanwalk.value || !currenUserId.value || !token.value) {
     router.push('/login');
     return;
   }
-  if (currentCleanwalk.value.host.author_id === currenUserId.value) {
+  if (cleanwalk.value.host.author_id === currenUserId.value) {
     // edit cleanwalk
-    router.push(`/cleanwalk/edit/${currentCleanwalk.value.id}`);
+    router.push(`/cleanwalk/edit/${cleanwalk.value.id}`);
     return;
   }
-  if (currentCleanwalk.value.is_user_participant === true) {
+  if (cleanwalk.value.is_user_participant === true) {
     // leave cleanwalk
     toogleLeaveCwPopup();
     return;
   }
-  if (currentCleanwalk.value.is_user_participant === false) {
+  if (cleanwalk.value.is_user_participant === false) {
     // join cleanwalk
     toggleParticipationPopup();
     return;
@@ -102,13 +105,13 @@ const actionButton = () => {
 }
 
 const getActionButtonText = (): string => {
-  if (currentCleanwalk.value?.host.author_id === currenUserId.value) {
+  if (cleanwalk.value?.host.author_id === currenUserId.value) {
     return "Editer la cleanwalk";
   }
-  if (currentCleanwalk.value?.is_user_participant === true) {
+  if (cleanwalk.value?.is_user_participant === true) {
     return "Se désinscrire";
   }
-  if (currentCleanwalk.value?.is_user_participant === false) {
+  if (cleanwalk.value?.is_user_participant === false) {
     return "Je participe";
   }
   return "";
@@ -144,12 +147,12 @@ onUnmounted(() => {
   
   <main>
     <div>
-      <img v-if="currentCleanwalk" class="cover" :src="currentCleanwalk?.img_url" alt="" />
+      <img v-if="cleanwalk" class="cover" :src="cleanwalk?.img_url" alt="cover image" />
     </div>
 
-    <div class="desktop-layout" v-if="isDesktop && currentCleanwalk">
+    <div class="desktop-layout" v-if="isDesktop && cleanwalk">
       <div class="container">
-        <h1>{{ currentCleanwalk?.name }}</h1>
+        <h1>{{ cleanwalk?.name }}</h1>
         <div class="date-location">
           <div class="top">
             <icon-clock />
@@ -157,43 +160,43 @@ onUnmounted(() => {
           </div>
           <div class="bot">
             <iconMiniMap />
-            <div>{{ currentCleanwalk?.address }}</div>
+            <div>{{ cleanwalk?.address }}</div>
           </div>
         </div>
         
         <div class="map-links">
           <!-- Conditionally show Apple Maps or Google Maps depending on device -->
           <a v-if="isIOS" 
-             :href="`https://maps.apple.com/?q=${currentCleanwalk?.address}&ll=${currentCleanwalk?.pos_lat},${currentCleanwalk?.pos_long}`"
+             :href="`https://maps.apple.com/?q=${cleanwalk?.address}&ll=${cleanwalk?.pos_lat},${cleanwalk?.pos_long}`"
              target="_blank">
             <img src="../assets/appleMap.svg" alt="Apple Maps logo">
             <h4>Ouvrir dans Plans</h4>
           </a>
           <a v-else 
-             :href="`https://www.google.com/maps/?q=${currentCleanwalk?.pos_lat},${currentCleanwalk?.pos_long}`"
+             :href="`https://www.google.com/maps/?q=${cleanwalk?.pos_lat},${cleanwalk?.pos_long}`"
              target="_blank">
             <img src="../assets/googleMap.svg" alt="Google Maps logo">
             <h4>Ouvrir dans Google Maps</h4>
           </a>
           
-          <a :href="`https://www.openstreetmap.org/?mlat=${currentCleanwalk?.pos_lat}&mlon=${currentCleanwalk?.pos_long}`"
+          <a :href="`https://www.openstreetmap.org/?mlat=${cleanwalk?.pos_lat}&mlon=${cleanwalk?.pos_long}`"
             target="_blank">
             <img src="../assets/osm_logo.webp" alt="OpenStreetMap logo">
             <h4>Ouvrir dans OpenStreetMap</h4>
           </a>
         </div>
         
-        <div v-if="currentCleanwalk?.host.author_id === currenUserId" class="participant-count">
-          {{ currentCleanwalk?.participant_count }} participant(s)
+        <div v-if="cleanwalk?.host.author_id === currenUserId" class="participant-count">
+          {{ cleanwalk?.participant_count }} participant(s)
         </div>
         
         <div class="orga">
           <div class="left">
             <div>organisé par:</div>
-            <h2> {{ currentCleanwalk?.host?.name }} </h2>
+            <h2> {{ cleanwalk?.host?.name }} </h2>
           </div>
-          <div class="right" v-if="currentCleanwalk?.host?.profile_picture">
-            <img :src="currentCleanwalk.host.profile_picture" alt="profile-picture">
+          <div class="right" v-if="cleanwalk?.host?.profile_picture">
+            <img :src="cleanwalk.host.profile_picture" alt="profile-picture">
           </div>
         </div>
         
@@ -202,7 +205,7 @@ onUnmounted(() => {
         </button>
         
         <p class="description">
-          {{ currentCleanwalk?.description }}
+          {{ cleanwalk?.description }}
         </p>
       </div>
       
@@ -210,8 +213,8 @@ onUnmounted(() => {
         <h3>Localisation</h3>
         <div class="map-container">
           <MapView 
-            v-if="currentCleanwalk?.pos_lat && currentCleanwalk?.pos_long"
-            :cleanwalk = "currentCleanwalk"
+            v-if="cleanwalk?.pos_lat && cleanwalk?.pos_long"
+            :cleanwalk = "cleanwalk"
           />
         </div>
       </div>
@@ -219,7 +222,7 @@ onUnmounted(() => {
 
     <!-- Mobile layout -->
     <div class="container" v-if="!isDesktop">
-      <h1>{{ currentCleanwalk?.name }}</h1>
+      <h1>{{ cleanwalk?.name }}</h1>
       <div class="date-location">
         <div class="top">
           <icon-clock />
@@ -227,44 +230,44 @@ onUnmounted(() => {
         </div>
         <div class="bot">
           <iconMiniMap />
-          <div>{{ currentCleanwalk?.address }}</div>
+          <div>{{ cleanwalk?.address }}</div>
         </div>
       </div>
       
       <div class="map-links">
         <!-- Conditionally show Apple Maps or Google Maps depending on device -->
         <a v-if="isIOS" 
-           :href="`https://maps.apple.com/?q=${currentCleanwalk?.address}&ll=${currentCleanwalk?.pos_lat},${currentCleanwalk?.pos_long}`"
+           :href="`https://maps.apple.com/?q=${cleanwalk?.address}&ll=${cleanwalk?.pos_lat},${cleanwalk?.pos_long}`"
            target="_blank">
           <img src="../assets/appleMap.svg" alt="Apple Maps logo">
           <h4>Ouvrir dans Plans</h4>
         </a>
         <a v-else
-           :href="`https://www.google.com/maps/?q=${currentCleanwalk?.pos_lat},${currentCleanwalk?.pos_long}`"
+           :href="`https://www.google.com/maps/?q=${cleanwalk?.pos_lat},${cleanwalk?.pos_long}`"
            target="_blank">
           <img src="../assets/googleMap.svg" alt="Google Maps logo">
           <h4>Ouvrir dans Google Maps</h4>
         </a>
 
         <!-- Always show OpenStreetMap -->
-        <a :href="`https://www.openstreetmap.org/?mlat=${currentCleanwalk?.pos_lat}&mlon=${currentCleanwalk?.pos_long}`"
+        <a :href="`https://www.openstreetmap.org/?mlat=${cleanwalk?.pos_lat}&mlon=${cleanwalk?.pos_long}`"
           target="_blank">
           <img src="../assets/osm_logo.webp" alt="OpenStreetMap logo">
           <h4>Ouvrir dans OpenStreetMap</h4>
         </a>
       </div>
       
-      <div v-if="currentCleanwalk?.host.author_id === currenUserId">
-        {{ currentCleanwalk?.participant_count }} participant(s)
+      <div v-if="cleanwalk?.host.author_id === currenUserId">
+        {{ cleanwalk?.participant_count }} participant(s)
       </div>
       
       <div class="orga">
         <div class="left">
           <div>organisé par:</div>
-          <h2> {{ currentCleanwalk?.host?.name }} </h2>
+          <h2> {{ cleanwalk?.host?.name }} </h2>
         </div>
-        <div class="right" v-if="currentCleanwalk?.host?.profile_picture">
-          <img :src="currentCleanwalk.host.profile_picture" alt="profile-picture">
+        <div class="right" v-if="cleanwalk?.host?.profile_picture">
+          <img :src="cleanwalk.host.profile_picture" alt="profile-picture">
         </div>
       </div>
       
@@ -273,7 +276,7 @@ onUnmounted(() => {
       </button>
       
       <p class="description">
-        {{ currentCleanwalk?.description }}
+        {{ cleanwalk?.description }}
       </p>
     </div>
   </main>
