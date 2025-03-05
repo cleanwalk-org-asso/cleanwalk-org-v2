@@ -43,7 +43,6 @@ const backButton = () => {
 };
 
 onMounted(() => {
-    cleanwalkStore.getAllCleanwalks();
     const card = draggableCard.value;
     if (!card) return;
 

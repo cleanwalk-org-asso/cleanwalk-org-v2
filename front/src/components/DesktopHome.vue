@@ -25,7 +25,7 @@ const {
 
 // Map configuration
 let zoom = ref(6);
-let center: Ref<PointExpression> = ref([47.2, 2.333333]);
+let center: Ref<PointExpression> = ref([47.2, 0]);
 
 // When filtered results change to exactly one cleanwalk, select it automatically
 watch(filteredCleanwalks, (newVal) => {

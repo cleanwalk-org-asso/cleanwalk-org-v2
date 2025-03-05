@@ -11,14 +11,12 @@ const store = useCleanwalkStore();
 
 const { isMobile } = useDevice();
 onMounted( async () => {
-  const data = await store.getAllCleanwalks();
+  await store.getAllCleanwalks();
 });
 </script>
 
 <template>
-  <main>
     <MobileHome v-if="isMobile" />
     <DesktopHome v-if="!isMobile" />
     <navBar />
-  </main>
 </template>
