@@ -133,7 +133,7 @@ main {
     left: 1rem;
     transform: translateY(calc(50% + 2.75rem));
     width: 30rem;
-    padding: 1rem;
+    padding: 1rem 0.9rem 1rem 1rem; // 1rem padding on the left to match the map
     background-color: #F8FAFD;
     box-shadow: 0px -10px 100px rgba(194, 194, 194, 0.2);
     z-index: 999;
@@ -149,6 +149,7 @@ main {
         gap: 1rem;
         overflow-y: auto;
         max-height: 100%;
+        padding-right: 0.1rem; //move scrollbar to the left
     }
     
     .no-results {
@@ -163,4 +164,25 @@ main {
         color: inherit;
     }
 }
+
+/* Styliser l'ensemble de la scrollbar */
+::-webkit-scrollbar {
+    width: 4px; /* Ajustez la largeur à votre préférence */
+  }
+
+  /* Styliser le fond de la scrollbar */
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* Styliser le bouton de défilement */
+  ::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 10px;
+  }
+
+  /* Styliser le thumb lors du survol */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #dfe5ec;
+  }
 </style>
