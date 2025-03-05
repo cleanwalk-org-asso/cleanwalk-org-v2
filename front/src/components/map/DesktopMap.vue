@@ -6,9 +6,9 @@ import { ref, watch, type Ref } from 'vue';
 import greenMapIcon from "@/assets/green-map.svg";
 import blueMapIcon from "@/assets/blue-map.svg";
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
-import BaseSearchInput from './base/BaseSearchInput.vue';
-import CleanwalkListCard from './cards/CleanwalkListCard.vue';
-import CleanwalkSoloCard from './cards/CleanwalkSoloCard.vue';
+import BaseSearchInput from '@/components/base/BaseSearchInput.vue';
+import CleanwalkListCard from '@/components/cards/CleanwalkListCard.vue';
+import CleanwalkSoloCard from '@/components/cards/CleanwalkSoloCard.vue';
 import type { Cleanwalk } from '@/interfaces/cleanwalkInterface';
 
 const cleanwalkStore = useCleanwalkStore();

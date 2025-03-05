@@ -16,6 +16,16 @@ const router = createRouter({
       }
     },
     {
+      path: '/map',
+      name: 'map',
+      component: () => import('../views/MapView.vue'),
+      meta: {
+        title: 'Carte des Cleanwalk | Cleanwalk.org',
+        description: 'Rejoignez Cleanwalk.org pour organiser et participer à des événements de nettoyage citoyen. Faites un impact environnemental positif dans votre région.',
+        ogImage: '/default-banner.svg'
+      }
+    },
+    {
       path: '/cleanwalk/:id',
       name: 'cleanwalk',
       component: () => import('../views/SingleCleanwalkView.vue'),
