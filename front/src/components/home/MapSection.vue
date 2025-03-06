@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import "leaflet/dist/leaflet.css";
 import { LMap, LTileLayer, LMarker, LIcon } from "@vue-leaflet/vue-leaflet";
 import L, { type PointExpression } from "leaflet";
 import { onMounted, ref, type Ref } from 'vue';

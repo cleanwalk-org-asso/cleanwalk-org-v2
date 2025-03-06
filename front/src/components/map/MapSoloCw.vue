@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import "leaflet/dist/leaflet.css";
 import { LMap, LTileLayer, LMarker, LIcon } from "@vue-leaflet/vue-leaflet";
 import L, { type PointExpression } from "leaflet";
 import greenMapIcon from "@/assets/green-map.svg";
