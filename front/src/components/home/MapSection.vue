@@ -19,6 +19,17 @@ onMounted(async () => {
 </script>
 <template>
     <section class="map-section">
+        <div class="svg-background">
+            <svg width="3500" height="750" viewBox="0 0 3500 750" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 750C0 335.786 783.502 0 1750 0C2716.5 0 3500 335.786 3500 750H0Z" fill="url(#paint0_radial_1230_13104)"/>
+                <defs>
+                    <radialGradient id="paint0_radial_1230_13104" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1481.5 -56.4999) rotate(68.6345) scale(2746.23 21878.1)">
+                        <stop stop-color="#132778"/>
+                        <stop offset="1" stop-color="#2348DE"/>
+                    </radialGradient>
+                </defs>
+            </svg>
+        </div>
         <div class="container">
             <h2>
                 Découvrez les ramassages organisés près de chez vous !
@@ -29,7 +40,7 @@ onMounted(async () => {
             </p>
         </div>
         <div class="map-container">
-            <l-map ref="map" v-model:zoom="zoom" v-model:center="center" :min-zoom="5" :useGlobalLeaflet="false">
+            <l-map ref="map" v-model:zoom="zoom" v-model:center="center" :min-zoom="5" :max-zoom="5" :useGlobalLeaflet="false">
                 <l-tile-layer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="base"></l-tile-layer>
                 <div v-for="cleanwalk in cleanwalkStore.cleanwalksTab" :key="cleanwalk.id">
                     <l-marker :lat-lng="L.latLng(cleanwalk.pos_lat, cleanwalk.pos_long)">
@@ -58,8 +69,15 @@ onMounted(async () => {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: #f5f5f5;
     position: relative;
+    overflow: hidden;
+}
+
+.svg-background {
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .map-container {
@@ -68,6 +86,7 @@ onMounted(async () => {
     width: 1340px;
     height: 571px;
     position: relative;
+    margin-bottom: 16.88rem;
     
     .map-overlay {
         position: absolute;
@@ -92,7 +111,7 @@ onMounted(async () => {
             font-weight: 900;
             line-height: 2.375rem;
             padding-bottom: 1rem;
-            padding-top: 15.38rem;
+            padding-top: 10rem;
         }
 
         div {
@@ -103,7 +122,7 @@ onMounted(async () => {
             font-style: normal;
             font-weight: 500;
             line-height: 1.5rem;
-            padding-bottom: 7.69rem;
+            padding-bottom: 8rem;
         }
 
         .action-button {
@@ -138,6 +157,20 @@ onMounted(async () => {
         line-height: 50px;
         padding-bottom: 1.5rem;
         padding-top: 9.38rem;
+        position: relative;
+        z-index: 1;
+        &::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 3.14838rem;
+            background: rgba(114, 189, 163, 0.50);
+            top: 82%;
+            left: 49.5%;
+            transform: translate(-50%, -50%) rotate(-1.015deg);
+            z-index: -1;
+            border-radius: 0.25rem;
+        }
     }
     
     p {
