@@ -8,7 +8,7 @@ import blueMapIcon from "@/assets/blue-map.svg";
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
 
 let zoom = ref(6);
-let center: Ref<PointExpression> = ref([47.866667, 2.333333]);
+let center: Ref<PointExpression> = ref([47.5, 2.333333]);
 
 const cleanwalkStore = useCleanwalkStore();
 
@@ -40,7 +40,7 @@ onMounted(async () => {
             </p>
         </div>
         <div class="map-container">
-            <l-map ref="map" v-model:zoom="zoom" v-model:center="center" :min-zoom="5" :max-zoom="5" :useGlobalLeaflet="false">
+            <l-map ref="map" v-model:zoom="zoom" v-model:center="center" :min-zoom="6" :max-zoom="6" :useGlobalLeaflet="false">
                 <l-tile-layer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="base"></l-tile-layer>
                 <div v-for="cleanwalk in cleanwalkStore.cleanwalksTab" :key="cleanwalk.id">
                     <l-marker :lat-lng="L.latLng(cleanwalk.pos_lat, cleanwalk.pos_long)">
