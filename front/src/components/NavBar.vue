@@ -25,7 +25,7 @@ onMounted(() => {
 <template>
     <nav class="nav" v-if="isMobile">
         <ul class="container" :class="{ 'shadow': currentPage !== 'map' }">
-            <li :class="{ 'active': currentPage === 'home' || currentPage === 'cleanwalk' }">
+            <li :class="{ 'active': currentPage === 'map' || currentPage === 'cleanwalk' }">
                 <router-link to="/" class="redirect">
                     <iconMap />
                     <div>Carte</div>
