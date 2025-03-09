@@ -1,4 +1,3 @@
-version: '3.8'
 services:
 
   frontend:
@@ -13,8 +12,6 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile.prod
-    volumes:
-      - ./uploads:/app/uploads
     restart: always
     networks:
       - my_network
@@ -29,7 +26,6 @@ services:
     volumes:
       - ./data-nginx:/data
       - ./letsencrypt:/etc/letsencrypt
-      - ./uploads:/var/www/uploads
     networks:
       - my_network
 
