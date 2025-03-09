@@ -24,8 +24,6 @@ def create_app():
     app.config['API_KEY'] = os.getenv('API_KEY')
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=30)
-    app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER')
-    app.config['UPLOADS_URL'] = os.getenv('UPLOADS_URL')
     app.config['FRONTEND_URL'] = os.getenv('FRONTEND_URL')
 
     # Configurer Flask-Mail
@@ -36,6 +34,13 @@ def create_app():
     app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
     app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@demo.com')
     app.config['RESET_PASSWORD_SALT'] = os.getenv('RESET_PASSWORD_SALT')
+
+    # R2 Configuration - Use environment variables
+    app.config['R2_ENDPOINT_URL'] = os.getenv('R2_ENDPOINT_URL')
+    app.config['R2_ACCESS_KEY_ID'] = os.getenv('R2_ACCESS_KEY_ID')
+    app.config['R2_SECRET_ACCESS_KEY'] = os.getenv('R2_SECRET_ACCESS_KEY')
+    app.config['R2_BUCKET_NAME'] = os.getenv('R2_BUCKET_NAME')
+    app.config['R2_PUBLIC_URL'] = os.getenv('R2_PUBLIC_URL')  # If you have a public URL configured
 
     # Initialiser les extensions
     db.init_app(app)
