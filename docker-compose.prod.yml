@@ -1,13 +1,13 @@
 services:
 
   frontend:
-    image: 'ghcr.io/baguettetropcuite/cleanwalk-org-v2/frontend:latest'
+    image: 'ghcr.io/cleanwalk-org-asso/cleanwalk-org-v2/frontend:latest'
     restart: always
     networks:
       - my_network
 
   api:
-    image: 'ghcr.io/baguettetropcuite/cleanwalk-org-v2/api:latest'
+    image: 'ghcr.io/cleanwalk-org-asso/cleanwalk-org-v2/api:latest'
     volumes:
       - ./uploads:/app/uploads
     restart: always
