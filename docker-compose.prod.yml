@@ -1,21 +1,18 @@
-version: '3.8'
 services:
 
   frontend:
-    build: 
-      context: ./front
-      dockerfile: Dockerfile
+    image: 'ghcr.io/baguettetropcuite/cleanwalk-org-v2/frontend:latest'
     restart: always
     networks:
       - my_network
 
   api:
-    build:
-      context: ./api
-      dockerfile: Dockerfile.prod
+    image: 'ghcr.io/baguettetropcuite/cleanwalk-org-v2/api:latest'
     volumes:
       - ./uploads:/app/uploads
     restart: always
+    env_file:
+      - ./api/.env
     networks:
       - my_network
 
