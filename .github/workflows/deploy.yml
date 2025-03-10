@@ -2,14 +2,14 @@ name: Deploy V1
 
 # WORKFLOW SETUP : 
 # 1 : Generate token (write:packages, delete:packages)
-# 2 : Add secret ['secrets.SERVER_HOST','secrets.SERVER_USER','secrets.SERVER_SSH_KEY','secrets.SERVER_PORT']
+# 2 : Add secret ['secrets.SERVER_HOST','secrets.SERVER_USER','secrets.SERVER_SSH_KEY','secrets.SERVER_PORT',"ghrcToken","ghrcUser"]
 # 3 : Replace 'git pull origin main' with 'git pull origin release' during the rebuild phase
-# 4 : Change the push branch name to 'release
+# 4 : Change the push branch name to 'main"
 
 on:
   push:
     branches:
-      - x  # "release" pour CW
+      - main
 
 jobs:
   build:
@@ -56,7 +56,7 @@ jobs:
           fi
 
       - name: Login
-        run: echo "${{ secrets.ghrc }}" | docker login ghcr.io -u ${{ env.ACTOR_LOWER }} --password-stdin
+        run: echo "${{ secrets.ghrcToken }}" | docker login ghcr.io -u ${{ secrets.ghrcUser }} --password-stdin
 
       - name: Build Front
         if: env.FRONTEND_CHANGED == 'true'
