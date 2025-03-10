@@ -5,13 +5,12 @@ import L, { LatLng, LatLngBounds, type PointExpression } from "leaflet";
 import { ref, type Ref, onMounted, nextTick } from "vue";
 import iconLeftArrow from "@/components/icons/icon-left-arrow.vue";
 import iconSearch from "@/components/icons/icon-search.vue";
-import iconInfo from "./icons/icon-info.vue";
+import iconInfo from "@/components/icons/icon-info.vue";
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
-import iconClock from './icons/icon-clock.vue';
-import iconMiniMap from './icons/icon-mini-map.vue';
-import type { Cleanwalk } from "@/interfaces/cleanwalkInterface";
+import iconClock from '@/components/icons/icon-clock.vue';
+import iconMiniMap from '@/components/icons/icon-mini-map.vue';
 import dateService from "@/services/dateService";
-import cleanwalkCard from './cards/CleanwalkListCard.vue';
+import cleanwalkCard from '@/components/cards/CleanwalkListCard.vue';
 import { useAccountStore } from "@/stores/AccountStore";
 import greenMapIcon from "@/assets/green-map.svg";
 import blueMapIcon from "@/assets/blue-map.svg";
@@ -167,7 +166,7 @@ function mapClickEvent() {
             </l-map>
         </div>
         <div class="top-bar">
-            <img class="logo" src="../assets/logo.svg" alt="logo" v-if="!cardListBool">
+            <img class="logo" src="../../assets/logo.svg" alt="logo" v-if="!cardListBool">
             <div class="search-bar" :class="{ 'active': cardListBool, 'base': !cardListBool }">
                 <button @click="backButton()">
                     <iconLeftArrow />

@@ -8,7 +8,7 @@ import dateService from '@/services/dateService';
 import { useAccountStore } from '@/stores/AccountStore';
 import LeaveCwPopup from './popups/LeaveCwPopup.vue';
 import ParticipationPopup from './popups/ParticipationPopup.vue';
-import MapView from './map/MapView.vue';
+import MapSoloCw from '@/components/map/MapSoloCw.vue';
 import TopBar from './TopBar.vue';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
@@ -212,7 +212,7 @@ onUnmounted(() => {
       <div class="map-section">
         <h3>Localisation</h3>
         <div class="map-container">
-          <MapView 
+          <MapSoloCw 
             v-if="cleanwalk?.pos_lat && cleanwalk?.pos_long"
             :cleanwalk = "cleanwalk"
           />

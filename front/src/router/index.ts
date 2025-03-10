@@ -1,6 +1,10 @@
 import { createRouter, createWebHistory, type NavigationGuardNext, type RouteLocationNormalized } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import { useAccountStore } from '@/stores/AccountStore';
+import { useDevice } from '@/composables/useDevice';
+import { is } from 'date-fns/locale';
+
+const { isMobile } = useDevice();
 
 const router = createRouter({
   history: createWebHistory((import.meta as any).env.BASE_URL),
@@ -11,6 +15,16 @@ const router = createRouter({
       component: HomeView,
       meta: {
         title: 'Cleanwalk.org - Événements de Nettoyage Citoyen',
+        description: 'Rejoignez Cleanwalk.org pour organiser et participer à des événements de nettoyage citoyen. Faites un impact environnemental positif dans votre région.',
+        ogImage: '/default-banner.svg'
+      }
+    },
+    {
+      path: '/map',
+      name: 'map',
+      component: () => import('../views/MapView.vue'),
+      meta: {
+        title: 'Carte des Cleanwalk | Cleanwalk.org',
         description: 'Rejoignez Cleanwalk.org pour organiser et participer à des événements de nettoyage citoyen. Faites un impact environnemental positif dans votre région.',
         ogImage: '/default-banner.svg'
       }
@@ -177,6 +191,13 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
   if(!useAccountStore().isLoggedIn) {
     await useAccountStore().tokenLogin();
   }
+
+  // Redirect to map if on mobile 
+  if (to.name === 'home' && isMobile.value) {
+    next({ name: 'map' });
+    return;
+  }
+  
   if (routesRequiringAuth.includes(to.name as string) && !useAccountStore().isLoggedIn) {
     next({ name: 'login' });
   } else {
