@@ -78,7 +78,10 @@ def upload_file():
             # Construire l'URL publique du fichier
             file_url = f"{current_app.config['R2_PUBLIC_URL']}/{unique_filename}"
             
-            return jsonify({'url': file_url, 'success': True}), 200
+            return jsonify({
+                'success': True,
+                'img_url': file_url
+            }), 200
             
         except Exception as e:
             # Log l'erreur pour le débogage
