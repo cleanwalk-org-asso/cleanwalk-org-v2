@@ -50,22 +50,19 @@ def upload_file():
         
         if file.filename == '':
             return jsonify({'error': 'No file selected for uploading'}), 400
-            
-        # Sécuriser le nom de fichier
-        filename = secure_filename(file.filename)
         
-        # Générer un nom de fichier unique avec timestamp
-        timestamp = int(time.time())
-        unique_filename = f"{timestamp}_{filename}"
+        # Vérifier si le type de fichier est autorisé
+        extension = allowed_file(file.filename)
+        if not extension:
+            return jsonify({'error': 'File type not allowed'}), 400
+        
+        # Générer un nom de fichier basé sur UUID plutôt que le nom original
+        unique_filename = f"{uuid.uuid4()}.{extension}"
         
         # Upload vers R2 directement depuis l'objet file
         try:
-            s3_client = boto3.client(
-                's3',
-                endpoint_url=current_app.config['R2_ENDPOINT_URL'],
-                aws_access_key_id=current_app.config['R2_ACCESS_KEY_ID'],
-                aws_secret_access_key=current_app.config['R2_SECRET_ACCESS_KEY'],
-            )
+            # Utiliser la fonction get_r2_client pour avoir une configuration correcte
+            s3_client = get_r2_client()
             
             # Upload direct depuis l'objet file sans sauvegarder localement
             file.seek(0)  # S'assurer de lire depuis le début du fichier
