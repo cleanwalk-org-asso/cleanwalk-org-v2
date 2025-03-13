@@ -10,6 +10,8 @@ from flask_jwt_extended import jwt_required
 import time
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+# Taille maximale de fichier: 1 Mo
+MAX_FILE_SIZE = 1 * 1024 * 1024  # 1 Mo en octets
 
 def allowed_file(filename):
     _, extension = os.path.splitext(filename)
@@ -55,6 +57,12 @@ def upload_file():
         extension = allowed_file(file.filename)
         if not extension:
             return jsonify({'error': 'File type not allowed'}), 400
+        
+        # Vérifier la taille du fichier
+        file.seek(0, os.SEEK_END)
+        file_size = file.tell()
+        if file_size > MAX_FILE_SIZE:
+            return jsonify({'error': f'File size exceeds maximum limit of {MAX_FILE_SIZE/1024/1024} MB'}), 400
         
         # Générer un nom de fichier basé sur UUID plutôt que le nom original
         unique_filename = f"{uuid.uuid4()}.{extension}"
