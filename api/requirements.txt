@@ -11,5 +11,7 @@ google-auth
 psycopg2-binary
 itsdangerous
 Flask-Mail
+boto3
+Pillow
 
 

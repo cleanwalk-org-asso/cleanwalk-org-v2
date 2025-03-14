@@ -148,7 +148,7 @@ def login():
     res = db.session.query(User, Role).join(Role, User.role_id == Role.id).filter(User.email == email).first()
     if res:
         if res.User.password == hash_password(data.get('password'), res.User.salt):
-            access_token = create_access_token(identity=res.User.id, additional_claims={'role': res.Role.role})
+            access_token = create_access_token(identity=str(res.User.id), additional_claims={'role': res.Role.role})
             return jsonify({
                 'message': 'Successful connection', 
                 'id': res.User.id, 'email': email, 
@@ -205,7 +205,7 @@ def google_login():
         role_name = 'association' if role.id == 2 else 'user'
 
         # Generate a JWT token for the user (if using flask_jwt_extended)
-        access_token = create_access_token(identity=user.id, additional_claims={'role': role_name})
+        access_token = create_access_token(identity=str(user.id), additional_claims={'role': role_name})
 
         return jsonify({
             'access_token': access_token,
@@ -225,6 +225,7 @@ def google_login():
 @users_bp.route('/token-login', methods=['POST'])
 @jwt_required()
 def tokenLogin():
+    print("Token login")
     current_user = get_jwt_identity()
     claims = get_jwt()
 
