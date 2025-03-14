@@ -8,8 +8,10 @@ import boto3
 from botocore.client import Config
 from flask_jwt_extended import jwt_required
 import time
+from PIL import Image
+from io import BytesIO
 
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 # Taille maximale de fichier: 1 Mo
 MAX_FILE_SIZE = 1 * 1024 * 1024  # 1 Mo en octets
 
@@ -41,6 +43,18 @@ def check_api_key():
     if not validate_api_key(api_key):
         return jsonify({'message': 'Invalid API KEY'}), 401
 
+# Fonction pour convertir les images en WebP
+def convert_to_webp(file_data, quality=80):
+    try:
+        image = Image.open(BytesIO(file_data))
+        output = BytesIO()
+        image.save(output, format="WEBP", quality=quality)
+        output.seek(0)
+        return output
+    except Exception as e:
+        print(f"Error converting to WebP: {str(e)}")
+        return None
+
 @upload_bp.route('', methods=['POST'])
 @jwt_required()
 def upload_file():
@@ -64,24 +78,36 @@ def upload_file():
         if file_size > MAX_FILE_SIZE:
             return jsonify({'error': f'File size exceeds maximum limit of {MAX_FILE_SIZE/1024/1024} MB'}), 400
         
-        # Générer un nom de fichier basé sur UUID plutôt que le nom original
-        unique_filename = f"{uuid.uuid4()}.{extension}"
+        # Générer un nom de fichier basé sur UUID
+        unique_filename = f"{uuid.uuid4()}"
         
-        # Upload vers R2 directement depuis l'objet file
+        # Convert PNG and JPG to WebP
+        file.seek(0)  # Reset file pointer to beginning
+        file_data = file.read()
+        
+        if extension.lower() in ['png', 'jpg', 'jpeg']:
+            # Convert to WebP
+            webp_file = convert_to_webp(file_data)
+            if webp_file:
+                extension = 'webp'
+                file_data = webp_file.getvalue()
+        
+        # Final filename with extension
+        final_filename = f"{unique_filename}.{extension}"
+        
+        # Upload vers R2 directement
         try:
-            # Utiliser la fonction get_r2_client pour avoir une configuration correcte
             s3_client = get_r2_client()
             
-            # Upload direct depuis l'objet file sans sauvegarder localement
-            file.seek(0)  # S'assurer de lire depuis le début du fichier
-            s3_client.upload_fileobj(
-                file, 
-                current_app.config['R2_BUCKET_NAME'], 
-                unique_filename
+            s3_client.put_object(
+                Bucket=current_app.config['R2_BUCKET_NAME'],
+                Key=final_filename,
+                Body=file_data,
+                ContentType=f"image/{extension}"
             )
             
             # Construire l'URL publique du fichier
-            file_url = f"{current_app.config['R2_PUBLIC_URL']}/{unique_filename}"
+            file_url = f"{current_app.config['R2_PUBLIC_URL']}/{final_filename}"
             
             return jsonify({
                 'success': True,
