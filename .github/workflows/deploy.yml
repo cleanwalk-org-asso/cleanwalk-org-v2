@@ -1,4 +1,4 @@
-name: Deploy V1
+name: Deploy V1.1
 
 # WORKFLOW SETUP : 
 # 1 : Generate token (write:packages, delete:packages)
@@ -58,9 +58,13 @@ jobs:
       - name: Login
         run: echo "${{ secrets.ghrcToken }}" | docker login ghcr.io -u ${{ secrets.ghrcUser }} --password-stdin
 
+
+      # SECRET FRONT (mv .env.exemple .env + add .ENVFRONT to .env)
       - name: Build Front
         if: env.FRONTEND_CHANGED == 'true'
         run: |
+          mv ./front/.env.exemple ./front/.env
+          echo "${{ secrets.ENVFRONT }}" | tee -a .env > /dev/null
           docker build -f ./front/Dockerfile -t ghcr.io/${{ env.REPO_LOWER }}/frontend:latest ./front
           docker push ghcr.io/${{ env.REPO_LOWER }}/frontend:latest
 
@@ -68,9 +72,7 @@ jobs:
         if: env.API_CHANGED == 'true'
         run: |
           docker build -f ./api/Dockerfile.prod -t ghcr.io/${{ env.REPO_LOWER }}/api:latest ./api
-          docker build -f ./api/Dockerfile.dev -t ghcr.io/${{ env.REPO_LOWER }}/api.dev:latest ./api
           docker push ghcr.io/${{ env.REPO_LOWER }}/api:latest
-          docker push ghcr.io/${{ env.REPO_LOWER }}/api.dev:latest
 
   deploy:
     needs: build
@@ -89,7 +91,8 @@ jobs:
           script: |
             cd /home/$(whoami)/setup-production
             pwd
+            echo "${{ secrets.ghrcToken }}" | docker login ghcr.io -u ${{ secrets.ghrcUser }} --password-stdin
             git pull origin main
-            docker compose -f docker-compose.prod.yml pull
-            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+            docker compose -f docker-compose.yml pull
+            docker compose -f docker-compose.yml up -d --remove-orphans
             docker image prune -f
