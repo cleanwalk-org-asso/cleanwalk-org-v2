@@ -57,7 +57,7 @@ onMounted(async () => {
                 <div>
                     Pas d'inscription requise
                 </div>
-                <router-link to="/map" class="action-button">Ouvrir la carte</router-link>
+                <router-link :to="{name: 'map'}" class="action-button">Ouvrir la carte</router-link>
             </div>
         </div>
     </section>

@@ -10,14 +10,12 @@ import { useDevice } from '@/composables/useDevice';
 
 const currentPage = ref('');
 const route = useRoute();
-let discoverPageName: string = '';
 const { isMobile } = useDevice(); // Utilisation du composable pour détecter mobile/desktop
 const user = useAccountStore().CurrentUser;
 
 //local storage
 onMounted(() => {
     currentPage.value = route.name as string;
-    discoverPageName = localStorage.getItem('discoverPage') ?? 'associations';
 });
 
 
@@ -26,25 +24,25 @@ onMounted(() => {
     <nav class="nav" v-if="isMobile">
         <ul class="container" :class="{ 'shadow': currentPage !== 'map' }">
             <li :class="{ 'active': currentPage === 'map' || currentPage === 'cleanwalk' }">
-                <router-link to="/" class="redirect">
+                <router-link :to="{name: 'map'}" class="redirect">
                     <iconMap />
                     <div>Carte</div>
                 </router-link>
             </li>
             <li :class="{ 'active': currentPage.includes('add') }">
-                <router-link to="/add/cleanwalk" class="redirect">
+                <router-link :to="{ name: 'addCleanwalk'}" class="redirect">
                     <iconAdd />
-                    <div>Ajouter</div>
+                    <div>Ajouter </div>
                 </router-link>
             </li>
             <li :class="{ 'active': currentPage === 'associations' || currentPage === 'associations' }">
-                <router-link :to="'/' + discoverPageName" class="redirect">
+                <router-link :to="{ name: 'associations'}" class="redirect">
                     <iconDiscover />
                     <div>Découvrir</div>
                 </router-link>
             </li>
             <li :class="{ 'active': currentPage.includes('menu') }">
-                <router-link to='/menu' class="redirect">
+                <router-link :to="{ name:'menu'}" class="redirect">
                     <iconBurger />
                     <div>Menu</div>
                 </router-link>
@@ -56,24 +54,24 @@ onMounted(() => {
             <img class="logo" src="../assets/logo.svg" alt="logo cleanwalk.org">
         </router-link>
         <div class="links">
-            <router-link class="link" to="/" :class="{ 'active': currentPage === 'home' }">Accueil</router-link>
-            <router-link class="link" to="/map"
+            <router-link class="link" :to="{name: 'home'}" :class="{ 'active': currentPage === 'home' }">Accueil</router-link>
+            <router-link class="link" :to="{name: 'map'}"
                 :class="{ 'active': currentPage === 'map' || currentPage === 'cleanwalk' }">Carte</router-link>
-            <router-link class="link" to="/add/cleanwalk" :class="{ 'active': currentPage.includes('add') }">Ajouter
+            <router-link class="link" :to="{name: 'addCleanwalk'}" :class="{ 'active': currentPage.includes('add') }">Ajouter
                 cleanwalk</router-link>
-            <router-link class="link" :to="'/' + discoverPageName"
+            <router-link class="link" :to="{ name: 'associations'}"
                 :class="{ 'active': currentPage === 'associations' || currentPage === 'associations' }">Découvrir</router-link>
-            <router-link class="link" to='/menu' :class="{ 'active': currentPage.includes('menu') }">Menu</router-link>
+            <router-link class="link" :to="{name: 'menu'}" :class="{ 'active': currentPage.includes('menu') }">Menu</router-link>
         </div>
         <div v-if="user">
-            <router-link to="/menu/profile" class="account">
+            <router-link :to="{name:'menuProfile'}" class="account">
                 <div>{{ user.name }}</div>
                 <img :src="user.profile_picture" alt="profile_picture">
             </router-link>
         </div>
         <div class="infos" v-else>
-            <router-link to="/login">Se connecter</router-link>
-            <router-link to="/signup">S'inscrire</router-link>
+            <router-link :to="{name: 'login'}">Se connecter</router-link>
+            <router-link :to="{name:'signup'}">S'inscrire</router-link>
         </div>
 
     </nav>

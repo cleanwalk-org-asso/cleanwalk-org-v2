@@ -20,7 +20,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/map',
+      path: '/carte',
       name: 'map',
       component: () => import('../views/MapView.vue'),
       meta: {
@@ -40,7 +40,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/add/cleanwalk',
+      path: '/ajouter/cleanwalk',
       name: 'addCleanwalk',
       component: () => import('../views/AddCleanwalkView.vue'),
       meta: {

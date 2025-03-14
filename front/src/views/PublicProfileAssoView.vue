@@ -63,7 +63,7 @@ const updateMetaTags = (asso: Association) => {
 onMounted(async () => {
   const id = +route.params.id;
   if (isNaN(id)) {
-    router.push('/associations');
+    router.push({ name: 'associations' });
     return;
   }
   
@@ -73,12 +73,12 @@ onMounted(async () => {
       updateMetaTags(association.value);
     } else {
       // Redirect to associations page if no association is found
-      router.push('/associations');
+      router.push({ name: 'associations' });
     }
   } catch (error) {
     console.error("Failed to load association data for SEO:", error);
     // Redirect to associations page if there's an error loading the data
-    router.push('/associations');
+    router.push({ name: 'associations' });
   }
 });
 
@@ -93,12 +93,12 @@ watch(() => route.params.id, async (newId) => {
       updateMetaTags(association.value);
     } else {
       // Redirect to associations page if no association is found
-      router.push('/associations');
+      router.push({ name: 'associations' });
     }
   } catch (error) {
     console.error("Failed to load association data for SEO:", error);
     // Redirect to associations page if there's an error loading the data
-    router.push('/associations');
+    router.push({ name: 'associations' });
   }
 });
 </script>

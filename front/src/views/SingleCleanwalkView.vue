@@ -63,7 +63,7 @@ const updateMetaTags = (cleanwalk: CleanwalkType) => {
 
 const fetchCleanwalkData = async (id: number) => {
   if (isNaN(id)) {
-    router.push('/404');
+    router.push({ name: 'NotFound' });
     return;
   }
   
@@ -73,11 +73,11 @@ const fetchCleanwalkData = async (id: number) => {
     if (currentCleanwalk.value) {
       updateMetaTags(currentCleanwalk.value);
     } else {
-      router.push('/404');
+      router.push({ name: 'NotFound' });
     }
   } catch (error) {
     console.error("Failed to load cleanwalk data:", error);
-    router.push('/404');
+    router.push({ name: 'NotFound' });
   }
 };
 

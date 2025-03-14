@@ -34,16 +34,16 @@ let currentCleanwalk: Ref<SingleCleanwalk | undefined> = ref(undefined);
 
 onMounted(async () => {
   if (!accountStore.CurrentUser?.id) {
-    router.push('/login');
+    router.push({name: 'login'});
   }
   const cleanwalkId = route.params.id;
   if (!cleanwalkId) {
-    router.push('/');
+    router.push({name: 'carte'});
   }
   // fetch cleanwalk
   currentCleanwalk.value = await getCleanwalkById(+cleanwalkId);
   if (!currentCleanwalk.value) {
-    router.push('/');
+    router.push({name: 'carte'});
   } else {
     const { dateDay, hourBegin, hourEnd } = dateService.getDayAndHourBegginEndByDate(currentCleanwalk.value.date_begin, currentCleanwalk.value.duration);
     dateCleanwalk.value.dateDay = format(parse(dateDay, 'dd-MM-yyyy', new Date()), 'yyyy-MM-dd');

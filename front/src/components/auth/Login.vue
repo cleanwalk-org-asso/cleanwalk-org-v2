@@ -49,7 +49,7 @@ const login = async () => {
         role: response.data.role as "organization" | "user",
     }
     accountStore.CurrentUser = user;
-    router.push({ path: '/' });
+    router.push({ name: 'home' });
     accountStore.setToken(response.data.access_token as string);
 
 }
@@ -75,11 +75,11 @@ const login = async () => {
                     placeholder="Votre mot de passe" />
                 <button class="action-button" type="submit">Se connecter</button>
             </form>
-            <router-link to="/forgot-password" class="forgot-password">
+            <router-link :to="{name:'forgotPassword'}" class="forgot-password">
                 Mot de passe oublié ?
             </router-link>
         </div>
-        <router-link to="/signup" class="go-signup">
+        <router-link :to="{name:'signup'}" class="go-signup">
             Vous êtes nouveau chez cleanwalk.org : <span class="span">Inscrivez-vous</span>
         </router-link>
     </div>

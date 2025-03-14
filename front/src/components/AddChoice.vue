@@ -5,11 +5,11 @@ import iconAdd from './icons/icon-add.vue';
 <template>
     <section class="container">
         <h1>Que souhaitez vous ajouter ?</h1>
-        <router-link class="add" to="/add/cleanwalk">
+        <router-link class="add" :to="{ name: 'addCleanwalk'}">
             <icon-add />
             <div>Ajouter une cleanwalk</div>
         </router-link>
-        <router-link class="add" to="/add/article">
+        <router-link class="add" :to="{ name: 'addArticle'}">
             <icon-add />
             <div>Ajouter un article</div>
         </router-link>

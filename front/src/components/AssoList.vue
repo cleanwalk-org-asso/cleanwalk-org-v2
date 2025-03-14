@@ -35,7 +35,7 @@ const filteredAssoList = computed(() => {
   <SearchBar :searchInput="searchInput" @updateSearch="searchInput = $event" />
   <section class="container">
     <router-link
-      :to="'/associations/' + asso.id"
+      :to="{ name: 'association', params: { name: asso.name } }"
       v-for="asso in filteredAssoList"
       :key="asso.name"
       class="asso-card"

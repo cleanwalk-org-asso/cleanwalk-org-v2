@@ -56,7 +56,7 @@ const next = () => {
 
 const back = () => {
   if (progress.value === 1) {
-    router.push('/add');
+    router.push({ name: 'addCleanwalk' });
     return;
   }
   progress.value -= 1;

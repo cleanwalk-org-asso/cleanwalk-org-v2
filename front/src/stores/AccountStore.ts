@@ -92,7 +92,7 @@ export const useAccountStore = defineStore('account', () => {
         }
         setToken(response.data.access_token as string);
         isLoggedIn.value = true;
-        router.push({ path: '/' });
+        router.push({ name: 'home' });
         CurrentUser.value = response.data.user as User;
         isLoggedIn.value = true;
         return true;
