@@ -24,7 +24,7 @@ const resetPassword = async () => {
     });
     if (response.success) {
       showToast("Mot de passe réinitialisé avec succès. Vous pouvez maintenant vous connecter.", true);
-      router.push('/login');
+      router.push({ name: 'login' });
     } else {
       showToast("Erreur lors de la réinitialisation du mot de passe.", false);
     }

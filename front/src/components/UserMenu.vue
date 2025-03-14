@@ -15,17 +15,17 @@ const currentUser = accountStore.CurrentUser!;
 
 <template>
     <section class="container">
-        <router-link v-if="currentUser" to="/menu/profile" class="profil">
+        <router-link v-if="currentUser" :to="{name: 'manuProfile'}" class="profil">
             <img class="img" :src="currentUser.profile_picture" alt="profile picture" />
             <h3>{{ currentUser.name }}</h3>
             <iconRightArrow />
         </router-link>
         <div v-if="!currentUser" class="unlog-profiles">
-            <router-link to="/login" class="profil unlog">
+            <router-link :to="{name: 'login'}" class="profil unlog">
                 <h3>Se connecter</h3>
                 <iconRightArrow />
             </router-link>
-            <router-link to="/signup" class="profil unlog">
+            <router-link :to="{name: 'signup'}" class="profil unlog">
                 <h3>S'inscrire</h3>
                 <iconRightArrow />
             </router-link>

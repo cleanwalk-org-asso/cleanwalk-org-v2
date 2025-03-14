@@ -30,7 +30,7 @@ let debounceTimeoutDescription: any;
 
 onMounted(async () => {
     if (!currentUser.value) {
-        router.push('/login');
+        router.push({ name: 'login' });
         return;
     }
     if (currentUser.value?.role === 'organization') {

@@ -17,42 +17,42 @@ const name = ref("");
 const password = ref("");
 const confirmPassword = ref("");
 
-const signup = async ( ) => {
-    if(!name.value) {
+const signup = async () => {
+    if (!name.value) {
         showToast("Veuillez renseigner votre prénom", false);
         return;
     }
-    if(!email.value) {
+    if (!email.value) {
         showToast("Veuillez renseigner votre email", false);
         return;
     }
-    if(!password.value || !confirmPassword.value) {
+    if (!password.value || !confirmPassword.value) {
         showToast("Veuillez renseigner votre mot de passe", false);
         return;
     }
-    if(password.value !== confirmPassword.value) {
+    if (password.value !== confirmPassword.value) {
         showToast("Les mots de passe ne correspondent pas", false);
         return;
     }
-    const response:ApiResponse = await apiService.kyPostWithoutToken( "/users", {
+    const response: ApiResponse = await apiService.kyPostWithoutToken("/users", {
         email: email.value,
         password: password.value,
         name: name.value,
         profile_picture: 'https://api.dicebear.com/8.x/fun-emoji/svg?seed=' + uuidv4(),
         role_id: 1
     });
-    if(response.success === false) {
+    if (response.success === false) {
         showToast(response.data.message as string, false);
         return;
     } else {
         showToast("Votre compte a été créé avec succès", true);
         setTimeout(() => {
-            router.push('/login').then(() => router.go(0));
+            router.push({name:'login'}).then(() => router.go(0));
         }, 1000);
 
     }
-    
-    
+
+
 }
 
 </script>
@@ -70,38 +70,36 @@ const signup = async ( ) => {
             <span>ou</span>
             <div class="line"></div> -->
         <div class="choice-container">
-            <router-link to="/signup/perso" class="choice">
+            <router-link :to="{ name: 'signupPerso' }" class="choice">
                 <IconPerson class="choice-icon" />
                 <span>Compte personnel</span>
             </router-link>
-            <router-link to="/signup/asso" class="choice">
+            <router-link :to="{ name: 'signupAsso'}" class="choice">
                 <IconAsso class="choice-icon" />
                 <span>Compte association</span>
             </router-link>
         </div>
-        <router-link to="/login" class="go-login">
+        <router-link :to="{name: 'login'}" class="go-login">
             Vous utilisez déjà cleanwalk.org : <span>Connectez-vous</span>
         </router-link>
-        </section>
+    </section>
 </template>
 
 <style scoped lang="scss">
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    padding: 0 2rem;
 
+    h1 {
+        font-size: 24px;
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
 
-    .container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        overflow: hidden;
-        padding: 0 2rem;
-
-        h1 {
-            font-size: 24px;
-            font-weight: 500;
-            margin-bottom: 1rem;
-        }
-
-        .go-login {
+    .go-login {
         color: var(--text-color-secondary);
         font-size: 12px;
         width: 100%;
@@ -113,40 +111,41 @@ const signup = async ( ) => {
             font-weight: 500;
             cursor: pointer;
             text-decoration: underline;
-        
+
         }
     }
 
-        .choice-container {
+    .choice-container {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-direction: column;
+
+        .choice {
+            padding: 1rem 2rem;
+            border-radius: 5px;
+            border-radius: 8px;
+            border: 1px solid #CBD5E1;
+            background-color: var(--primary-color);
+            color: #373646;
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 24px;
+            transition: all 0.3s;
             display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            flex-direction: column;
-            .choice {
-                padding: 1rem 2rem;
-                border-radius: 5px;
-                border-radius: 8px;
-                border: 1px solid #CBD5E1;
-                background-color: var(--primary-color);
-                color: #373646;
-                font-weight: 700;
-                text-decoration: none;
-                font-size: 24px;
-                transition: all 0.3s;
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                min-width: 26rem;
-                &:hover {
-                    background-color: var(--primary-color-dark);
-                }
-                
-                .choice-icon {
-                    width: 48px; 
-                    height: 48px;
-                }
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 26rem;
+
+            &:hover {
+                background-color: var(--primary-color-dark);
+            }
+
+            .choice-icon {
+                width: 48px;
+                height: 48px;
             }
         }
     }
-
+}
 </style>

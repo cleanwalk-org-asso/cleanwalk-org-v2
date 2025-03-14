@@ -79,7 +79,7 @@ export function useCleanwalkForm() {
         if (response_cw) {
           showToast('Your cleanwalk has been successfully published', true);
           setTimeout(() => {
-            router.push('/').then(() => router.go(0));
+            router.push({name: 'map'}).then(() => router.go(0));
           }, 1000);
         } else {
           showToast('Error while creating the event', false);

@@ -52,7 +52,7 @@ const getDate = () => {
 
 const leaveCleanwalk = async () => {
   if (!cleanwalk.value || !currenUserId.value || !token.value) {
-    router.push('/login');
+    router.push({ name: 'login' });
     return;
   }
   await cleanwalkStore.leaveCleanwalk(cleanwalk.value.id, token.value, currenUserId.value);
@@ -68,7 +68,7 @@ const leaveCleanwalk = async () => {
 
 const handleJoinCleanwalk = async (data: { participantCount: number, isAnonymous: boolean }) => {
   if (!cleanwalk.value || !currenUserId.value || !token.value) {
-    router.push('/login');
+    router.push({ name: 'login' });
     return;
   }
   await cleanwalkStore.joinCleanwalk(cleanwalk.value.id, token.value, data.participantCount, currenUserId.value);
@@ -84,12 +84,12 @@ const handleJoinCleanwalk = async (data: { participantCount: number, isAnonymous
 
 const actionButton = () => {
   if (!cleanwalk.value || !currenUserId.value || !token.value) {
-    router.push('/login');
+    router.push({ name: 'login' });
     return;
   }
   if (cleanwalk.value.host.author_id === currenUserId.value) {
     // edit cleanwalk
-    router.push(`/cleanwalk/edit/${cleanwalk.value.id}`);
+    router.push({ name: 'editCleanwalk', params: { id: cleanwalk.value.id.toString() } });
     return;
   }
   if (cleanwalk.value.is_user_participant === true) {

@@ -13,7 +13,7 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
 
     const route:string = '/cleanwalks';
 
-    let cleanwalksTab: Ref<Cleanwalk[]> = ref([]);
+    const cleanwalksTab: Ref<Cleanwalk[]> = ref([]);
 
     async function getAllCleanwalks() {
         const route = '/cleanwalks'; // Assure-toi que cette route est correcte et complète
@@ -48,7 +48,7 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
     async function createCleanwalk(cleanwalk: CleanwalkCreation): Promise<CleanwalkCreation|undefined> {
         const token = getToken();
         if (token === undefined) {
-            router.push('/login');
+            router.push({ name: 'login' });
             return undefined;
         }
         const result = await apiService.kyPost(route, cleanwalk as unknown as Record<string, unknown>, token);
