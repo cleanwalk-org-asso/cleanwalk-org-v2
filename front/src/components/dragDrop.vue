@@ -5,6 +5,7 @@ import { useAccountStore } from '@/stores/AccountStore';
 import apiService from '@/services/apiService';
 import type { ApiResponse } from '@/interfaces/apiResponseInterface';
 import { useUtilsStore } from '@/stores/UtilsStore';
+import { FolderType } from '@/interfaces/FolderUploadinterfaces';
 
 const showToast = useUtilsStore().showToast;
 
@@ -76,7 +77,7 @@ const handleUpload = async (): Promise<string | undefined> => {
   if (fileInput.value?.files?.length && fileInput.value) {
     // Utilisez votre fonction d'aide pour uploader l'image
     const token = accountStore.getAccessToken();
-    const Response: ApiResponse = await apiService.uploadFile(fileInput.value.files[0], token!);
+    const Response: ApiResponse = await apiService.uploadFile(fileInput.value.files[0], FolderType.CLEANWALKS, token!);
     if (Response.success) {
       // showToast("Image uploaded successfully", true);
       removeImage();

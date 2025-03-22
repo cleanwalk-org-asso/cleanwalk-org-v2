@@ -6,6 +6,7 @@ import { HTTPError } from 'ky';
 const apiUrl = import.meta.env.VITE_API_URL;
 
 import type { ApiResponse } from '@/interfaces/apiResponseInterface';
+import type { FolderType } from '@/interfaces/FolderUploadinterfaces';
 
 const kyGet = async (route: string):Promise<ApiResponse> => {
     try {
@@ -98,9 +99,10 @@ const kyDelete = async (route: string, data:Record<string, unknown>, access_toke
     }
 };
 
-async function uploadFile(file: File, token: string): Promise<ApiResponse> {
+async function uploadFile(file: File, folder: FolderType, token: string): Promise<ApiResponse> {
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('folder', folder);
 
     try {
         const response:Record<string, unknown> = await ky.post(apiUrl + '/upload', {
