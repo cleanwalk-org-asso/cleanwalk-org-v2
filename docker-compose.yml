@@ -16,7 +16,7 @@ services:
     volumes:
       - ./api:/app # Montez le code de l'API dans le conteneur
     ports:
-      - '5001:5000' # Exposez le port 5000 pour l'API Flask
+      - '5000:5000' # Exposez le port 5000 pour l'API Flask
     environment:
       - UPLOAD_FOLDER=/app/images
 
