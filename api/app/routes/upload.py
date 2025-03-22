@@ -7,7 +7,6 @@ import os
 import boto3
 from botocore.client import Config
 from flask_jwt_extended import jwt_required
-import time
 from PIL import Image
 from io import BytesIO
 
@@ -93,7 +92,10 @@ def upload_file():
                 file_data = webp_file.getvalue()
         
         # Final filename with extension
-        final_filename = f"{unique_filename}.{extension}"
+        folder = request.form.get('folder', '').strip('/')
+        
+        final_filename = f"{uuid.uuid4()}.{extension}"
+        key = f"{folder}/{final_filename}" if folder else final_filename
         
         # Upload vers R2 directement
         try:
@@ -101,13 +103,13 @@ def upload_file():
             
             s3_client.put_object(
                 Bucket=current_app.config['R2_BUCKET_NAME'],
-                Key=final_filename,
+                Key=key,
                 Body=file_data,
                 ContentType=f"image/{extension}"
             )
             
             # Construire l'URL publique du fichier
-            file_url = f"{current_app.config['R2_PUBLIC_URL']}/{final_filename}"
+            file_url = f"{current_app.config['R2_PUBLIC_URL']}/{key}"
             
             return jsonify({
                 'success': True,

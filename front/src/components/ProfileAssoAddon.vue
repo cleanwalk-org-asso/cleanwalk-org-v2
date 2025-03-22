@@ -6,6 +6,7 @@ import apiService from '@/services/apiService';
 import type { ApiResponse } from '@/interfaces/apiResponseInterface';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import type { Association } from '@/interfaces/userInterface';
+import { FolderType } from '@/interfaces/FolderUploadinterfaces';
 
 
 const showToast = useUtilsStore().showToast;
@@ -29,14 +30,14 @@ const fileInputPP: Ref<HTMLInputElement | null> = ref(null);
 const fileInputBanner: Ref<HTMLInputElement | null> = ref(null);
 
 
-const handleUpload = async (fileInput: HTMLInputElement): Promise<string | undefined> => {
+const handleUpload = async (fileInput: HTMLInputElement, folderType: FolderType): Promise<string | undefined> => {
     if (!fileInput.files?.length || !fileInput.value) {
         showToast("No file selected", false);
         return undefined;
     }
     // Utilisez votre fonction d'aide pour uploader l'image
     const token = accountStore.getAccessToken();
-    const Response: ApiResponse = await apiService.uploadFile(fileInput.files[0], token!);
+    const Response: ApiResponse = await apiService.uploadFile(fileInput.files[0], folderType, token!);
     if (Response.success) {
         return Response.data.img_url as string; //img name is in Response.data.filename
     } else {
@@ -46,7 +47,7 @@ const handleUpload = async (fileInput: HTMLInputElement): Promise<string | undef
 };
 
 const uploadProfilePicture = async () => {
-    const img_url = await handleUpload(fileInputPP.value!);
+    const img_url = await handleUpload(fileInputPP.value!, FolderType.ASSO_PP);
     if(!img_url) return;
     currentPP.value = img_url;
     accountStore.modifyAssociation({profile_picture: img_url});
@@ -54,7 +55,7 @@ const uploadProfilePicture = async () => {
 };
 
 const uploadBanner = async () => {
-    const img_url = await handleUpload(fileInputBanner.value!);
+    const img_url = await handleUpload(fileInputBanner.value!, FolderType.ASSO_BANNER);
     if (!img_url) return;
     currentBanner.value = img_url;
     accountStore.modifyAssociation({ banner_img: img_url });
