@@ -15,7 +15,7 @@ const currentUser = accountStore.CurrentUser!;
 
 <template>
     <section class="container">
-        <router-link v-if="currentUser" :to="{name: 'manuProfile'}" class="profil">
+        <router-link v-if="currentUser" :to="{name: 'menuProfile'}" class="profil">
             <img class="img" :src="currentUser.profile_picture" alt="profile picture" />
             <h3>{{ currentUser.name }}</h3>
             <iconRightArrow />

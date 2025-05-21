@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, type Ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import TopBar from './TopBar.vue';
 import { useAccountStore } from '@/stores/AccountStore';
 import type { SingleCleanwalk } from '@/interfaces/cleanwalkInterface';
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
@@ -51,12 +50,6 @@ onMounted(async () => {
     dateCleanwalk.value.hourEnd = hourEnd;
   }
 });
-
-const getWrittenDate = () => {
-  if (currentCleanwalk.value && currentCleanwalk.value.date_begin && currentCleanwalk.value.duration) {
-    return dateService.getCleanwalkWrittenDate(new Date(currentCleanwalk.value.date_begin), currentCleanwalk.value.duration);
-  }
-}
 
 const validate = async() => {
   if (dateCleanwalk.value.dateDay && dateCleanwalk.value.hourBegin && dateCleanwalk.value.hourEnd) {
@@ -109,9 +102,6 @@ const handleSelectAddress = (addressData: { address: string, lat: string, lon: s
     currentCleanwalk.value.pos_long = parseFloat(addressData.lon);
     currentCleanwalk.value.city = addressData.city;
 };
-
-
-
 </script>
 
 <template>
@@ -119,18 +109,31 @@ const handleSelectAddress = (addressData: { address: string, lat: string, lon: s
     <div class="banner">
       <dragDrop ref="dragDropRef" :current-img="currentCleanwalk.img_url" format="card" />
     </div>
-    <BaseInput v-model="currentCleanwalk.name" name="name" type="text" label="Nom de la cleanwalk" placeholder="Saisissez le nom de votre évènement" />
-    <AutocompleteAddress v-model:query="currentCleanwalk.address"
-    @select-suggestion="handleSelectAddress" />
-    <label for="description">Description</label>
-    <BaseTextarea name="descrition" v-model="currentCleanwalk.description" id="description" :rows="4"></BaseTextarea>
-    <BaseInput v-model="dateCleanwalk.dateDay" name="date" type="date" label="Date de l'évènement" />
-    <BaseInput v-model="dateCleanwalk.hourBegin" name="hourBegin" type="time" label="Heure de début" />
-    <BaseInput v-model="dateCleanwalk.hourEnd" name="hourEnd" type="time" label="Heure de fin" />
+    
+    <div class="form-content">
+      <div class="form-section">
+        <BaseInput v-model="currentCleanwalk.name" name="name" type="text" label="Nom de la cleanwalk" placeholder="Saisissez le nom de votre évènement" />
+        <AutocompleteAddress v-model:query="currentCleanwalk.address"
+        @select-suggestion="handleSelectAddress" />
+      </div>
+      
+      <div class="form-section">
+        <label for="description">Description</label>
+        <BaseTextarea name="descrition" v-model="currentCleanwalk.description" id="description" :rows="4"></BaseTextarea>
+      </div>
+      
+      <div class="form-section date-time-section">
+        <BaseInput v-model="dateCleanwalk.dateDay" name="date" type="date" label="Date de l'évènement" />
+        <div class="time-inputs">
+          <BaseInput v-model="dateCleanwalk.hourBegin" name="hourBegin" type="time" label="Heure de début" />
+          <BaseInput v-model="dateCleanwalk.hourEnd" name="hourEnd" type="time" label="Heure de fin" />
+        </div>
+      </div>
 
-    <button @click="validate()" class="validate button-primary">
-      Valider
-    </button>
+      <button @click="validate()" class="validate button-primary">
+        Valider
+      </button>
+    </div>
   </div>
 </template>
 
@@ -139,12 +142,67 @@ const handleSelectAddress = (addressData: { address: string, lat: string, lon: s
   display: flex;
   flex-direction: column;
   padding: 4.5rem 1rem 0 1rem;
-}
+  
+  .form-section {
+    margin-bottom: 1.5rem;
+    
+    @media (min-width: 768px) {
+      background-color: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+  }
 
-.validate {
-  width: 8rem;
-  margin: 0 auto;
-  padding: 0.5rem 1rem;
-  margin-top: 2rem;
+  .time-inputs {
+    margin-top: 1rem;
+    
+    @media (min-width: 768px) {
+      display: flex;
+      gap: 1rem;
+      
+      > * {
+        flex: 1;
+      }
+    }
+  }
+  
+  .validate {
+    width: 8rem;
+    margin: 0 auto;
+    padding: 0.5rem 1rem;
+    margin-top: 2rem;
+  }
+  
+  .banner {
+    @media (min-width: 768px) {
+      width: 100%;
+      max-height: 300px;
+      overflow: hidden;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+    }
+  }
+  
+  .form-content {
+    @media (min-width: 768px) {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      width: 100%;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 6rem 2rem 2rem 2rem;
+    
+    .validate {
+      width: 12rem;
+      padding: 0.75rem 1.5rem;
+      font-size: 1.1rem;
+    }
+  }
 }
 </style>
