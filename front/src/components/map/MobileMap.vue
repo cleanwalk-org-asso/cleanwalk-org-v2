@@ -357,7 +357,7 @@ main {
  
     .map-container {
         padding: 58px 0 ;
-        height: calc(100dvh - 20px);
+        height: calc(100dvh - 2rem);
     }
 
     .cleanwalk-list {

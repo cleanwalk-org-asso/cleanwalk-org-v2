@@ -12,5 +12,4 @@ onMounted(() => {
 <template>
     <SwithChoice categorie1="articles" categorie2="associations" route1="articles" route2="associations" :activeCategory="true" />
     <ArticlesList />
-    <navBar />
 </template>

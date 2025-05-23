@@ -52,7 +52,7 @@ const getDate = () => {
 
 const leaveCleanwalk = async () => {
   if (!cleanwalk.value || !currenUserId.value || !token.value) {
-    router.push({ name: 'login' });
+    router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } });
     return;
   }
   await cleanwalkStore.leaveCleanwalk(cleanwalk.value.id, token.value, currenUserId.value);
@@ -68,7 +68,7 @@ const leaveCleanwalk = async () => {
 
 const handleJoinCleanwalk = async (data: { participantCount: number, isAnonymous: boolean }) => {
   if (!cleanwalk.value || !currenUserId.value || !token.value) {
-    router.push({ name: 'login' });
+    router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } });
     return;
   }
   await cleanwalkStore.joinCleanwalk(cleanwalk.value.id, token.value, data.participantCount, currenUserId.value);
@@ -84,7 +84,7 @@ const handleJoinCleanwalk = async (data: { participantCount: number, isAnonymous
 
 const actionButton = () => {
   if (!cleanwalk.value || !currenUserId.value || !token.value) {
-    router.push({ name: 'login' });
+    router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } });
     return;
   }
   if (cleanwalk.value.host.author_id === currenUserId.value) {
@@ -293,7 +293,6 @@ main {
   width: 100vw;
   object-fit: cover;
   aspect-ratio: 21/9;
-  margin-top: 58px;
 
   @media (min-width: 768px) {
     height: 20rem;

@@ -175,7 +175,6 @@ const back = () => {
 }
 
 .section {
-  padding-top: 14vh;
   display: flex;
   justify-content: space-evenly;
 }

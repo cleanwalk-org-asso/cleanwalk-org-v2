@@ -1,241 +1,204 @@
-import { createRouter, createWebHistory, type NavigationGuardNext, type RouteLocationNormalized } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import { useAccountStore } from '@/stores/AccountStore';
-import { useDevice } from '@/composables/useDevice';
-import { is } from 'date-fns/locale';
+import { createRouter, createWebHistory } from 'vue-router'
+import { useAccountStore } from '@/stores/AccountStore'
+import { useDevice } from '@/composables/useDevice'
 
-const { isMobile } = useDevice();
+import NavBarLayout from '@/layouts/NavBarLayout.vue'
+
+const { isMobile } = useDevice()
 
 const router = createRouter({
-  history: createWebHistory((import.meta as any).env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    // Routes avec layout principal
     {
       path: '/',
-      name: 'home',
-      component: HomeView,
-      meta: {
-        title: 'Cleanwalk.org - Événements de Nettoyage Citoyen',
-        description: 'Rejoignez Cleanwalk.org pour organiser et participer à des événements de nettoyage citoyen. Faites un impact environnemental positif dans votre région.',
-        ogImage: '/default-banner.svg'
-      }
+      component: NavBarLayout,
+      children: [
+        {
+          path: '',
+          name: 'home',
+          component: () => import('@/views/HomeView.vue'),
+          meta: {
+            title: 'Cleanwalk.org - Événements de Nettoyage Citoyen',
+            description: 'Rejoignez Cleanwalk.org pour organiser et participer à des événements de nettoyage citoyen.',
+            ogImage: '/default-banner.svg'
+          }
+        },
+        {
+          path: 'carte',
+          name: 'map',
+          component: () => import('@/views/MapView.vue'),
+          meta: {
+            title: 'Carte des Cleanwalk | Cleanwalk.org',
+            description: 'Trouvez et rejoignez des événements de nettoyage près de chez vous.',
+            ogImage: '/default-banner.svg'
+          }
+        },
+        {
+          path: 'cleanwalk/:id',
+          name: 'cleanwalk',
+          component: () => import('@/views/SingleCleanwalkView.vue'),
+          meta: {
+            title: 'Détails de l\'Événement | Cleanwalk.org',
+            description: 'Détails d’un événement de nettoyage citoyen.',
+            ogImage: '/default-banner.svg'
+          }
+        },
+        {
+          path: 'associations',
+          name: 'associations',
+          component: () => import('@/views/AssoListView.vue'),
+          meta: {
+            title: 'Associations Environnementales | Cleanwalk.org',
+            description: 'Découvrez des organisations actives pour l’environnement.',
+            ogImage: '/default-banner.svg'
+          }
+        },
+        {
+          path: 'associations/:id',
+          name: 'association',
+          component: () => import('@/views/PublicProfileAssoView.vue'),
+          meta: {
+            title: 'Profil Association | Cleanwalk.org',
+            description: 'Profil public d’une organisation environnementale.',
+            ogImage: '/default-banner.svg'
+          }
+        },
+        {
+          path: 'ajouter/cleanwalk',
+          name: 'addCleanwalk',
+          component: () => import('@/views/AddCleanwalkView.vue'),
+          meta: {
+            requiresAuth: true,
+            title: 'Créer un Événement | Cleanwalk.org',
+            description: 'Organisez une cleanwalk dans votre région.',
+            ogImage: '/default-banner.svg'
+          }
+        },
+        {
+          path: 'menu',
+          name: 'menu',
+          component: () => import('@/views/MenuView.vue'),
+          meta: {
+            title: 'Menu | Cleanwalk.org',
+            description: 'Accédez aux options de navigation.',
+            ogImage: '/default-banner.svg'
+          }
+        },
+        {
+          path: 'menu/profile',
+          name: 'menuProfile',
+          component: () => import('@/views/ProfileView.vue'),
+          meta: {
+            requiresAuth: true,
+            title: 'Votre Profil | Cleanwalk.org',
+            description: 'Gérez votre compte et préférences.',
+            ogImage: '/default-banner.svg'
+          }
+        },
+        // {
+        //   path: 'privacy-policy',
+        //   name: 'privacyPolicy',
+        //   component: () => import('@/views/PrivacyPolicyView.vue')
+        // },
+        // {
+        //   path: 'terms-of-use',
+        //   name: 'termsOfUse',
+        //   component: () => import('@/views/TermsOfUseView.vue')
+        // },
+      ]
     },
-    {
-      path: '/carte',
-      name: 'map',
-      component: () => import('../views/MapView.vue'),
-      meta: {
-        title: 'Carte des Cleanwalk | Cleanwalk.org',
-        description: 'Rejoignez Cleanwalk.org pour organiser et participer à des événements de nettoyage citoyen. Faites un impact environnemental positif dans votre région.',
-        ogImage: '/default-banner.svg'
-      }
-    },
-    {
-      path: '/cleanwalk/:id',
-      name: 'cleanwalk',
-      component: () => import('../views/SingleCleanwalkView.vue'),
-      meta: {
-        title: 'Détails de l\'Événement Cleanwalk | Cleanwalk.org',
-        description: 'Détails sur un événement de nettoyage citoyen. Rejoignez une cleanwalk près de chez vous et aidez à faire la différence.',
-        ogImage: '/default-banner.svg'
-      }
-    },
-    {
-      path: '/ajouter/cleanwalk',
-      name: 'addCleanwalk',
-      component: () => import('../views/AddCleanwalkView.vue'),
-      meta: {
-        title: 'Créer un Événement Cleanwalk | Cleanwalk.org',
-        description: 'Organisez votre propre événement de nettoyage citoyen. Créez une cleanwalk et invitez les autres à rejoindre.',
-        ogImage: '/default-banner.svg'
-      }
-    },
-    {
-      path: '/associations',
-      name: 'associations',
-      component: () => import('../views/AssoListView.vue'),
-      meta: {
-        title: 'Organizations Environnementales | Cleanwalk.org',
-        description: 'Découvrez des organizations et associations environnementales organisant des événements cleanwalk dans votre région.',
-        ogImage: '/default-banner.svg'
-      }
-    },
-    {
-      path: '/associations/:id',
-      name: 'association',
-      component: () => import('../views/PublicProfileAssoView.vue'),
-      meta: {
-        title: 'Profil de l\'Organization | Cleanwalk.org',
-        description: 'Découvrez cette organization environnementale et leurs initiatives de nettoyage.',
-        ogImage: '/default-banner.svg'
-      }
-    },
-    {
-      path: '/menu',
-      name: 'menu',
-      component: () => import('../views/MenuView.vue'),
-      meta: {
-        title: 'Menu | Cleanwalk.org',
-        description: 'Naviguez à travers les fonctionnalités et options de Cleanwalk.org.',
-        ogImage: '/default-banner.svg'
-      }
-    },
-    {
-      path: '/menu/profile',
-      name: 'menuProfile',
-      component: () => import('../views/ProfileView.vue'),
-      meta: {
-        title: 'Votre Profil | Cleanwalk.org',
-        description: 'Gérez votre profil et vos préférences sur Cleanwalk.org.',
-        ogImage: '/default-banner.svg'
-      }
-    },
+
+    // Auth & divers
     {
       path: '/login',
       name: 'login',
-      component: () => import('../views/LoginView.vue'),
-      meta: {
-        title: 'Connexion | Cleanwalk.org',
-        description: 'Connectez-vous à votre compte Cleanwalk.org pour rejoindre ou créer des événements de nettoyage.',
-        ogImage: '/default-banner.svg'
-      }
+      component: () => import('@/views/LoginView.vue'),
     },
     {
       path: '/signup',
       name: 'signup',
-      component: () => import('../views/SignupChoiceView.vue'),
-      meta: {
-        title: 'Inscription | Cleanwalk.org',
-        description: 'Créez un compte sur Cleanwalk.org pour participer à des événements de nettoyage citoyen.',
-        ogImage: '/default-banner.svg'
-      }
+      component: () => import('@/views/SignupChoiceView.vue'),
     },
     {
       path: '/signup/asso',
       name: 'signupAsso',
-      component: () => import('../views/SignupAssoView.vue'),
-      meta: {
-        title: 'Inscription Organization | Cleanwalk.org',
-        description: 'Enregistrez votre organization environnementale sur Cleanwalk.org pour organiser des événements de nettoyage.',
-        ogImage: '/default-banner.svg'
-      }
+      component: () => import('@/views/SignupAssoView.vue'),
     },
     {
       path: '/signup/perso',
       name: 'signupPerso',
-      component: () => import('../views/SignupView.vue'),
-      meta: {
-        title: 'Inscription Personnelle | Cleanwalk.org',
-        description: 'Créez un compte personnel sur Cleanwalk.org pour rejoindre des événements de nettoyage citoyen.',
-        ogImage: '/default-banner.svg'
-      }
+      component: () => import('@/views/SignupView.vue'),
     },
     {
       path: '/logout',
       name: 'logout',
-      component: () => import('../views/SignupView.vue'),
-      meta: {
-        title: 'Déconnexion | Cleanwalk.org',
-        description: 'Déconnectez-vous en toute sécurité de votre compte Cleanwalk.org.',
-        ogImage: '/default-banner.svg'
-      }
-    },
-    {
-      path: '/:catchAll(.*)',
-      name: 'NotFound',
-      component: () => import('../views/404.vue'),
-      meta: {
-        title: 'Page Non Trouvée | Cleanwalk.org',
-        description: 'La page que vous recherchez n\'a pas été trouvée sur Cleanwalk.org.',
-        ogImage: '/default-banner.svg'
-      }
+      component: () => import('@/views/SignupView.vue'),
     },
     {
       path: '/cleanwalk/edit/:id',
       name: 'editCleanwalk',
-      component: () => import('../views/EditCleanwalkView.vue'),
-      meta: {
-        title: 'Modifier Cleanwalk | Cleanwalk.org',
-        description: 'Mettez à jour les détails de votre événement de nettoyage citoyen.',
-        ogImage: '/default-banner.svg'
-      }
+      component: () => import('@/views/EditCleanwalkView.vue'),
+      meta: { requiresAuth: true }
     },
     {
       path: '/reset-password/:token',
       name: 'resetPassword',
-      component: () => import('../views/ResetPasswordView.vue'),
-      meta: {
-        title: 'Réinitialiser le Mot de Passe | Cleanwalk.org',
-        description: 'Créez un nouveau mot de passe pour votre compte Cleanwalk.org.',
-        ogImage: '/default-banner.svg'
-      }
+      component: () => import('@/views/ResetPasswordView.vue'),
     },
     {
       path: '/forgot-password',
       name: 'forgotPassword',
-      component: () => import('../views/ForgotPasswordView.vue'),
+      component: () => import('@/views/ForgotPasswordView.vue'),
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: () => import('@/views/404.vue'),
       meta: {
-        title: 'Mot de Passe Oublié | Cleanwalk.org',
-        description: 'Demandez une réinitialisation de mot de passe pour votre compte Cleanwalk.org.',
+        title: 'Page Non Trouvée | Cleanwalk.org',
+        description: 'Cette page n’existe pas.',
         ogImage: '/default-banner.svg'
       }
     },
   ]
-  
 })
 
-const routesRequiringAuth = ['profile', 'addCleanwalk'];
+// Navigation Guard
+router.beforeEach(async (to, from, next) => {
+  const store = useAccountStore()
 
-// SEO - Update meta tags based on route
-router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
-  // Authentication logic
-  if(!useAccountStore().isLoggedIn) {
-    await useAccountStore().tokenLogin();
+  if (!store.isLoggedIn) {
+    await store.tokenLogin()
   }
 
-  // Redirect to map if on mobile 
   if (to.name === 'home' && isMobile.value) {
-    next({ name: 'map' });
-    return;
+    return next({ name: 'map' })
   }
-  
-  if (routesRequiringAuth.includes(to.name as string) && !useAccountStore().isLoggedIn) {
-    next({ name: 'login' });
-  } else {
-    // Update meta tags for SEO
-    const nearestWithTitle = to.matched.slice().reverse().find(r => r.meta && r.meta.title);
-    const nearestWithDescription = to.matched.slice().reverse().find(r => r.meta && r.meta.description);
-    const nearestWithOgImage = to.matched.slice().reverse().find(r => r.meta && r.meta.ogImage);
 
-    // Update document title
-    if(nearestWithTitle) {
-      document.title = nearestWithTitle.meta.title as string;
-    }
-
-    // Update meta description
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if(metaDescription && nearestWithDescription) {
-      metaDescription.setAttribute('content', nearestWithDescription.meta.description as string);
-    }
-
-    // Update Open Graph meta tags
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    if(ogTitle && nearestWithTitle) {
-      ogTitle.setAttribute('content', nearestWithTitle.meta.title as string);
-    }
-
-    const ogDescription = document.querySelector('meta[property="og:description"]');
-    if(ogDescription && nearestWithDescription) {
-      ogDescription.setAttribute('content', nearestWithDescription.meta.description as string);
-    }
-
-    const ogImage = document.querySelector('meta[property="og:image"]');
-    if(ogImage && nearestWithOgImage) {
-      const baseUrl = window.location.origin;
-      ogImage.setAttribute('content', `${baseUrl}${nearestWithOgImage.meta.ogImage}`);
-    }
-
-    next();
+  if (to.meta.requiresAuth && !store.isLoggedIn) {
+    return next({ name: 'login', query: { redirect: to.fullPath } })
   }
-});
+
+  // SEO dynamique
+  const meta = to.meta
+  if (meta.title) document.title = meta.title as string
+
+  const desc = document.querySelector('meta[name="description"]')
+  if (desc && meta.description) desc.setAttribute('content', meta.description as string)
+
+  const ogTitle = document.querySelector('meta[property="og:title"]')
+  if (ogTitle && meta.title) ogTitle.setAttribute('content', meta.title as string)
+
+  const ogDesc = document.querySelector('meta[property="og:description"]')
+  if (ogDesc && meta.description) ogDesc.setAttribute('content', meta.description as string)
+
+  const ogImage = document.querySelector('meta[property="og:image"]')
+  if (ogImage && meta.ogImage) {
+    ogImage.setAttribute('content', `${window.location.origin}${meta.ogImage}`)
+  }
+
+  next()
+})
 
 export default router

@@ -18,5 +18,4 @@ onMounted( async () => {
 <template>
     <MobileMap v-if="isMobile" />
     <DesktopMap v-if="!isMobile" />
-    <navBar />
 </template>

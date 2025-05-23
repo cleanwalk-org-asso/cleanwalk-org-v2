@@ -85,16 +85,16 @@ export const useAccountStore = defineStore('account', () => {
         return response.data as unknown as Association[];
     }
 
-    const googleLoginSignup = async (credential: string) => {
+    const googleLoginSignup = async (credential: string, redirectPath?: string) => {
         const response: ApiResponse = await apiService.kyPostWithoutToken('/users/google-login', {'token': credential});
         if (response.success !== true) {
             return false;
         }
         setToken(response.data.access_token as string);
         isLoggedIn.value = true;
-        router.push({ name: 'home' });
         CurrentUser.value = response.data.user as User;
-        isLoggedIn.value = true;
+        
+        // Ne redirige plus automatiquement, cela sera géré par le composant appelant
         return true;
     }
 

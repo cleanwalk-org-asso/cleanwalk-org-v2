@@ -4,7 +4,7 @@ import iconDiscover from '@/components/icons/icon-discover.vue';
 import iconMap from '@/components/icons/icon-map.vue';
 import iconBurger from '@/components/icons/icon-burger.vue';
 import { useAccountStore } from '@/stores/AccountStore';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useDevice } from '@/composables/useDevice';
 
@@ -13,9 +13,14 @@ const route = useRoute();
 const { isMobile } = useDevice(); // Utilisation du composable pour détecter mobile/desktop
 const user = useAccountStore().CurrentUser;
 
-//local storage
+// Update currentPage when component is mounted
 onMounted(() => {
     currentPage.value = route.name as string;
+});
+
+// Watch for route changes and update currentPage
+watch(() => route.name, (newName) => {
+    currentPage.value = newName as string;
 });
 
 

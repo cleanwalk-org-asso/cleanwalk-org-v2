@@ -10,5 +10,4 @@ import NavBar from '@/components/NavBar.vue';
     <HeroSection />
     <MapSection />
     <StatSection />
-    <NavBar />
 </template>

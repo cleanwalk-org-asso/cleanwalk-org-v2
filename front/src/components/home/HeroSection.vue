@@ -13,7 +13,6 @@
 
 <style lang="scss" scoped>
     .hero {
-        margin-top: 88px;
         background-image: url('../../assets/home-banner.webp');
         height: 694px;
         background-size: cover;

@@ -96,7 +96,6 @@ watch(() => route.params.id, async (newId) => {
 <template>
   <!-- Use v-model to create two-way binding -->
   <SingleCleanwalk v-if="currentCleanwalk" v-model="currentCleanwalk" />
-  <navBar />
   <!-- Add structured data JSON-LD for events -->
   <JsonLdEvent v-if="currentCleanwalk" :cleanwalk="currentCleanwalk" />
 </template>

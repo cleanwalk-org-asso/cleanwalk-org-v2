@@ -117,14 +117,13 @@ body,
 main {
     margin: 0;
     padding: 0;
-    height: 100vh;
+    height: calc(100vh - 5.5rem);
     width: 100vw;
 }
 
 .map-container {
     height: 100%;
     width: 100%;
-    padding-top: 5.5rem;
 }
 
 .cleanwalk-container {
