@@ -1,12 +1,9 @@
 <script setup lang="ts">
-import iconAdd from '@/components/icons/icon-add.vue';
-import iconDiscover from '@/components/icons/icon-discover.vue';
-import iconMap from '@/components/icons/icon-map.vue';
-import iconBurger from '@/components/icons/icon-burger.vue';
 import { useAccountStore } from '@/stores/AccountStore';
 import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useDevice } from '@/composables/useDevice';
+import { Plus, MapPin, Compass, Menu } from 'lucide-vue-next';
 
 const currentPage = ref('');
 const route = useRoute();
@@ -30,25 +27,25 @@ watch(() => route.name, (newName) => {
         <ul class="container" :class="{ 'shadow': currentPage !== 'map' }">
             <li :class="{ 'active': currentPage === 'map' || currentPage === 'cleanwalk' }">
                 <router-link :to="{name: 'map'}" class="redirect">
-                    <iconMap />
+                    <MapPin />
                     <div>Carte</div>
                 </router-link>
             </li>
             <li :class="{ 'active': currentPage.includes('add') }">
                 <router-link :to="{ name: 'addCleanwalk'}" class="redirect">
-                    <iconAdd />
+                    <Plus />
                     <div>Ajouter </div>
                 </router-link>
             </li>
             <li :class="{ 'active': currentPage === 'associations' || currentPage === 'associations' }">
                 <router-link :to="{ name: 'associations'}" class="redirect">
-                    <iconDiscover />
+                    <Compass />
                     <div>Découvrir</div>
                 </router-link>
             </li>
             <li :class="{ 'active': currentPage.includes('menu') }">
                 <router-link :to="{ name:'menu'}" class="redirect">
-                    <iconBurger />
+                    <Menu />
                     <div>Menu</div>
                 </router-link>
             </li>

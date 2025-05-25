@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref, type Ref } from 'vue';
-import iconPhoto from './icons/icon-photo.vue';
+import { Camera, X } from 'lucide-vue-next';
+
 import { useAccountStore } from '@/stores/AccountStore';
 import apiService from '@/services/apiService';
 import type { ApiResponse } from '@/interfaces/apiResponseInterface';
@@ -101,12 +102,14 @@ defineExpose({ handleUpload });
 
 <template>
   <div class="container-drag-drop ">
-    <button v-if="imageSrc && !props.autoUpload" @click.stop="removeImage()" class="cross">X</button>
+    <button v-if="imageSrc && !props.autoUpload" @click.stop="removeImage()" class="cross">
+      <X />
+    </button>
     <div  class="drop-area" @dragover.prevent="dragOver" @dragleave.prevent="dragLeave" @drop.prevent="onFileDrop"
       @click="fileInputClick" :class="{ 'dragover': isDragOver , [props.format]: true }"
       :style="{ backgroundImage: currentImg ? `url(${currentImg})` : 'none' }">
       <input type="file" ref="fileInput" @change="onFileChange" accept="image/jpeg, image/png" style="display: none" />
-      <icon-photo class="icon-photo" v-if="!imageSrc" />
+      <Camera :size="50" v-if="!imageSrc" />
 
       <img v-if="imageSrc" :src="imageSrc" alt="Preview" class="preview" />
     </div>
@@ -162,12 +165,6 @@ defineExpose({ handleUpload });
 
 .dragover {
   background-color: #E1F4F8;
-}
-
-.icon-photo {
-  width: 50px;
-  height: 50px;
-  stroke: #000000;
 }
 
 .preview {

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import iconCross from '../icons/icon-cross.vue';
-import iconAdd from '../icons/icon-add.vue';
-import iconMinus from '../icons/icon-minus.vue';
+// import iconCross from '../icons/icon-cross.vue';
+// import iconAdd from '../icons/icon-add.vue';
+// import iconMinus from '../icons/icon-minus.vue';
+import { Minus, Plus, X } from 'lucide-vue-next';
 import { ref, onMounted, onUnmounted } from 'vue';
 
 const props = defineProps<{
@@ -68,18 +69,18 @@ onUnmounted(() => {
     <div class="popup-validation" ref="popupRef">
       <div class="cross-container">
         <button class="cross" @click="cancel()">
-          <iconCross />
+          <X />
         </button>
       </div>
       <h3>Validation de la participation au ramassage</h3>
       <div class="warning">Maximum 5 personnes avec vous</div>
       <div class="counter">
         <button class="button-primary minus" @click="counterMinus()">
-          <iconMinus />
+          <Minus />
         </button>
         <div>{{ counterParticipate }}</div>
         <button class="button-primary add" @click="counterAdd()">
-          <iconAdd />
+          <Plus />
         </button>
       </div>
       <div class="anonyme">

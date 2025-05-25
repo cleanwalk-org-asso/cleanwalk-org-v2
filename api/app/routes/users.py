@@ -77,7 +77,7 @@ def get_association(user_id):
 # Route to get associations ordered by RAND
 @users_bp.route('/associations', methods=['GET'])
 def get_organizations():
-    organizations = db.session.query(User, Organization).join(Organization, User.id == Organization.user_id).filter(User.role_id == 2).order_by(func.rand()).all()
+    organizations = db.session.query(User, Organization).join(Organization, User.id == Organization.user_id).filter(User.role_id == 2).order_by(func.random()).all()
     if organizations:
         organization_data = []
         for organization in organizations:

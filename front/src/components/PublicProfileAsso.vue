@@ -28,7 +28,6 @@ const props = defineProps<{
         height: 150px;
         aspect-ratio: 21;
         object-fit: cover;
-        margin-top: 58px;
     }
     .pp {
         position: relative;

@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import iconInfo from './icons/icon-info.vue'
-import iconLeftArrow from './icons/icon-left-arrow.vue'
-import iconSearch from './icons/icon-search.vue'
+// import iconInfo from './icons/icon-info.vue'
+// import iconLeftArrow from './icons/icon-left-arrow.vue'
+// import iconSearch from './icons/icon-search.vue'
+
+import { Info, ChevronLeft, Search } from 'lucide-vue-next'
 import { useAccountStore } from '@/stores/AccountStore'
 
 const props = defineProps({
@@ -30,7 +32,7 @@ const backButton = () => {
         <img class="logo" src="../assets/logo.svg" alt="logo" v-if="!inputActive" />
         <div class="search-bar" :class="{ active: inputActive, base: !inputActive }">
             <button @click="backButton()">
-                <iconLeftArrow />
+                <ChevronLeft color="#94A3B8" />
             </button>
             <input
                 @click="inputActive = true"
@@ -42,14 +44,14 @@ const backButton = () => {
                 autocomplete="off"
             />
             <label for="search" @click="inputActive = true">
-                <iconSearch />
+                <Search :size="20" color="#94a3b8" />
             </label>
         </div>
         <RouterLink to="/menu/profile" class="pp" v-if="userImg">
             <img :src="userImg" alt="user img" />
         </RouterLink>
         <button class="info" v-else>
-            <iconInfo />
+            <Info color="#94a3b8" />
         </button>
     </div>
 </template>
@@ -93,10 +95,6 @@ const backButton = () => {
         width: 38px;
         height: 38px;
         margin-left: 8px;
-
-        svg {
-            stroke: #94a3b8;
-        }
     }
     .search-bar {
         &.base {
@@ -120,14 +118,7 @@ const backButton = () => {
             }
 
             label {
-                padding: 0 10px;
-            }
-
-            svg {
-                stroke: #94a3b8;
-                width: 24px;
-                height: 24px;
-                margin: 5px 1px 0 0;
+                display: flex;
             }
         }
         &.active {
@@ -161,11 +152,6 @@ const backButton = () => {
                 padding-right: 10px;
             }
 
-            svg {
-                width: 20px;
-                height: 20px;
-                stroke: #94a3b8;
-            }
         }
     }
 }

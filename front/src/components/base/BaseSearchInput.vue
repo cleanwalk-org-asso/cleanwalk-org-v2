@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import IconSearch from '../icons/icon-search.vue';
+import { Search } from 'lucide-vue-next';
+
 
 // Utilisation de defineModel pour permettre la liaison bidirectionnelle avec v-model
 const model = defineModel<string>();
@@ -30,7 +31,7 @@ const props = defineProps({
             :id="name"
             class="input"
         />
-        <IconSearch class="icon-search" />
+        <Search class="icon-search" />
     </div>
 </template>
 

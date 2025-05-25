@@ -2,9 +2,8 @@
 import { ref } from 'vue';
 import { useCleanwalkForm } from '@/composables/useAddCleanwalk'; // Import the composable
 import AutocompleteAddress from '@/components/base/AutocompleteAddress.vue';
-import iconMiniMap from '@/components/icons/icon-mini-map.vue';
-import iconClock from '@/components/icons/icon-clock.vue';
 import dragDrop from '@/components/dragDrop.vue';
+import { MapPin, Clock,  } from 'lucide-vue-next';
 import dateService from '@/services/dateService';
 import BaseInput from '@/components/base/BaseInput.vue';
 import BaseTextarea from '@/components/base/BaseTextarea.vue';
@@ -117,12 +116,12 @@ const getConseil = () => {
           <h3>{{ newCleanwalk.name }}</h3>
           <div class="date-locate">
             <div class="divtop">
-              <iconClock />
+              <Clock :size="16" />
               <div>{{ dateService.getCleanwalkWrittenDate(new Date(newCleanwalk.date_begin), newCleanwalk.duration) }}
               </div>
             </div>
             <div class="bot">
-              <iconMiniMap />
+              <MapPin :size="16" />
               <div>{{ newCleanwalk.address }}</div>
             </div>
           </div>

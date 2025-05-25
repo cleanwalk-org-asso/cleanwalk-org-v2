@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import iconMiniMap from '../icons/icon-mini-map.vue';
-import iconClock from '../icons/icon-clock.vue';
 import type { Cleanwalk } from '@/interfaces/cleanwalkInterface';
 import dateService from '@/services/dateService';
-import IconExternalLink from '../icons/icon-external-link.vue';
-import IconCross from '../icons/icon-cross.vue';
+import { Clock, MapPin, ExternalLink, X } from 'lucide-vue-next';
 
 //define props
 const props = defineProps<{
@@ -24,10 +21,10 @@ const defaultCover = '/src/assets/default_cover.webp'
         <img :src="props.cleanwalk.img_url ?? defaultCover" alt="cleanwalk image">
         <div class="btn-container">
             <router-link class="btn" :to="{ name: 'cleanwalk', params: { id: props.cleanwalk.id } }">
-                <IconExternalLink />
+                <ExternalLink color="#65707F" />
             </router-link>
             <button class="btn" @click="props.onClose()">
-                <IconCross />
+                <X color="#65707F" />
             </button>
         </div>
         <div class="container">
@@ -35,12 +32,12 @@ const defaultCover = '/src/assets/default_cover.webp'
             <div class="content">
                 <div class="title">{{ props.cleanwalk.name }}</div>
                 <div class="date">
-                    <icon-clock />
+                    <Clock :size="20" color="#363545" />
                     <div>{{ dateService.getCleanwalkWrittenDate(new Date(props.cleanwalk.date_begin), props.cleanwalk.duration) }}
                     </div>
                 </div>
                 <div>
-                    <iconMiniMap />
+                    <MapPin :size="20" color="#363545"/>
                     <div>{{ props.cleanwalk.address }}</div>
                 </div>
                 <p>
@@ -91,7 +88,6 @@ const defaultCover = '/src/assets/default_cover.webp'
 
         .btn {
             background-color: #E8E8E8;
-            stroke: #363545;
             display: flex;
             width: 2.5rem;
             height: 2.5rem;

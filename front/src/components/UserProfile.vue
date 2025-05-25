@@ -2,7 +2,6 @@
 import { watch, ref, onMounted, type Ref } from 'vue';
 import { useAccountStore } from '@/stores/AccountStore';
 import router from '@/router';
-import iconShuffleArrow from './icons/icon-shuffle-arrow.vue';
 import { v4 as uuidv4 } from 'uuid';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import type { Association } from '@/interfaces/userInterface';
@@ -10,6 +9,7 @@ import ProfileAssoAddon from './ProfileAssoAddon.vue';
 import BaseInput from './base/BaseInput.vue';
 import BaseTextarea from './base/BaseTextarea.vue';
 import LogoutButton from './buttons/LogoutButton.vue';
+import { RefreshCcw } from 'lucide-vue-next';
 
 const getToken = useAccountStore().getAccessToken;
 const showToast = useUtilsStore().showToast;
@@ -127,7 +127,7 @@ const changeUserPP = () => {
         <div class="img-user" v-if="currentUser?.role !== 'organization'">
             <img class="pp" :src="currentUser?.profile_picture" alt="cover-img">
             <div @click="changeUserPP()" class="icon-shuffle-arrow">
-                <iconShuffleArrow />
+                <RefreshCcw color="#fff" :size="20" />
             </div>
         </div>
         <div class="content">
@@ -202,12 +202,10 @@ const changeUserPP = () => {
       align-items: center;
       justify-content: center;
       border-radius: 9999px;
-      padding-right: 1px;
       padding-bottom: 1px;
       margin-top: -25px;
       z-index: 999;
       margin-right: -60px;
-      stroke: #fff;
       background-color: var(--color-primary);
       transition: transform 0.3s ease-in-out;
 

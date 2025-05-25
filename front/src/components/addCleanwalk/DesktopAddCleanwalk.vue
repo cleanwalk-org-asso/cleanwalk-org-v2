@@ -8,8 +8,8 @@ import router from '@/router';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import BaseTextarea from '@/components/base/BaseTextarea.vue';
 import dateService from '@/services/dateService';
-import IconClock from '@/components/icons/icon-clock.vue';
-import IconMiniMap from '@/components/icons/icon-mini-map.vue';
+import { Clock, MapPin } from 'lucide-vue-next';
+
 
 
 const titles = ref([
@@ -90,7 +90,8 @@ const back = () => {
         <div v-if="progress === 1">
           <BaseInput v-model="newCleanwalk.name" name="text" type="text" label="nom de la cleanwalk"
             placeholder="Saisissez le nom de votre événement" />
-          <AutocompleteAddress v-model:query="newCleanwalk.address" label="adresse" @select-suggestion="handleSelectAddress" />
+          <AutocompleteAddress v-model:query="newCleanwalk.address" label="adresse"
+            @select-suggestion="handleSelectAddress" />
         </div>
         <div v-if="progress === 2">
           <BaseInput v-if="progress === 2" v-model="dateCleanwalk.dateDay" name="date" type="date"
@@ -107,13 +108,13 @@ const back = () => {
           <h3>{{ newCleanwalk.name }}</h3>
           <div class="date-locate">
             <div class="divtop">
-              <IconClock />
+              <Clock :size="16" />
               <div>
                 {{ dateService.getCleanwalkWrittenDate(new Date(newCleanwalk.date_begin), newCleanwalk.duration) }}
               </div>
             </div>
             <div class="bot">
-              <IconMiniMap />
+              <MapPin :size="16" />
               <div>{{ newCleanwalk.address }}</div>
             </div>
           </div>
@@ -122,12 +123,13 @@ const back = () => {
 
 
       </div>
-      <div v-if="progress<=4" class="help">
+      <div v-if="progress <= 4" class="help">
         <h3>Aide</h3>
         <p>{{ getConseil() }}</p>
       </div>
       <div class="btn-container">
-        <button class="btn back" @click="back()" v-if="progress !== 1">{{ progress === 5 ? 'Modifier' : 'Précédent' }}</button>
+        <button class="btn back" @click="back()" v-if="progress !== 1">{{ progress === 5 ? 'Modifier' : 'Précédent'
+          }}</button>
         <div class="btn" v-else></div>
         <button class="btn next btn" @click="next()">{{ progress === 5 ? 'Publier' : 'Suivant' }}</button>
       </div>
@@ -255,9 +257,15 @@ const back = () => {
     }
   }
 
-
-
 }
+
+.date-locate {
+    div {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
 
 @media screen and (min-width: 1500px) {
   .progress {

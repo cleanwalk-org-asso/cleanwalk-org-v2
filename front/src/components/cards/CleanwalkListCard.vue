@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import iconMiniMap from '../icons/icon-mini-map.vue';
-import iconClock from '../icons/icon-clock.vue';
+// import iconMiniMap from '../icons/icon-mini-map.vue';
+// import iconClock from '../icons/icon-clock.vue';
+
+import { MapPin, Clock, Map } from 'lucide-vue-next';
 import type { Cleanwalk } from '@/interfaces/cleanwalkInterface';
 import dateService from '@/services/dateService';
 // Get cleanwalk from props
@@ -18,11 +20,11 @@ const defaultCover = '/src/assets/default_cover.webp'
 
             <div class="date-location"> 
                 <div>
-                    <icon-clock />
+                    <Clock :size="16" />
                     <div>{{ dateService.getCleanwalkWrittenDate(new Date(cleanwalk.date_begin), cleanwalk.duration) }}</div>
                 </div>
                 <div>
-                    <iconMiniMap />
+                    <MapPin :size="16" />
                     <div>{{ cleanwalk.address }}</div>
                 </div>
             </div>

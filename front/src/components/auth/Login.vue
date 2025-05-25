@@ -99,6 +99,9 @@ const login = async () => {
             Vous êtes nouveau chez cleanwalk.org : <span class="span">Inscrivez-vous</span>
         </router-link>
     </div>
+    <router-link :to="{name:'home'}" class="danger-button">
+        Retour à la page d'accueil
+    </router-link>
 </template>
 
 <style scoped lang="scss">

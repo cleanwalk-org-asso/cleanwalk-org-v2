@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import iconCross from '../icons/icon-cross.vue';
 import { useAccountStore } from '@/stores/AccountStore';
 
 const lougout = useAccountStore().logout;

@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import iconLogout from '@/components/icons/icon-logout.vue';
-import iconRightArrow from '@/components/icons/icon-right-arrow.vue';
 import LogoutPopup from '../popups/LogoutPopup.vue';
+import { ChevronRight, LogOut } from 'lucide-vue-next';
 
 
 // Define props
@@ -26,9 +25,9 @@ const togglePopup = () => {
     <LogoutPopup :is-visible="isPopupVisible" :toggle-popup="togglePopup" />
     
     <button @click="togglePopup()" class="logout">
-      <iconLogout />
+      <LogOut />
       <h3>Se Déconnecter</h3>
-      <iconRightArrow class="arrow"/>
+      <ChevronRight />
     </button>
   </div>
 </template>

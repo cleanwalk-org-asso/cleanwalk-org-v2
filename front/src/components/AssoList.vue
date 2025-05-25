@@ -5,6 +5,10 @@ import { useUtilsStore } from '@/stores/UtilsStore'
 import { type Association } from '@/interfaces/userInterface'
 import defaultBanner from '../assets/default-banner.svg'
 import SearchBar from './SearchBar.vue'
+import { useDevice } from '@/composables/useDevice'
+
+const { isMobile } = useDevice();
+
 
 const showToast = useUtilsStore().showToast
 const accountStore = useAccountStore()
@@ -14,7 +18,9 @@ const searchInput = ref('') // La valeur de recherche
 
 // Récupération des associations lors du montage du composant
 onMounted(async () => {
+    console.log('Récupération des associations...', assoList.value)
     assoList.value = await accountStore.getAssoList()
+    console.log(assoList.value)
     if (!assoList.value) {
         showToast('Erreur lors de la récupération des associations', false)
     }
@@ -32,12 +38,12 @@ const filteredAssoList = computed(() => {
 </script>
 
 <template>
-  <SearchBar :searchInput="searchInput" @updateSearch="searchInput = $event" />
+  <SearchBar v-if="isMobile" :searchInput="searchInput" @updateSearch="searchInput = $event" />
   <section class="container">
     <router-link
-      :to="{ name: 'association', params: { name: asso.name } }"
+      :to="{ name: 'association', params: { id: asso.id } }"
       v-for="asso in filteredAssoList"
-      :key="asso.name"
+      :key="asso.id || asso.name"
       class="asso-card"
     >
       <img :src="asso.banner_img || defaultBanner" alt="cover-img" class="cover" />

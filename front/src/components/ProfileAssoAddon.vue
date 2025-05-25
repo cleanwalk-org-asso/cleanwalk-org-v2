@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { onMounted, ref, type Ref } from 'vue';
-import iconPhoto from './icons/icon-photo.vue';
 import { useAccountStore } from '@/stores/AccountStore';
 import apiService from '@/services/apiService';
 import type { ApiResponse } from '@/interfaces/apiResponseInterface';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import type { Association } from '@/interfaces/userInterface';
 import { FolderType } from '@/interfaces/FolderUploadinterfaces';
+import { Camera } from 'lucide-vue-next';
 
 
 const showToast = useUtilsStore().showToast;
@@ -70,14 +70,14 @@ const uploadBanner = async () => {
         <div class="input-area banner" :style="currentBanner ? { backgroundImage: `url(${currentBanner})` } : {}"
             @click="fileInputBanner?.click()">
             <input type="file" ref="fileInputBanner" @change="uploadBanner" style="display: none;" />
-            <iconPhoto class="iconPhoto" />
+            <Camera class="iconPhoto" />
         </div>
 
         <!-- Profile Picture Area -->
         <div class="input-area pp" :style="{ backgroundImage: `url(${currentPP})` }"
             @click="fileInputPP?.click()">
             <input type="file" ref="fileInputPP" @change="uploadProfilePicture" style="display: none;" />
-            <iconPhoto class="iconPhoto pp" />
+            <Camera class="iconPhoto pp" />
         </div>
     </div>
 </template>

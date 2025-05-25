@@ -1,10 +1,5 @@
 <script setup lang="ts">
-import iconRightArrow from '@/components/icons/icon-right-arrow.vue';
-import iconCalendar from '@/components/icons/icon-calendar.vue';
-import iconSettings from '@/components/icons/icon-settings.vue';
-import iconBackTime from '@/components/icons/icon-back-time.vue';
-import iconFile from '@/components/icons/icon-file.vue';
-import iconPaperPlane from '@/components/icons/icon-paper-plane.vue';
+import { CalendarDays, Settings, History, File, Send, ChevronRight } from 'lucide-vue-next';
 import { useAccountStore } from '@/stores/AccountStore';
 import DeleteAccountButton from './buttons/DeleteAccountButton.vue';
 import LogoutButton from './buttons/LogoutButton.vue';
@@ -18,43 +13,43 @@ const currentUser = accountStore.CurrentUser!;
         <router-link v-if="currentUser" :to="{name: 'menuProfile'}" class="profil">
             <img class="img" :src="currentUser.profile_picture" alt="profile picture" />
             <h3>{{ currentUser.name }}</h3>
-            <iconRightArrow />
+            <ChevronRight />
         </router-link>
         <div v-if="!currentUser" class="unlog-profiles">
             <router-link :to="{name: 'login'}" class="profil unlog">
                 <h3>Se connecter</h3>
-                <iconRightArrow />
+                <ChevronRight/>
             </router-link>
             <router-link :to="{name: 'signup'}" class="profil unlog">
                 <h3>S'inscrire</h3>
-                <iconRightArrow />
+                <ChevronRight/>
             </router-link>
         </div>
         <ul class="list">
             <li v-if="currentUser">
-                <iconCalendar />
+                <CalendarDays />
                 <h3>Mes évènements</h3>
-                <iconRightArrow />
+                <ChevronRight :size="22"/>
             </li>
             <li>
-                <iconSettings />
+                <Settings />
                 <h3>Paramètres</h3>
-                <iconRightArrow />
+                <ChevronRight :size="22"/>
             </li>
             <li>
-                <iconBackTime />
+                <History />
                 <h3>L'histoire de Cleanwalk.org</h3>
-                <iconRightArrow />
+                <ChevronRight :size="22"/>
             </li>
             <li>
-                <iconFile />
+                <File />
                 <h3>Guide de la cleanwalk</h3>
-                <iconRightArrow />
+                <ChevronRight :size="22"/>
             </li>
             <li>
-                <iconPaperPlane />
+                <Send />
                 <h3>Nous contacter</h3>
-                <iconRightArrow />
+                <ChevronRight :size="22"/>
             </li>
         </ul>
 
