@@ -19,7 +19,8 @@ const {
   dateCleanwalk,
   handleSelectAddress,
   setDate,
-  upload
+  upload,
+  clearStorage
 } = useCleanwalkForm(); // Destructure the composable to access the data and methods
 
 const progress = ref(1);
@@ -59,6 +60,30 @@ const back = () => {
     return;
   }
   progress.value -= 1;
+};
+
+// Function to clear form cache
+const clearFormCache = () => {
+  clearStorage();
+  // Reset form values
+  Object.assign(newCleanwalk.value, {
+    name: "",
+    description: "",
+    img_url: "",
+    date_begin: "",
+    duration: 0,
+    pos_lat: 0,
+    pos_long: 0,
+    address: "",
+    city: "",
+  });
+  Object.assign(dateCleanwalk.value, {
+    dateDay: undefined,
+    hourBegin: '',
+    hourEnd: ''
+  });
+  progress.value = 1;
+  showToast('Formulaire réinitialisé', true);
 };
 
 const titles = ref([

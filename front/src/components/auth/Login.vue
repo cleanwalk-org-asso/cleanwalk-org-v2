@@ -98,13 +98,23 @@ const login = async () => {
         <router-link :to="{name:'signup'}" class="go-signup">
             Vous êtes nouveau chez cleanwalk.org : <span class="span">Inscrivez-vous</span>
         </router-link>
+        <router-link :to="{name:'home'}" class="link">
+            Retour à la page d'accueil
+        </router-link>
     </div>
-    <router-link :to="{name:'home'}" class="danger-button">
-        Retour à la page d'accueil
-    </router-link>
 </template>
 
 <style scoped lang="scss">
+
+.link {
+    color: var(--text-color-secondary);
+    width: 100%;
+    text-align: left;
+    margin-top: 2rem;
+
+    text-decoration: underline;
+
+}
 .login-container {
     display: flex;
     flex-direction: column;
@@ -140,7 +150,6 @@ const login = async () => {
 
 .go-signup {
     color: var(--text-color-secondary);
-    font-size: 12px;
     width: 100%;
     text-align: left;
     margin-top: 2rem;

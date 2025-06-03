@@ -35,6 +35,7 @@ const togglePopup = () => {
 <style scoped lang="scss">
 .logout-button-container {
   width: 100%;
+
   
   .logout {
     stroke: #FF5757;

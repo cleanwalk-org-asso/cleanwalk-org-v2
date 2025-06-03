@@ -8,7 +8,7 @@ import router from '@/router';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import BaseTextarea from '@/components/base/BaseTextarea.vue';
 import dateService from '@/services/dateService';
-import { Clock, MapPin } from 'lucide-vue-next';
+import { Clock, MapPin, Trash } from 'lucide-vue-next';
 
 
 
@@ -30,6 +30,7 @@ const {
   handleSelectAddress,
   setDate,
   upload,
+  clearStorage,
 } = useCleanwalkForm(); // Destructure the composable to access the data and methods
 
 const progress = ref(1);
@@ -79,13 +80,41 @@ const back = () => {
   progress.value -= 1;
 };
 
+// Function to clear form cache
+const clearFormCache = () => {
+  clearStorage();
+  // Reset form values
+  Object.assign(newCleanwalk.value, {
+    name: "",
+    description: "",
+    img_url: "",
+    date_begin: "",
+    duration: 0,
+    pos_lat: 0,
+    pos_long: 0,
+    address: "",
+    city: "",
+  });
+  Object.assign(dateCleanwalk.value, {
+    dateDay: undefined,
+    hourBegin: '',
+    hourEnd: ''
+  });
+  progress.value = 1;
+  showToast('Formulaire réinitialisé', true);
+};
+
 </script>
 
 <template>
   <section class="section">
     <div class="container">
-      <h1>Organiser un ramassage</h1>
-      <h2>{{ titles[progress - 1] }}</h2>
+      <div class="header">
+        <div>
+          <h1>Organiser un ramassage</h1>
+          <h2>{{ titles[progress - 1] }}</h2>
+        </div>
+      </div>
       <div class="form">
         <div v-if="progress === 1">
           <BaseInput v-model="newCleanwalk.name" name="text" type="text" label="nom de la cleanwalk"
@@ -144,11 +173,44 @@ const back = () => {
         <li :class="{ active: progress === 4 }">Photo et visuel</li>
         <li :class="{ active: progress === 5 }">Aperçu</li>
       </ul>
+      <button @click="clearFormCache" class="clear-cache-btn" title="Réinitialiser le formulaire">
+          <Trash :size="16" />
+          <div>Vider le cache</div>
+      </button>
     </div>
   </section>
 </template>
 
+
+
 <style lang="scss" scoped>
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.clear-cache-btn {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    color: #6c757d;
+    line-height: 1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &:hover {
+      background: #e9ecef;
+      color: #495057;
+    }
+  }
+
 .btn-container {
   display: flex;
   justify-content: space-between;
@@ -159,7 +221,7 @@ const back = () => {
 
   .btn {
     flex: 1;
-    padding: 1.25rem;
+    padding: 1rem 1.25rem;
     font-weight: 700;
     font-size: 1.125rem;
     border-radius: 8px;
