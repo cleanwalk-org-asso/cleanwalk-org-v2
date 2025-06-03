@@ -34,7 +34,7 @@ let currentCleanwalk: Ref<SingleCleanwalk | undefined> = ref(undefined);
 
 onMounted(async () => {
   if (!accountStore.CurrentUser?.id) {
-    router.push({name: 'login'});
+    router.push({name: 'login', query: { redirect: router.currentRoute.value.fullPath }});
   }
   const cleanwalkId = route.params.id;
   if (!cleanwalkId) {

@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import iconAdd from './icons/icon-add.vue';
+import { Plus } from 'lucide-vue-next';
 </script>
 
 <template>
     <section class="container">
         <h1>Que souhaitez vous ajouter ?</h1>
         <router-link class="add" :to="{ name: 'addCleanwalk'}">
-            <icon-add />
+            <Plus />
             <div>Ajouter une cleanwalk</div>
         </router-link>
         <router-link class="add" :to="{ name: 'addArticle'}">
-            <icon-add />
+            <Plus />
             <div>Ajouter un article</div>
         </router-link>
     </section>

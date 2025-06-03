@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import iconLeftArrow from './icons/icon-left-arrow.vue';
-import iconInfo from './icons/icon-info.vue';
+
+import { ChevronLeft } from 'lucide-vue-next';
+
 import { useDevice } from '@/composables/useDevice';
 
 const { isMobile } = useDevice();
@@ -16,7 +17,7 @@ const props = defineProps({
 <template>
   <div class="top-bar" v-if="isMobile" >
     <router-link class="back" :to="backUrl" v-if="backUrl">
-      <iconLeftArrow />
+      <ChevronLeft color="#fff" />
     </router-link>
     <h2>{{ pageName }}</h2>
   </div>
@@ -30,7 +31,6 @@ const props = defineProps({
   width: 100vw;
   z-index: 999;
   background-color: var(--color-primary);
-  stroke: #fff;
   display: flex;
   padding: 0px;
   justify-content: space-between;
@@ -41,11 +41,6 @@ const props = defineProps({
     position: absolute;
     top: 1rem;
     left: 20px;
-
-    svg {
-      width: 24px;
-      height: 24px;
-    }
   }
 
   h2 {

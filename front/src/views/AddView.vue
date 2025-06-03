@@ -6,5 +6,4 @@ import Add from '@/components/AddChoice.vue';
 <template>
     <TopBar page-name="Ajouter" />
     <Add />
-    <navBar />
 </template>

@@ -6,8 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import router from '@/router';
 import BaseInput from '@/components/base/BaseInput.vue';
-import IconPerson from '@/components/icons/icon-person.vue';
-import IconAsso from '@/components/icons/icon-asso.vue';
+import { User, Users } from 'lucide-vue-next';
 
 const showToast = useUtilsStore().showToast;
 
@@ -71,11 +70,11 @@ const signup = async () => {
             <div class="line"></div> -->
         <div class="choice-container">
             <router-link :to="{ name: 'signupPerso' }" class="choice">
-                <IconPerson class="choice-icon" />
+                <User :size="28" />
                 <span>Compte personnel</span>
             </router-link>
             <router-link :to="{ name: 'signupAsso'}" class="choice">
-                <IconAsso class="choice-icon" />
+                <Users :size="28" />
                 <span>Compte association</span>
             </router-link>
         </div>

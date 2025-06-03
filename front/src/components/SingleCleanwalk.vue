@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import type { SingleCleanwalk } from '@/interfaces/cleanwalkInterface'
-import iconClock from './icons/icon-clock.vue';
-import iconMiniMap from './icons/icon-mini-map.vue';
 import { onMounted, ref, onUnmounted, computed } from 'vue';
 import router from '@/router';
 import dateService from '@/services/dateService';
@@ -12,6 +10,7 @@ import MapSoloCw from '@/components/map/MapSoloCw.vue';
 import TopBar from './TopBar.vue';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
+import { Clock, MapPin } from 'lucide-vue-next';
 
 const cleanwalkStore = useCleanwalkStore();
 const currenUserId = ref(useAccountStore().CurrentUser?.id);
@@ -52,7 +51,7 @@ const getDate = () => {
 
 const leaveCleanwalk = async () => {
   if (!cleanwalk.value || !currenUserId.value || !token.value) {
-    router.push({ name: 'login' });
+    router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } });
     return;
   }
   await cleanwalkStore.leaveCleanwalk(cleanwalk.value.id, token.value, currenUserId.value);
@@ -68,7 +67,7 @@ const leaveCleanwalk = async () => {
 
 const handleJoinCleanwalk = async (data: { participantCount: number, isAnonymous: boolean }) => {
   if (!cleanwalk.value || !currenUserId.value || !token.value) {
-    router.push({ name: 'login' });
+    router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } });
     return;
   }
   await cleanwalkStore.joinCleanwalk(cleanwalk.value.id, token.value, data.participantCount, currenUserId.value);
@@ -84,7 +83,7 @@ const handleJoinCleanwalk = async (data: { participantCount: number, isAnonymous
 
 const actionButton = () => {
   if (!cleanwalk.value || !currenUserId.value || !token.value) {
-    router.push({ name: 'login' });
+    router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } });
     return;
   }
   if (cleanwalk.value.host.author_id === currenUserId.value) {
@@ -143,29 +142,29 @@ onUnmounted(() => {
 <template>
   <TopBar backUrl="/" pageName="Cleanwalk" />
   <LeaveCwPopup :isVisible="showLeaveCwPopup" :tooglePopup="toogleLeaveCwPopup" :leaveCw="leaveCleanwalk" />
-  <ParticipationPopup :isVisible="showParticipationPopup" @close="toggleParticipationPopup" @confirm="handleJoinCleanwalk" />
+  <ParticipationPopup :isVisible="showParticipationPopup" @close="toggleParticipationPopup" @confirm="handleJoinCleanwalk" format="screen" />
   
   <main>
     <div>
-      <img v-if="cleanwalk" class="cover" :src="cleanwalk?.img_url" alt="cover image" />
+      
     </div>
 
     <div class="desktop-layout" v-if="isDesktop && cleanwalk">
       <div class="container">
+        <img v-if="cleanwalk" class="cover" :src="cleanwalk?.img_url" alt="cover image" />
         <h1>{{ cleanwalk?.name }}</h1>
         <div class="date-location">
           <div class="top">
-            <icon-clock />
+            <Clock :size="16" color="#363545"/>
             <div>{{ getDate() }}</div>
           </div>
           <div class="bot">
-            <iconMiniMap />
+            <MapPin :size="16" color="#363545"/>
             <div>{{ cleanwalk?.address }}</div>
           </div>
         </div>
         
         <div class="map-links">
-          <!-- Conditionally show Apple Maps or Google Maps depending on device -->
           <a v-if="isIOS" 
              :href="`https://maps.apple.com/?q=${cleanwalk?.address}&ll=${cleanwalk?.pos_lat},${cleanwalk?.pos_long}`"
              target="_blank">
@@ -220,64 +219,64 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- Mobile layout -->
     <div class="container" v-if="!isDesktop">
-      <h1>{{ cleanwalk?.name }}</h1>
-      <div class="date-location">
-        <div class="top">
-          <icon-clock />
-          <div>{{ getDate() }}</div>
+      <img v-if="cleanwalk" class="cover" :src="cleanwalk?.img_url" alt="cover image" />
+      <div class="content">
+        <h1>{{ cleanwalk?.name }}</h1>
+        <div class="date-location">
+          <div class="top">
+            <Clock :size="16" color="#363545"/>
+            <div>{{ getDate() }}</div>
+          </div>
+          <div class="bot">
+            <MapPin :size="16" color="#363545"/>
+            <div>{{ cleanwalk?.address }}</div>
+          </div>
         </div>
-        <div class="bot">
-          <iconMiniMap />
-          <div>{{ cleanwalk?.address }}</div>
+        
+        <div class="map-links">
+          <a v-if="isIOS" 
+             :href="`https://maps.apple.com/?q=${cleanwalk?.address}&ll=${cleanwalk?.pos_lat},${cleanwalk?.pos_long}`"
+             target="_blank">
+            <img src="../assets/appleMap.svg" alt="Apple Maps logo">
+            <h4>Ouvrir dans Plans</h4>
+          </a>
+          <a v-else
+             :href="`https://www.google.com/maps/?q=${cleanwalk?.pos_lat},${cleanwalk?.pos_long}`"
+             target="_blank">
+            <img src="../assets/googleMap.svg" alt="Google Maps logo">
+            <h4>Ouvrir dans Google Maps</h4>
+          </a>
+  
+          <a :href="`https://www.openstreetmap.org/?mlat=${cleanwalk?.pos_lat}&mlon=${cleanwalk?.pos_long}`"
+            target="_blank">
+            <img src="../assets/osm_logo.webp" alt="OpenStreetMap logo">
+            <h4>Ouvrir dans OpenStreetMap</h4>
+          </a>
         </div>
-      </div>
-      
-      <div class="map-links">
-        <!-- Conditionally show Apple Maps or Google Maps depending on device -->
-        <a v-if="isIOS" 
-           :href="`https://maps.apple.com/?q=${cleanwalk?.address}&ll=${cleanwalk?.pos_lat},${cleanwalk?.pos_long}`"
-           target="_blank">
-          <img src="../assets/appleMap.svg" alt="Apple Maps logo">
-          <h4>Ouvrir dans Plans</h4>
-        </a>
-        <a v-else
-           :href="`https://www.google.com/maps/?q=${cleanwalk?.pos_lat},${cleanwalk?.pos_long}`"
-           target="_blank">
-          <img src="../assets/googleMap.svg" alt="Google Maps logo">
-          <h4>Ouvrir dans Google Maps</h4>
-        </a>
-
-        <!-- Always show OpenStreetMap -->
-        <a :href="`https://www.openstreetmap.org/?mlat=${cleanwalk?.pos_lat}&mlon=${cleanwalk?.pos_long}`"
-          target="_blank">
-          <img src="../assets/osm_logo.webp" alt="OpenStreetMap logo">
-          <h4>Ouvrir dans OpenStreetMap</h4>
-        </a>
-      </div>
-      
-      <div v-if="cleanwalk?.host.author_id === currenUserId">
-        {{ cleanwalk?.participant_count }} participant(s)
-      </div>
-      
-      <div class="orga">
-        <div class="left">
-          <div>organisé par:</div>
-          <h2> {{ cleanwalk?.host?.name }} </h2>
+        
+        <div v-if="cleanwalk?.host.author_id === currenUserId">
+          {{ cleanwalk?.participant_count }} participant(s)
         </div>
-        <div class="right" v-if="cleanwalk?.host?.profile_picture">
-          <img :src="cleanwalk.host.profile_picture" alt="profile-picture">
+        
+        <div class="orga">
+          <div class="left">
+            <div>organisé par:</div>
+            <h2> {{ cleanwalk?.host?.name }} </h2>
+          </div>
+          <div class="right" v-if="cleanwalk?.host?.profile_picture">
+            <img :src="cleanwalk.host.profile_picture" alt="profile-picture">
+          </div>
         </div>
+        
+        <button class="button-primary" @click="actionButton()">
+          {{ getActionButtonText() }}
+        </button>
+        
+        <p class="description">
+          {{ cleanwalk?.description }}
+        </p>
       </div>
-      
-      <button class="button-primary" @click="actionButton()">
-        {{ getActionButtonText() }}
-      </button>
-      
-      <p class="description">
-        {{ cleanwalk?.description }}
-      </p>
     </div>
   </main>
 </template>
@@ -293,15 +292,17 @@ main {
   width: 100vw;
   object-fit: cover;
   aspect-ratio: 21/9;
-  margin-top: 58px;
 
   @media (min-width: 768px) {
-    height: 20rem;
+    height: 12rem;
     width: 100%;
+    margin-top: 3rem;
+    border-radius: 8px;
   }
 }
 
 .desktop-layout {
+  
   display: flex;
   width: 90%;
   max-width: 1200px;
@@ -333,8 +334,16 @@ main {
 }
 
 .container {
-  padding: 0 26px;
   font-size: 12px;
+  padding-top: 3.5rem;
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0 26px;
+
+  }
 
   .description {
     width: 100%;

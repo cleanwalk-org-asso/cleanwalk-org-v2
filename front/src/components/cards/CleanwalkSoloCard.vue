@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import iconMiniMap from '../icons/icon-mini-map.vue';
-import iconClock from '../icons/icon-clock.vue';
 import type { Cleanwalk } from '@/interfaces/cleanwalkInterface';
 import dateService from '@/services/dateService';
-import IconExternalLink from '../icons/icon-external-link.vue';
-import IconCross from '../icons/icon-cross.vue';
+import { Clock, MapPin, ExternalLink, X } from 'lucide-vue-next';
+import ParticipationPopup from '../popups/ParticipationPopup.vue';
+import LeaveCwPopup from '../popups/LeaveCwPopup.vue';
+import { onMounted, ref } from 'vue';
+import router from '@/router';
+import { useAccountStore } from '@/stores/AccountStore';
+import { useUtilsStore } from '@/stores/UtilsStore';
+import { useCleanwalkStore } from '@/stores/CleanwalkStore';
 
 //define props
 const props = defineProps<{
@@ -12,10 +16,115 @@ const props = defineProps<{
     onClose: Function
 }>()
 
-
-
+const cleanwalkStore = useCleanwalkStore();
+const currenUserId = ref(useAccountStore().CurrentUser?.id);
+const token = ref(useAccountStore().getAccessToken());
+const showToast = useUtilsStore().showToast;
 
 const defaultCover = '/src/assets/default_cover.webp'
+const showParticipationPopup = ref(false);
+const showLeaveCwPopup = ref(false);
+
+const currenCleanwalkParticipation = ref<{
+    is_participant: boolean,
+    is_host: boolean
+} | null>(null);
+
+onMounted(async() => {
+    //check if user is participating in the cleanwalk
+    if (!props.cleanwalk.id || !currenUserId.value) {
+        return;
+    }
+    currenCleanwalkParticipation.value = await cleanwalkStore.checkUserParticipation(props.cleanwalk.id!, currenUserId.value!);
+    
+});
+
+const toggleParticipationPopup = () => {
+    showParticipationPopup.value = !showParticipationPopup.value;
+}
+
+const toggleLeaveCwPopup = () => {
+    showLeaveCwPopup.value = !showLeaveCwPopup.value;
+}
+
+const handleJoinCleanwalk = async (data: { participantCount: number, isAnonymous: boolean }) => {
+    if (!props.cleanwalk || !currenUserId.value || !token.value) {
+        router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } });
+        return;
+    }
+    
+    try {
+        await cleanwalkStore.joinCleanwalk(props.cleanwalk.id!, token.value, data.participantCount, currenUserId.value);
+        
+        // Update participation status
+        currenCleanwalkParticipation.value = {
+            is_participant: true,
+            is_host: false
+        };
+        
+        showToast('Inscription réussie', true);
+        toggleParticipationPopup();
+    } catch (error) {
+        showToast('Erreur lors de l\'inscription', false);
+        console.error('Error joining cleanwalk:', error);
+    }
+}
+
+const leaveCleanwalk = async () => {
+    if (!props.cleanwalk || !currenUserId.value || !token.value) {
+        router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } });
+        return;
+    }
+    
+    try {
+        await cleanwalkStore.leaveCleanwalk(props.cleanwalk.id!, token.value, currenUserId.value);
+        
+        // Update participation status
+        currenCleanwalkParticipation.value = {
+            is_participant: false,
+            is_host: false
+        };
+        
+        showToast('Désinscription réussie', true);
+        toggleLeaveCwPopup();
+    } catch (error) {
+        showToast('Erreur lors de la désinscription', false);
+        console.error('Error leaving cleanwalk:', error);
+    }
+}
+
+const ShowParticipationPopup = () => {
+    if (!currenUserId.value || !token.value) {
+        router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } });
+        return;
+    }
+    
+    // Check if user is the host
+    if (currenCleanwalkParticipation.value?.is_host) {
+        // Redirect to edit cleanwalk
+        router.push({ name: 'editCleanwalk', params: { id: props.cleanwalk.id!.toString() } });
+        return;
+    }
+    
+    // Check if user is already participating
+    if (currenCleanwalkParticipation.value?.is_participant) {
+        // Show leave popup
+        toggleLeaveCwPopup();
+    } else {
+        // Show participation popup
+        toggleParticipationPopup();
+    }
+}
+
+const getButtonParticipationText = () => {
+    if (currenCleanwalkParticipation.value?.is_host) {
+        return 'Éditer la cleanwalk';
+    } else if (currenCleanwalkParticipation.value?.is_participant) {
+        return 'Se désinscrire';
+    } else {
+        return 'S\'inscrire';
+    }
+}
 
 </script>
 
@@ -24,23 +133,29 @@ const defaultCover = '/src/assets/default_cover.webp'
         <img :src="props.cleanwalk.img_url ?? defaultCover" alt="cleanwalk image">
         <div class="btn-container">
             <router-link class="btn" :to="{ name: 'cleanwalk', params: { id: props.cleanwalk.id } }">
-                <IconExternalLink />
+                <ExternalLink color="#65707F" />
             </router-link>
             <button class="btn" @click="props.onClose()">
-                <IconCross />
+                <X color="#65707F" />
             </button>
         </div>
         <div class="container">
-            
+            <LeaveCwPopup :isVisible="showLeaveCwPopup" :tooglePopup="toggleLeaveCwPopup" :leaveCw="leaveCleanwalk" />
+            <ParticipationPopup 
+                :is-visible="showParticipationPopup" 
+                format="card" 
+                @close="toggleParticipationPopup"
+                @confirm="handleJoinCleanwalk"
+            />
             <div class="content">
                 <div class="title">{{ props.cleanwalk.name }}</div>
                 <div class="date">
-                    <icon-clock />
+                    <Clock :size="20" color="#363545" />
                     <div>{{ dateService.getCleanwalkWrittenDate(new Date(props.cleanwalk.date_begin), props.cleanwalk.duration) }}
                     </div>
                 </div>
                 <div>
-                    <iconMiniMap />
+                    <MapPin :size="20" color="#363545"/>
                     <div>{{ props.cleanwalk.address }}</div>
                 </div>
                 <p>
@@ -57,8 +172,8 @@ const defaultCover = '/src/assets/default_cover.webp'
                         {{ props.cleanwalk.host!.name }}
                     </h3>
                 </div>
-                <button class="action-button">
-                    S'inscrire
+                <button class="action-button" @click="ShowParticipationPopup()">
+                    {{ getButtonParticipationText() }}
                 </button>
             </div>
         </div>
@@ -91,7 +206,6 @@ const defaultCover = '/src/assets/default_cover.webp'
 
         .btn {
             background-color: #E8E8E8;
-            stroke: #363545;
             display: flex;
             width: 2.5rem;
             height: 2.5rem;

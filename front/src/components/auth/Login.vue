@@ -6,20 +6,29 @@ import type { User } from '@/interfaces/userInterface';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import { GoogleLogin } from 'vue3-google-login';
 import BaseInput from '@/components/base/BaseInput.vue';
+import { type CallbackTypes } from 'vue3-google-login';
+import { useRouter, useRoute } from 'vue-router';
 
 const router = useRouter();
-
+const route = useRoute();
 const accountStore = useAccountStore();
 const showToast = useUtilsStore().showToast;
-import { type CallbackTypes } from 'vue3-google-login';
-import { useRouter } from 'vue-router';
 
 const email = ref("");
 
 const password = ref("");
 
 const callbackGoogleLogin: CallbackTypes.CredentialCallback = async (response) => {
-    await accountStore.googleLoginSignup(response.credential);
+    const result = await accountStore.googleLoginSignup(response.credential);
+    if (result) {
+        // Rediriger l'utilisateur vers la page d'origine s'il y en a une, sinon vers la page d'accueil
+        const redirectPath = route.query.redirect as string;
+        if (redirectPath) {
+            router.push(redirectPath);
+        } else {
+            router.push({ name: 'home' });
+        }
+    }
 };
 
 const login = async () => {
@@ -49,8 +58,15 @@ const login = async () => {
         role: response.data.role as "organization" | "user",
     }
     accountStore.CurrentUser = user;
-    router.push({ name: 'home' });
     accountStore.setToken(response.data.access_token as string);
+    
+    // Rediriger l'utilisateur vers la page d'origine s'il y en a une, sinon vers la page d'accueil
+    const redirectPath = route.query.redirect as string;
+    if (redirectPath) {
+        router.push(redirectPath);
+    } else {
+        router.push({ name: 'home' });
+    }
 
 }
 
@@ -83,6 +99,9 @@ const login = async () => {
             Vous êtes nouveau chez cleanwalk.org : <span class="span">Inscrivez-vous</span>
         </router-link>
     </div>
+    <router-link :to="{name:'home'}" class="danger-button">
+        Retour à la page d'accueil
+    </router-link>
 </template>
 
 <style scoped lang="scss">

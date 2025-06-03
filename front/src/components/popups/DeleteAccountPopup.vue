@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import iconCross from '../icons/icon-cross.vue';
 import { useAccountStore } from '@/stores/AccountStore';
+import { X } from 'lucide-vue-next';
 const accountStore = useAccountStore();
 // Assuming you have a deleteAccount method in your store
 
@@ -17,7 +17,7 @@ defineProps({
 <template>
   <div v-if="isVisible" class="popup" @click="togglePopup!">
     <div class="popup-content" @click.stop>
-      <div class="cross"><iconCross @click="togglePopup!" /></div>
+      <div class="cross"><X @click="togglePopup!" /></div>
       <h2>Clôturer son compte</h2>
       <p>Êtes-vous certain de vouloir clôturer votre compte ? Cette action est irréversible et toutes vos données seront définitivement supprimées.</p>
       <div class="btn-container">

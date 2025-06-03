@@ -13,5 +13,4 @@ const { isMobile } = useDevice();
     <TopBar v-if="isMobile" back-url="/add" page-name="Ajouter une cleanwalk" />
     <MobileAddCleanwalk v-if="isMobile" />
     <DesktopAddCleanwalk v-if="!isMobile" />
-    <navBar />
 </template>

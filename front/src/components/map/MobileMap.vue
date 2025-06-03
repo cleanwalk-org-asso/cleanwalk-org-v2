@@ -3,18 +3,14 @@ import "leaflet/dist/leaflet.css";
 import { LMap, LTileLayer, LMarker, LIcon } from "@vue-leaflet/vue-leaflet";
 import L, { LatLng, LatLngBounds, type PointExpression } from "leaflet";
 import { ref, type Ref, onMounted, nextTick } from "vue";
-import iconLeftArrow from "@/components/icons/icon-left-arrow.vue";
-import iconSearch from "@/components/icons/icon-search.vue";
-import iconInfo from "@/components/icons/icon-info.vue";
+import { Clock, Search, Info, MapPin, ChevronLeft } from "lucide-vue-next";
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
-import iconClock from '@/components/icons/icon-clock.vue';
-import iconMiniMap from '@/components/icons/icon-mini-map.vue';
 import dateService from "@/services/dateService";
 import cleanwalkCard from '@/components/cards/CleanwalkListCard.vue';
 import { useAccountStore } from "@/stores/AccountStore";
-import greenMapIcon from "@/assets/green-map.svg";
-import blueMapIcon from "@/assets/blue-map.svg";
 import { useCleanwalkMap } from "@/composables/useCleanwalkMap";
+import blueMapIcon from "@/assets/blue-map.svg";
+import greenMapIcon from "@/assets/green-map.svg";
 
 const {
     mapInstance,
@@ -169,18 +165,18 @@ function mapClickEvent() {
             <img class="logo" src="../../assets/logo.svg" alt="logo" v-if="!cardListBool">
             <div class="search-bar" :class="{ 'active': cardListBool, 'base': !cardListBool }">
                 <button @click="backButton()">
-                    <iconLeftArrow />
+                    <ChevronLeft color="#94A3B8" />
                 </button>
                 <input @click="hideCleanwalkList()" name="search" autocomplete="off" type="text" placeholder="Rechercher une cleanwalk" v-model="searchInput" />
                 <label for="search" @click="cardListBool = true">
-                    <iconSearch />
+                    <Search color="#94A3B8" :size="20" />
                 </label>
             </div>
             <RouterLink to="/menu/profile" class="pp" v-if="userImg">
                 <img :src="userImg" alt="user img">
             </RouterLink>
             <button class="info" v-else>
-                <iconInfo />
+                <Info color="#94A3B8"/>
             </button>
         </div>
         <div ref="draggableCard" class="draggable-card">
@@ -194,11 +190,11 @@ function mapClickEvent() {
                 <router-link :to="{name: 'cleanwalk', params:{id: selectedCleanwalk.id}}" class="flex-container">
                     <div class="left">
                         <div class="top">
-                            <icon-clock />
+                            <Clock :size="16"/>
                             <div>{{ dateService.getCleanwalkWrittenDate( new Date(selectedCleanwalk.date_begin), selectedCleanwalk.duration) }}</div>
                         </div>
                         <div class="bot">
-                            <iconMiniMap />
+                            <MapPin :size="16" />
                             <div>{{ selectedCleanwalk.address }}</div>
                         </div>
                     </div>
@@ -269,11 +265,6 @@ main {
             width: 38px;
             height: 38px;
             margin-left: 8px;
-
-            svg {
-                stroke: #94A3B8;
-            }
-
         }
 
         .search-bar {
@@ -298,16 +289,8 @@ main {
                 }
 
                 label {
-                    padding: 0 10px;
-                }
-
-                
-
-                svg {
-                    stroke: #94A3B8;
-                    width: 24px;
-                    height: 24px;
-                    margin: 5px 1px 0 0;
+                    padding-top: 7px;
+                    display: block;
                 }
 
             }
@@ -344,12 +327,6 @@ main {
                     padding-right: 10px;
                 }
 
-                svg {
-                    width: 20px;
-                    height: 20px;
-                    stroke: #94A3B8;
-                }
-
             }
         }
     }
@@ -357,7 +334,7 @@ main {
  
     .map-container {
         padding: 58px 0 ;
-        height: calc(100dvh - 20px);
+        height: calc(100dvh - 2rem);
     }
 
     .cleanwalk-list {
