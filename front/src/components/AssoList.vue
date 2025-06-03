@@ -18,9 +18,7 @@ const searchInput = ref('') // La valeur de recherche
 
 // Récupération des associations lors du montage du composant
 onMounted(async () => {
-    console.log('Récupération des associations...', assoList.value)
     assoList.value = await accountStore.getAssoList()
-    console.log(assoList.value)
     if (!assoList.value) {
         showToast('Erreur lors de la récupération des associations', false)
     }
