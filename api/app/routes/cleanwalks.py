@@ -137,6 +137,29 @@ def get_all_cleanwalks():
 
     return jsonify(cleanwalk_data)
 
+# Check if a user is already participating in a cleanwalk or is the host
+@cleanwalks_bp.route('/check_user_participation', methods=['GET'])
+def check_participation():
+    user_id = request.args.get('user_id')
+    cleanwalk_id = request.args.get('cleanwalk_id')
+
+    if not user_id or not cleanwalk_id:
+        return jsonify({'message': 'User ID and Cleanwalk ID are required'}), 400
+
+    participation = db.session.query(CleanwalkUser).filter(
+        CleanwalkUser.user_id == user_id,
+        CleanwalkUser.cleanwalk_id == cleanwalk_id
+    ).first()
+
+    if participation:
+        return jsonify({
+            'is_participant': True,
+            'is_host': participation.is_host,
+            'nb_person': participation.nb_person
+        }), 200
+    else:
+        return jsonify({'is_participant': False}), 200
+
 
 #------------------------------------POST------------------------------------#
 

@@ -89,6 +89,14 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
         return false;
     }
 
-    return {getAllCleanwalks, cleanwalksTab, getCleanwalkById, createCleanwalk, joinCleanwalk, leaveCleanwalk}
+    async function checkUserParticipation (cleanwalkId: number, userId: number): Promise<{is_host: boolean, is_participant: boolean, nb_person?: number} | null> {
+        const result = await apiService.kyGet(route + '/check_user_participation?user_id=' + userId + '&cleanwalk_id=' + cleanwalkId);
+        if(result.success && result.data) {
+            return result.data as unknown as {is_host: boolean, is_participant: boolean, nb_person?: number};
+        }
+        return null;
+    }
+
+    return {getAllCleanwalks, cleanwalksTab, getCleanwalkById, createCleanwalk, joinCleanwalk, leaveCleanwalk, checkUserParticipation}
    
 });

@@ -1,12 +1,10 @@
 <script setup lang="ts">
-// import iconCross from '../icons/icon-cross.vue';
-// import iconAdd from '../icons/icon-add.vue';
-// import iconMinus from '../icons/icon-minus.vue';
 import { Minus, Plus, X } from 'lucide-vue-next';
 import { ref, onMounted, onUnmounted } from 'vue';
 
 const props = defineProps<{
-  isVisible: boolean
+  isVisible: boolean,
+  format: 'screen' | 'card';
 }>();
 
 const emit = defineEmits(['close', 'confirm']);
@@ -65,8 +63,11 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="popup" v-if="isVisible">
-    <div class="popup-validation" ref="popupRef">
+  <div class="popup" v-if="isVisible"  :class="{ card: format === 'card' }">
+    <div
+      class="popup-validation"
+      ref="popupRef"
+    >
       <div class="cross-container">
         <button class="cross" @click="cancel()">
           <X />
@@ -100,7 +101,7 @@ onUnmounted(() => {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 100dvh;
   z-index: 999;
   background-color: rgba(0, 0, 0, 0.5);
@@ -218,6 +219,16 @@ onUnmounted(() => {
         }
       }
     }
+
+  }
+  &.card {
+    width: 100%;
+    align-items: flex-end;
+    padding: 0 2rem;
+    .popup-validation {
+      margin-bottom: 250px;
+    }
+    
   }
 }
 </style>
