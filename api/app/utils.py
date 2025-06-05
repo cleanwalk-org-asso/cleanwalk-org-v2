@@ -9,6 +9,8 @@ from flask_mail import Message
 from flask import url_for
 from . import mail
 from itsdangerous import URLSafeTimedSerializer
+import bcrypt
+
 
 CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
@@ -38,10 +40,14 @@ def validate_api_key(api_key):
     print(app_api_key)
     return api_key == app_api_key
 
-def hash_password(password, salt):
-    salted_password = salt + password.encode('utf-8')
-    hashed_password = hashlib.sha256(salted_password).hexdigest()
-    return hashed_password
+def hash_password(password):
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return hashed.decode('utf-8')
+
+def verify_password(password, hashed):
+    """Verify a password against its hash"""
+    return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
 
 def upload_img(image):
     if '.' in image.filename and image.filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']:

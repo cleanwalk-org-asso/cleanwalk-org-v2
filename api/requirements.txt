@@ -13,5 +13,5 @@ itsdangerous
 Flask-Mail
 boto3
 Pillow
-
-
+bcrypt
+Flask-Migrate

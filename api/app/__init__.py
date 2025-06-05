@@ -5,7 +5,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
-from flask_mail import Mail 
+from flask_mail import Mail
+from flask_migrate import Migrate
 
 from datetime import timedelta
 
@@ -15,6 +16,7 @@ load_dotenv()
 # Initialiser l'extension SQLAlchemy
 db = SQLAlchemy()
 mail = Mail()
+migrate = Migrate()
 
 def create_app():
     app = Flask(__name__)
@@ -45,6 +47,7 @@ def create_app():
     # Initialiser les extensions
     db.init_app(app)
     mail.init_app(app)
+    migrate.init_app(app, db)
     JWTManager(app)
 
     # Enregistrer les blueprints

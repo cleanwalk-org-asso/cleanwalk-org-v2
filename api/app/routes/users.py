@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request
 from flask_cors import CORS
 from sqlalchemy import desc, func
 from app.models import Cleanwalk, CleanwalkUser, db, User, Role, Organization
-from app.utils import validate_api_key, hash_password, upload_img, send_reset_email
+from app.utils import validate_api_key, hash_password, verify_password, upload_img, send_reset_email
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, get_jwt
 from sqlalchemy.exc import IntegrityError
 from app.utils import verify_google_token
@@ -147,7 +147,7 @@ def login():
     email = data.get('email')
     res = db.session.query(User, Role).join(Role, User.role_id == Role.id).filter(User.email == email).first()
     if res:
-        if res.User.password == hash_password(data.get('password'), res.User.salt):
+        if verify_password(data.get('password'), res.User.password):
             access_token = create_access_token(identity=str(res.User.id), additional_claims={'role': res.Role.role})
             return jsonify({
                 'message': 'Successful connection', 
@@ -257,8 +257,7 @@ def create_user():
     name = data.get('name')
     email = data.get('email')
     profile_picture = data.get('profile_picture')
-    salt = os.urandom(16)
-    password = hash_password(data.get('password'), salt)
+    password = hash_password(data.get('password'))
     role_id = data.get('role_id')
     
     try:
@@ -268,7 +267,6 @@ def create_user():
             email=email,
             profile_picture=profile_picture,
             password=password,
-            salt=salt,
             role_id=role_id,
             created_at=datetime.datetime.now()
         )
@@ -316,9 +314,9 @@ def update_user_password(user_id):
     if user:
         data = request.get_json()
         # Check if the old password is correct
-        if user.password == hash_password(data.get('old_password'), user.salt):
+        if verify_password(data.get('old_password'), user.password):
             # Update user password
-            user.password = hash_password(data.get('new_password'), user.salt)
+            user.password = hash_password(data.get('new_password'))
             db.session.commit()
             return jsonify({'message': 'Password updated successfully'})
         else:
@@ -398,13 +396,11 @@ def reset_password(token):
     if not new_password:
         return jsonify({'error': 'New password required'}), 400
 
-    # Generate a new salt and hash the password
-    salt = os.urandom(16)
-    hashed_password = hash_password(new_password, salt)
+    # Hash the password with bcrypt
+    hashed_password = hash_password(new_password)
 
     # Update the user with the new password
     user.password = hashed_password
-    user.salt = salt
 
     try:
         # Commit changes to the database
