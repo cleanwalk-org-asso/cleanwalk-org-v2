@@ -2,7 +2,7 @@
 
 from flask import Blueprint, jsonify, request
 from app.models import db, User, Role
-from app.utils import validate_api_key, hash_password
+from app.utils import validate_api_key, hash_password, verify_password
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, get_jwt
 
 import os
@@ -34,7 +34,7 @@ def login():
     email = data.get('email')
     res = db.session.query(User, Role).join(Role, User.role_id == Role.id).filter(User.email == email).first()
     if res:
-        if (res.User.password == hash_password(data.get('password'), res.User.salt) and (res.Role.role == 'admin1' or res.Role.role == 'admin2'or res.Role.role == 'admin3')):
+        if (verify_password(data.get('password'), res.User.password) and (res.Role.role == 'admin1' or res.Role.role == 'admin2'or res.Role.role == 'admin3')):
             access_token = create_access_token(identity=res.User.id, additional_claims={'role': res.Role.role})
             return jsonify({
                 'message': 'Successful connection', 
