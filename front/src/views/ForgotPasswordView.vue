@@ -16,7 +16,7 @@ const emailForgotPassword = async () => {
     });
     if (response.success) {
       showToast("Demande de réinitialisation du mot de passe réussie. Veuillez vérifier votre email.", true);
-      router.push({ name: 'Login' });
+      router.push({ name: 'login' });
     } else {
       showToast("Erreur lors de la demande de réinitialisation du mot de passe. Veuillez vérifier l'email ou essayer à nouveau.", false);
       }
@@ -47,6 +47,11 @@ const emailForgotPassword = async () => {
   align-items: center;
   justify-content: center;
   padding-top: 5rem;
+
+  form {
+    width: 100%;
+    max-width: 400px;
+  }
 }
 
 .container {
