@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  ASSOCIATION
+}
+
+model User {
+  id             Int             @id @default(autoincrement())
+  name           String
+  email          String          @unique
+  password       String?
+  createdAt      DateTime        @default(now())
+  profilePicture String?
+  role           UserRole
+  organization   Organization?
+  articles       Article[]
+  cleanwalks     CleanwalkUser[]
+}
+
+model Organization {
+  userId       Int       @id
+  description  String?
+  webSite      String?
+  socialMedias Json?
+  bannerImg    String?
+  lastEvent    DateTime?
+  user         User      @relation(fields: [userId], references: [id])
+}
+
+model Cleanwalk {
+  id           Int             @id @default(autoincrement())
+  name         String
+  posLat       Float
+  posLong      Float
+  dateBegin    DateTime
+  imgUrl       String?
+  duration     Int
+  description  String
+  address      String
+  cityId       Int
+  city         City            @relation(fields: [cityId], references: [id])
+  participants CleanwalkUser[]
+}
+
+model CleanwalkUser {
+  userId      Int
+  cleanwalkId Int
+  nbPerson    Int
+  isHost      Boolean
+
+  user      User      @relation(fields: [userId], references: [id])
+  cleanwalk Cleanwalk @relation(fields: [cleanwalkId], references: [id])
+
+  @@id([userId, cleanwalkId])
+}
+
+model Article {
+  id             Int               @id @default(autoincrement())
+  title          String
+  authorId       Int
+  content        Json
+  createdAt      DateTime          @default(now())
+  description    String
+  published      Boolean
+  previewPicture String?
+  author         User              @relation(fields: [authorId], references: [id])
+  categories     CategoryArticle[]
+}
+
+model City {
+  id         Int         @id @default(autoincrement())
+  name       String
+  cleanwalks Cleanwalk[]
+}
+
+model Category {
+  id       Int               @id @default(autoincrement())
+  category String
+  articles CategoryArticle[]
+}
+
+model CategoryArticle {
+  categoryId Int
+  articleId  Int
+
+  category Category @relation(fields: [categoryId], references: [id])
+  article  Article  @relation(fields: [articleId], references: [id])
+
+  @@id([categoryId, articleId])
+}
