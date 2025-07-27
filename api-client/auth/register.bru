@@ -5,15 +5,17 @@ meta {
 }
 
 post {
-  url: {{host}}/users/login
+  url: {{host}}/auth/register
   body: json
   auth: none
 }
 
 body:json {
   {
-    "email": "{{email}}",
-    "password": "{{password}}"
+    "name": "test asso",
+    "email": "testasso@email.com",
+    "password": "password",
+    "role": "ASSOCIATION"
   }
 }
 

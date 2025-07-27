@@ -7,19 +7,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  USER
-  ADMIN
-  ASSOCIATION
-}
-
 model RefreshToken {
   id        Int      @id @default(autoincrement())
   token     String   @unique
   userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
@@ -30,9 +24,9 @@ model User {
   createdAt      DateTime        @default(now())
   profilePicture String?
   role           UserRole
-  organization   Organization?
   articles       Article[]
   cleanwalks     CleanwalkUser[]
+  organization   Organization?
   refreshTokens  RefreshToken[]
 }
 
@@ -66,9 +60,8 @@ model CleanwalkUser {
   cleanwalkId Int
   nbPerson    Int
   isHost      Boolean
-
-  user      User      @relation(fields: [userId], references: [id])
-  cleanwalk Cleanwalk @relation(fields: [cleanwalkId], references: [id])
+  cleanwalk   Cleanwalk @relation(fields: [cleanwalkId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
 
   @@id([userId, cleanwalkId])
 }
@@ -101,9 +94,14 @@ model Category {
 model CategoryArticle {
   categoryId Int
   articleId  Int
-
-  category Category @relation(fields: [categoryId], references: [id])
-  article  Article  @relation(fields: [articleId], references: [id])
+  article    Article  @relation(fields: [articleId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
 
   @@id([categoryId, articleId])
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  ASSOCIATION
 }

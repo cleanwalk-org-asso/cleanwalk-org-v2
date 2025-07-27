@@ -11,28 +11,42 @@ export async function registerUser(
   req: FastifyRequest<{ Body: CreateUserInput }>,
   reply: FastifyReply,
 ) {
-  const { name, email, password, role, profilePicture } = req.body;
+  const body = req.body;
 
-  const existing = await prisma.user.findUnique({ where: { email } });
+  const existing = await prisma.user.findUnique({
+    where: { email: body.email },
+  });
+
   if (existing) {
     return reply.status(400).send({ message: "Email already registered" });
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(body.password, 10);
 
   const user = await prisma.user.create({
     data: {
-      name,
-      email,
+      name: body.name,
+      email: body.email,
       password: hashedPassword,
-      role,
-      profilePicture,
+      role: body.role,
+      profilePicture: body.profilePicture,
     },
   });
 
-  return reply
-    .code(201)
-    .send({ id: user.id, email: user.email, name: user.name });
+  // create new association if role is ASSOCIATION
+  if (user.role === "ASSOCIATION") {
+    await prisma.organization.create({
+      data: {
+        userId: user.id,
+      },
+    });
+  }
+
+  return reply.code(201).send({
+    id: user.id,
+    email: user.email,
+    name: user.name,
+  });
 }
 
 export async function loginUser(
@@ -43,22 +57,15 @@ export async function loginUser(
 
   const user = await prisma.user.findUnique({ where: { email } });
 
-  if (!user) {
+  if (!user || !(await bcrypt.compare(password, user.password ?? ""))) {
     return reply.status(401).send({ message: "Invalid credentials" });
   }
 
-  const isPasswordValid = await bcrypt.compare(password, user.password ?? "");
-  if (!isPasswordValid) {
-    return reply.status(401).send({ message: "Invalid credentials" });
-  }
-
-  // Génère le JWT (valide 1h)
   const token = await reply.jwtSign(
     { id: user.id, role: user.role },
     { expiresIn: "1h" },
   );
 
-  // Génère le refresh token UUID (valide 7j)
   const refreshToken = randomUUID();
   const refreshExpires = addMinutes(new Date(), 60 * 24 * 7);
 
@@ -70,22 +77,20 @@ export async function loginUser(
     },
   });
 
-  // Set cookie access_token (JWT)
   reply.setCookie("access_token", token, {
     httpOnly: true,
     sameSite: "strict",
     path: "/",
     secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60, // 1h
+    maxAge: 60 * 60,
   });
 
-  // Set cookie refresh_token
   reply.setCookie("refresh_token", refreshToken, {
     httpOnly: true,
     sameSite: "strict",
     path: "/",
     secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60 * 24 * 7, // 7 jours
+    maxAge: 60 * 60 * 24 * 7,
   });
 
   return reply.send({
