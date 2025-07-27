@@ -1,4 +1,4 @@
 export interface ApiResponse {
-    success: boolean;
-    data: Record<string, unknown>;
+    success: boolean
+    data: Record<string, unknown> | { message: string }
 }

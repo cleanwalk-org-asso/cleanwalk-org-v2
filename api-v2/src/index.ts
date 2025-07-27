@@ -4,16 +4,11 @@ import userRoutes from "./routes/user.route";
 import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
-import {
-  ZodTypeProvider,
-  serializerCompiler,
-  validatorCompiler,
-} from "fastify-type-provider-zod";
+import jwtPlugin from "./plugins/jwt";
+import authRoutes from "./routes/auth.route";
+import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 
-const server = fastify().withTypeProvider<ZodTypeProvider>();
-
-server.setValidatorCompiler(validatorCompiler);
-server.setSerializerCompiler(serializerCompiler);
+const server = fastify().withTypeProvider<TypeBoxTypeProvider>();
 
 server.register(cors, {
   origin: true,
@@ -30,7 +25,11 @@ server.register(swagger, {
 server.register(swaggerUi, {
   routePrefix: "/docs",
 });
+server.register(jwtPlugin);
+
+//routes
 server.register(userRoutes);
+server.register(authRoutes);
 
 server.get("/ping", async (request, reply) => {
   return "pong\n";

@@ -1,10 +1,15 @@
-import { z } from "zod";
+import { Type, Static } from "@sinclair/typebox";
 
-export const createUserSchema = z.object({
-  name: z.string().min(2),
-  email: z.email(),
-  password: z.string().min(8),
-  role: z.enum(["USER", "ADMIN", "ASSOCIATION"]),
+export const CreateUserSchema = Type.Object({
+  name: Type.String({ minLength: 2 }),
+  email: Type.String({ format: "email" }),
+  password: Type.String({ minLength: 8 }),
+  role: Type.Union([
+    Type.Literal("USER"),
+    Type.Literal("ADMIN"),
+    Type.Literal("ASSOCIATION"),
+  ]),
+  profilePicture: Type.Optional(Type.String({ format: "uri" })),
 });
 
-export type CreateUserInput = z.infer<typeof createUserSchema>;
+export type CreateUserInput = Static<typeof CreateUserSchema>;

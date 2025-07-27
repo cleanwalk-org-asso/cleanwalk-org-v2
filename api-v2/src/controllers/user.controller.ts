@@ -1,26 +1,41 @@
-import { FastifyReply, FastifyRequest } from "fastify";
+import { FastifyRequest, FastifyReply } from "fastify";
 import { CreateUserInput } from "../schemas/user.schema";
 import { Prisma } from "@prisma/client";
 
+// GET /users
 export async function getAllUsers(req: FastifyRequest, reply: FastifyReply) {
-  const users = await req.server.prisma.user.findMany();
+  const users = await req.server.prisma.user.findMany({
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      createdAt: true,
+      profilePicture: true,
+    },
+  });
+
   reply.send(users);
 }
 
-export async function createUser(
-  req: FastifyRequest<{ Body: CreateUserInput }>,
+// GET /users/:id
+export async function getUserById(
+  req: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply,
 ) {
-  const { name, email, password, role } = req.body;
+  const user = await req.server.prisma.user.findUnique({
+    where: { id: Number(req.params.id) },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      createdAt: true,
+      profilePicture: true,
+    },
+  });
 
-  const userData: Prisma.UserCreateInput = {
-    name,
-    email,
-    password,
-    role: role ?? "USER",
-  };
-
-  const newUser = await req.server.prisma.user.create({ data: userData });
-
-  reply.code(201).send(newUser);
+  if (!user)
+    return reply.code(404).send({ message: "Utilisateur introuvable" });
+  reply.send(user);
 }
