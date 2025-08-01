@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import apiService from '@/services/apiService';
-import type { ApiResponse } from '@/interfaces/apiResponseInterface';
+import api from '@/services/apiService';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import router from '@/router';
 import BaseInput from '@/components/base/BaseInput.vue';
 
 const showToast = useUtilsStore().showToast;
+
+interface SignupResponse {
+    id: string;
+    email: string;
+    name: string;
+    message?: string;
+}
 
 const email = ref("");
 const name = ref("");
@@ -30,15 +36,18 @@ const signup = async () => {
         showToast("Les mots de passe ne correspondent pas", false);
         return;
     }
-    const response: ApiResponse = await apiService.kyPostWithoutToken("/users", {
-        email: email.value,
-        password: password.value,
-        name: name.value,
-        profile_picture: 'https://api.dicebear.com/9.x/initials/svg?seed=' + name.value,
-        role_id: 2,
+    const response = await api.post("auth/register", {
+        json: {
+            email: email.value,
+            password: password.value,
+            name: name.value,
+            profile_picture: 'https://api.dicebear.com/9.x/initials/svg?seed=' + name.value,
+            role : 'ASSOCIATION',
+        }
     });
-    if (response.success === false) {
-        showToast(response.data.message as string, false);
+    const json: SignupResponse = await response.json();
+    if (response.ok === false) {
+        showToast(json.message as string, false);
         return;
     } else {
         showToast("Votre compte a été créé avec succès", true);

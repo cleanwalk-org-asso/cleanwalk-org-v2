@@ -1,58 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import apiService from '@/services/apiService';
-import type { ApiResponse } from '@/interfaces/apiResponseInterface';
-import { v4 as uuidv4 } from 'uuid';
-import { useUtilsStore } from '@/stores/UtilsStore';
-import router from '@/router';
-import BaseInput from '@/components/base/BaseInput.vue';
 import { User, Users } from 'lucide-vue-next';
 
-const showToast = useUtilsStore().showToast;
-
-
-const email = ref("");
-const name = ref("");
-const password = ref("");
-const confirmPassword = ref("");
-
-const signup = async () => {
-    if (!name.value) {
-        showToast("Veuillez renseigner votre prénom", false);
-        return;
-    }
-    if (!email.value) {
-        showToast("Veuillez renseigner votre email", false);
-        return;
-    }
-    if (!password.value || !confirmPassword.value) {
-        showToast("Veuillez renseigner votre mot de passe", false);
-        return;
-    }
-    if (password.value !== confirmPassword.value) {
-        showToast("Les mots de passe ne correspondent pas", false);
-        return;
-    }
-    const response: ApiResponse = await apiService.kyPostWithoutToken("/users", {
-        email: email.value,
-        password: password.value,
-        name: name.value,
-        profile_picture: 'https://api.dicebear.com/8.x/fun-emoji/svg?seed=' + uuidv4(),
-        role_id: 1
-    });
-    if (response.success === false) {
-        showToast(response.data.message as string, false);
-        return;
-    } else {
-        showToast("Votre compte a été créé avec succès", true);
-        setTimeout(() => {
-            router.push({name:'login'}).then(() => router.go(0));
-        }, 1000);
-
-    }
-
-
-}
 
 </script>
 

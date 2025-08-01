@@ -4,7 +4,7 @@ export interface User {
     email: string,
     password?: string,
     profile_picture: string,
-    role: "organization" | "user"
+    role: "ASSOCIATION" | "USER" | "ADMIN",
 }
 
 export interface modifyAssociation {

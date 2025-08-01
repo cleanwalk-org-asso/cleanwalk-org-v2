@@ -5,6 +5,9 @@ import { CreateUserInput, LoginInput } from "../schemas/auth.schema";
 import { randomUUID } from "crypto";
 import { addMinutes } from "date-fns";
 
+const ACCESS_TOKEN_MAX_AGE = 60 * 60; // 1 heure en secondes
+const REFRESH_TOKEN_MAX_AGE = 60 * 60 * 24 * 30; // 30 jours en secondes
+
 const prisma = new PrismaClient();
 
 export async function registerUser(
@@ -53,7 +56,20 @@ export async function loginUser(
   req: FastifyRequest<{ Body: LoginInput }>,
   reply: FastifyReply,
 ) {
+
   const { email, password } = req.body;
+
+  // Supprime l'ancien refresh token si présent
+  const oldRefreshToken = req.cookies?.refresh_token;
+  if (oldRefreshToken) {
+    await prisma.refreshToken.deleteMany({ where: { token: oldRefreshToken } });
+    reply.clearCookie("refresh_token", {
+      path: "/",
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+    });
+  }
 
   const user = await prisma.user.findUnique({ where: { email } });
 
@@ -82,7 +98,7 @@ export async function loginUser(
     sameSite: "strict",
     path: "/",
     secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60,
+    maxAge: ACCESS_TOKEN_MAX_AGE,
   });
 
   reply.setCookie("refresh_token", refreshToken, {
@@ -90,7 +106,7 @@ export async function loginUser(
     sameSite: "strict",
     path: "/",
     secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: REFRESH_TOKEN_MAX_AGE,
   });
 
   return reply.send({
@@ -153,10 +169,20 @@ export async function refreshTokenHandler(
     sameSite: "strict",
     path: "/",
     secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60 * 24 * 7, // 7 jours
+    maxAge: REFRESH_TOKEN_MAX_AGE,
   });
 
-  return reply.send({ token: jwt });
+  // Set le cookie access_token (JWT)
+  reply.setCookie("access_token", jwt, {
+    httpOnly: true,
+    sameSite: "strict",
+    path: "/",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: ACCESS_TOKEN_MAX_AGE,
+  });
+
+  // Optionnel : renvoyer un message ou rien
+  return reply.code(204).send();
 }
 
 export async function getCurrentUser(req: FastifyRequest, reply: FastifyReply) {

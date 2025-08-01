@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import apiService from '@/services/apiService';
-import type { ApiResponse } from '@/interfaces/apiResponseInterface';
+import api from '@/services/apiService';
 import { v4 as uuidv4 } from 'uuid';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import router from '@/router';
@@ -16,6 +15,13 @@ const showToast = useUtilsStore().showToast;
 const callbackGoogleLogin: CallbackTypes.CredentialCallback = async (response) => {
     await accountStore.googleLoginSignup(response.credential);
 };
+
+interface SignupResponse {
+    id: string;
+    email: string;
+    name: string;
+    message?: string;
+}
 
 const email = ref("");
 const name = ref("");
@@ -39,15 +45,18 @@ const signup = async () => {
         showToast("Les mots de passe ne correspondent pas", false);
         return;
     }
-    const response: ApiResponse = await apiService.kyPostWithoutToken("/users", {
-        email: email.value,
-        password: password.value,
-        name: name.value,
-        profile_picture: 'https://api.dicebear.com/8.x/fun-emoji/svg?seed=' + uuidv4(),
-        role_id: 1
+    const response = await api.post("auth/register", {
+        json: {
+            email: email.value,
+            password: password.value,
+            name: name.value,
+            profile_picture: 'https://api.dicebear.com/8.x/fun-emoji/svg?seed=' + uuidv4(),
+            role : 'USER',
+        }
     });
-    if (response.success === false) {
-        showToast(response.data.message as string, false);
+    const json: SignupResponse = await response.json();
+    if (response.ok === false) {
+        showToast(json.message as string, false);
         return;
     } else {
         showToast("Votre compte a été créé avec succès", true);
@@ -56,8 +65,6 @@ const signup = async () => {
         }, 1000);
 
     }
-
-
 }
 
 </script>

@@ -35,6 +35,7 @@ const server = fastify({
 
 server.register(cors, {
   origin: true,
+  credentials: true,
 });
 server.register(multipart);
 server.register(prismaPlugin);

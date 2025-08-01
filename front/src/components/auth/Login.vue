@@ -8,7 +8,6 @@ import { GoogleLogin } from 'vue3-google-login'
 import BaseInput from '@/components/base/BaseInput.vue'
 import { type CallbackTypes } from 'vue3-google-login'
 import { useRouter, useRoute } from 'vue-router'
-import type { ApiResponse } from '@/interfaces/apiResponseInterface'
 
 const router = useRouter()
 const route = useRoute()
@@ -18,6 +17,10 @@ const showToast = useUtilsStore().showToast
 const email = ref('')
 
 const password = ref('')
+
+interface LoginResponse {
+  user: User; 
+};
 
 const callbackGoogleLogin: CallbackTypes.CredentialCallback = async (response) => {
     const result = await accountStore.googleLoginSignup(response.credential)
@@ -43,27 +46,33 @@ const login = async () => {
     }
 
     // Call the login API
-    const response: ApiResponse = await api
-        .post('/auth/login', {
+    const response  = await api
+        .post('auth/login', {
             json: {
                 email: email.value,
                 password: password.value
             }
         })
-        .json()
-    if (response.success === false) {
+    if (response.ok === false) {
         showToast('Email ou mot de passe incorrect', false)
         return
     }
+    console.log('Login response:', response.ok)
+
+    const json:LoginResponse = await response.json();
+
+    console.log('Login response JSON:', json)
+
     const user: User = {
-        email: response.data.email as string,
-        name: response.data.name as string,
-        id: response.data.id as number,
-        profile_picture: response.data.profile_picture as string,
-        role: response.data.role as 'organization' | 'user'
-    }
+    email: json.user.email,
+    name: json.user.name,
+    id: json.user.id,
+    profile_picture: json.user.profile_picture,
+    role: json.user.role
+    };
+
     accountStore.CurrentUser = user
-    accountStore.setToken(response.data.access_token as string)
+    console.log('CurrentUser set:', accountStore.CurrentUser)
 
     // Rediriger l'utilisateur vers la page d'origine s'il y en a une, sinon vers la page d'accueil
     const redirectPath = route.query.redirect as string
