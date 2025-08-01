@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { Type } from "@sinclair/typebox";
-import { getCity, getAllCities, createCity, updateCity, deleteCity } from "../controllers/city.controller";
-import { CitySchema, CreateCitySchema, UpdateCitySchema } from "../schemas/city.schema";
+import { getCity, getAllCities, createCity, updateCity, deleteCity } from "../controllers/city.controller.js";
+import { CitySchema, CreateCitySchema, UpdateCitySchema } from "../schemas/city.schema.js";
 
 export default async function cityRoutes(fastify: FastifyInstance) {
   fastify.get("/:cityId", {

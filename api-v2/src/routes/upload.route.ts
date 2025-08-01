@@ -1,6 +1,6 @@
 // routes/uploadRoutes.ts
 import { FastifyInstance } from "fastify";
-import { uploadFileController } from "../controllers/upload.controller";
+import { uploadFileController } from "../controllers/upload.controller.js";
 
 export default async function uploadRoutes(fastify: FastifyInstance) {
   fastify.post('/image', {

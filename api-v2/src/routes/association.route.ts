@@ -3,8 +3,8 @@ import {
   updateAssociation,
   getAllAssociations,
   getAssociationById,
-} from "../controllers/association.controller";
-import { UpdateAssociationSchema } from "../schemas/association.schema";
+} from "../controllers/association.controller.js";
+import { UpdateAssociationSchema } from "../schemas/association.schema.js";
 
 export default async function userRoutes(app: FastifyInstance) {
   app.get("", getAllAssociations);

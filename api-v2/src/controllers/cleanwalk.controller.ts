@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { PrismaClient } from "@prisma/client";
 import { Static } from "@sinclair/typebox";
-import { CreateCleanwalkSchema, UpdateCleanwalkSchema } from "../schemas/cleanwalk.schema";
+import { CreateCleanwalkSchema, UpdateCleanwalkSchema } from "../schemas/cleanwalk.schema.js";
 
 const prisma = new PrismaClient();
 

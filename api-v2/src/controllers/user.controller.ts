@@ -1,6 +1,4 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { CreateUserInput } from "../schemas/user.schema";
-import { Prisma } from "@prisma/client";
 
 // GET /users
 export async function getAllUsers(req: FastifyRequest, reply: FastifyReply) {

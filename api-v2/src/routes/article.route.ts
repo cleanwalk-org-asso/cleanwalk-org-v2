@@ -5,8 +5,8 @@ import {
   createArticle, 
   updateArticle, 
   deleteArticle 
-} from "../controllers/article.controller";
-import { CreateArticleSchema, UpdateArticleSchema, ArticleParamsSchema } from "../schemas/article.schema";
+} from "../controllers/article.controller.js";
+import { CreateArticleSchema, UpdateArticleSchema, ArticleParamsSchema } from "../schemas/article.schema.js";
 
 export async function articleRoutes(fastify: FastifyInstance) {
   // GET /articles/:articleId

@@ -18,10 +18,10 @@ declare module "fastify" {
 }
 
 async function s3Plugin(fastify: FastifyInstance) {
-  const region = "auto"; // ✅ Pour R2, la région est toujours "auto"
+  const region = "auto";
   const accessKeyId = process.env.S3_ACCESS_KEY_ID!;
   const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY!;
-  const endpoint = process.env.S3_ENDPOINT!; // ex: https://abc123.r2.cloudflarestorage.com
+  const endpoint = process.env.S3_ENDPOINT!;
 
   if (!accessKeyId || !secretAccessKey || !endpoint) {
     throw new Error("S3 credentials or endpoint missing");
@@ -29,7 +29,7 @@ async function s3Plugin(fastify: FastifyInstance) {
 
   fastify.decorate("s3PutObject", async ({ bucket, key, body, contentType }: S3PutParams) => {
     const host = new URL(endpoint).host;
-    const path = `/${bucket}/${encodeURIComponent(key)}`; // ✅ R2 n'utilise pas le bucket en sous-domaine
+    const path = `/${bucket}/${encodeURIComponent(key)}`;
 
     const signed = aws4.sign(
       {

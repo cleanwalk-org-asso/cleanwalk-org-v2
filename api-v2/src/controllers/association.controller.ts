@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { PrismaClient } from "@prisma/client";
-import { UpdateAssociationInput } from "../schemas/association.schema";
+import { UpdateAssociationInput } from "../schemas/association.schema.js";
 
 const prisma = new PrismaClient();
 

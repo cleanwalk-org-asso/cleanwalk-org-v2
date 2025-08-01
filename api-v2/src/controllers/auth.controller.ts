@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
-import { CreateUserInput, LoginInput } from "../schemas/auth.schema";
+import { CreateUserInput, LoginInput } from "../schemas/auth.schema.js";
 import { randomUUID } from "crypto";
 import { addMinutes } from "date-fns";
 

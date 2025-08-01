@@ -4,8 +4,8 @@ import {
   loginUser,
   getCurrentUser,
   refreshTokenHandler,
-} from "../controllers/auth.controller";
-import { CreateUserSchema, LoginSchema } from "../schemas/auth.schema";
+} from "../controllers/auth.controller.js";
+import { CreateUserSchema, LoginSchema } from "../schemas/auth.schema.js";
 
 export default async function authRoutes(app: FastifyInstance) {
   app.post(

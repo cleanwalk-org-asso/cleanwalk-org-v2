@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { PrismaClient } from "@prisma/client";
 import { Static } from "@sinclair/typebox";
-import { CreateArticleSchema, UpdateArticleSchema, ArticleParamsSchema } from "../schemas/article.schema";
+import { CreateArticleSchema, UpdateArticleSchema, ArticleParamsSchema } from "../schemas/article.schema.js";
 
 const prisma = new PrismaClient();
 

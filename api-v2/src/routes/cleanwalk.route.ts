@@ -9,12 +9,12 @@ import {
   updateCleanwalk,
   deleteCleanwalk,
   leaveCleanwalk
-} from "../controllers/cleanwalk.controller";
+} from "../controllers/cleanwalk.controller.js";
 import {
   CleanwalkSchema,
   CreateCleanwalkSchema,
   UpdateCleanwalkSchema
-} from "../schemas/cleanwalk.schema";
+} from "../schemas/cleanwalk.schema.js";
 
 export default async function cleanwalkRoutes(fastify: FastifyInstance) {
   fastify.get("/:cleanwalkId", {
