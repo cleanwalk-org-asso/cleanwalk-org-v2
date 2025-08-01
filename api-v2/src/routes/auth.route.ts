@@ -9,7 +9,7 @@ import { CreateUserSchema, LoginSchema } from "../schemas/auth.schema";
 
 export default async function authRoutes(app: FastifyInstance) {
   app.post(
-    "/auth/register",
+    "/register",
     {
       schema: {
         body: CreateUserSchema,
@@ -19,7 +19,7 @@ export default async function authRoutes(app: FastifyInstance) {
   );
 
   app.post(
-    "/auth/login",
+    "/login",
     {
       schema: {
         body: LoginSchema,
@@ -28,7 +28,7 @@ export default async function authRoutes(app: FastifyInstance) {
     loginUser,
   );
 
-  app.post("/auth/refresh", refreshTokenHandler);
+  app.post("/refresh", refreshTokenHandler);
 
-  app.get("/auth/me", { preHandler: app.authenticate }, getCurrentUser);
+  app.get("/me", { preHandler: app.authenticate }, getCurrentUser);
 }

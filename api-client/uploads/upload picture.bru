@@ -5,9 +5,14 @@ meta {
 }
 
 post {
-  url: {{host}}/uploads
-  body: none
+  url: {{host}}/upload/image
+  body: multipartForm
   auth: none
+}
+
+body:multipart-form {
+  : @file(/home/arhur/Downloads/astro.png)
+  folder: test
 }
 
 docs {

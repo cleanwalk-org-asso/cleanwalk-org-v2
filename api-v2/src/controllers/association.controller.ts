@@ -5,7 +5,7 @@ import { UpdateAssociationInput } from "../schemas/association.schema";
 const prisma = new PrismaClient();
 
 export async function getAssociationById(
-  req: FastifyRequest<{ Params: { id: string } }>,
+  req: FastifyRequest<{ Params: { id: number } }>,
   reply: FastifyReply,
 ) {
   const user = await req.server.prisma.user.findFirst({

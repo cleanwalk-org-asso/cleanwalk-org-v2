@@ -4,11 +4,20 @@ import userRoutes from "./routes/user.route";
 import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
+import multipart from "@fastify/multipart";
 import jwtPlugin from "./plugins/jwt";
 import authRoutes from "./routes/auth.route";
 import associationRoutes from "./routes/association.route";
+import cityRoutes from "./routes/city.route";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import loggingPlugin from "./plugins/logging";
+import cleanwalkRoutes from "./routes/cleanwalk.route";
+import { articleRoutes } from "./routes/article.route";
+import uploadRoutes from "./routes/upload.route";
+import s3Plugin from "./plugins/s3";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const server = fastify({
   logger: {
@@ -27,6 +36,7 @@ const server = fastify({
 server.register(cors, {
   origin: true,
 });
+server.register(multipart);
 server.register(prismaPlugin);
 server.register(swagger, {
   openapi: {
@@ -43,9 +53,15 @@ server.register(jwtPlugin);
 server.register(loggingPlugin);
 
 //routes
-server.register(userRoutes);
-server.register(authRoutes);
-server.register(associationRoutes);
+server.register(userRoutes, { prefix: '/users' });
+server.register(authRoutes, { prefix: '/auth' });
+server.register(associationRoutes, { prefix: '/associations' });
+server.register(cityRoutes, { prefix: '/cities' });
+server.register(cleanwalkRoutes, { prefix: '/cleanwalks' });
+server.register(articleRoutes, { prefix: '/articles' });
+server.register(uploadRoutes, { prefix: '/upload' });
+server.register(s3Plugin);
+
 server.get("/ping", async (request, reply) => {
   return "pong\n";
 });
