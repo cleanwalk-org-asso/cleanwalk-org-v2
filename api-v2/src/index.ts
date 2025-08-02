@@ -5,7 +5,7 @@ import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 import multipart from "@fastify/multipart";
-import jwtPlugin from "./plugins/jwt.js";
+import jwtPlugin from "./plugins/security.js";
 import authRoutes from "./routes/auth.route.js";
 import associationRoutes from "./routes/association.route.js";
 import cityRoutes from "./routes/city.route.js";
@@ -36,6 +36,8 @@ const server = fastify({
 server.register(cors, {
   origin: true,
   credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 });
 server.register(multipart);
 server.register(prismaPlugin);

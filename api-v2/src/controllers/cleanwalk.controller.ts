@@ -49,7 +49,7 @@ export async function getCleanwalkById(req: FastifyRequest<{ Params: { cleanwalk
             author_id: host.id,
             name: host.name,
             role_id: host.role,
-            profile_picture: host.profilePicture
+            profilePicture: host.profilePicture
         } : null,
         participant_count: participantCount,
         is_user_participant: isUserParticipant
@@ -87,7 +87,7 @@ export async function getAllCleanwalks(req: FastifyRequest, reply: FastifyReply)
         host: cw.participants[0]?.user ? {
             name: cw.participants[0].user.name,
             role_id: cw.participants[0].user.role,
-            profile_picture: cw.participants[0].user.profilePicture
+            profilePicture: cw.participants[0].user.profilePicture
         } : null
     }));
 

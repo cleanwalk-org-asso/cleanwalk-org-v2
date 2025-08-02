@@ -11,7 +11,7 @@ const props = defineProps<{
 <template>
     <div class="container">
         <img :src="props.asso.banner_img ? props.asso.banner_img : defaultBanner" alt="banner asso" class="banner">
-        <img :src="props.asso.profile_picture" alt="logo asso" class="pp">
+        <img :src="props.asso.profilePicture" alt="logo asso" class="pp">
     </div>
     <div class="text-container">
         <h1>{{ props.asso.name }}</h1>

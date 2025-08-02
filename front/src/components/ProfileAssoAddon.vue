@@ -17,7 +17,7 @@ const props = defineProps<{
 }>();
 
 const currentBanner = ref(props.Asso?.banner_img);
-const currentPP = ref(props.Asso?.profile_picture);
+const currentPP = ref(props.Asso?.profilePicture);
 
 onMounted(() => {
     if (!props.Asso) {
@@ -50,7 +50,7 @@ const uploadProfilePicture = async () => {
     const img_url = await handleUpload(fileInputPP.value!, FolderType.ASSO_PP);
     if(!img_url) return;
     currentPP.value = img_url;
-    accountStore.modifyAssociation({profile_picture: img_url});
+    accountStore.modifyAssociation({profilePicture: img_url});
     showToast("Votre photo de profil a été modifiée", true);
 };
 

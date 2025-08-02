@@ -41,7 +41,7 @@ const signup = async () => {
             email: email.value,
             password: password.value,
             name: name.value,
-            profile_picture: 'https://api.dicebear.com/9.x/initials/svg?seed=' + name.value,
+            profilePicture: 'https://api.dicebear.com/9.x/initials/svg?seed=' + name.value,
             role : 'ASSOCIATION',
         }
     });

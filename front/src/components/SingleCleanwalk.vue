@@ -194,8 +194,8 @@ onUnmounted(() => {
             <div>organisé par:</div>
             <h2> {{ cleanwalk?.host?.name }} </h2>
           </div>
-          <div class="right" v-if="cleanwalk?.host?.profile_picture">
-            <img :src="cleanwalk.host.profile_picture" alt="profile-picture">
+          <div class="right" v-if="cleanwalk?.host?.profilePicture">
+            <img :src="cleanwalk.host.profilePicture" alt="profile-picture">
           </div>
         </div>
         
@@ -264,8 +264,8 @@ onUnmounted(() => {
             <div>organisé par:</div>
             <h2> {{ cleanwalk?.host?.name }} </h2>
           </div>
-          <div class="right" v-if="cleanwalk?.host?.profile_picture">
-            <img :src="cleanwalk.host.profile_picture" alt="profile-picture">
+          <div class="right" v-if="cleanwalk?.host?.profilePicture">
+            <img :src="cleanwalk.host.profilePicture" alt="profile-picture">
           </div>
         </div>
         

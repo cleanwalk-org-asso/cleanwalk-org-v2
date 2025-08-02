@@ -21,7 +21,7 @@ export const useAccountStore = defineStore('account', () => {
 
     async function logout() {
         isLoggedIn.value = false
-        //TODO request api to remove cookie
+        await api.post('auth/logout')
         CurrentUser.value = undefined
         router.push({ name: 'login' })
     }
@@ -53,7 +53,6 @@ export const useAccountStore = defineStore('account', () => {
 
     const changePassword = async (
         userId: number,
-        token: string,
         oldPassword: string,
         newPassword: string
     ) => {
@@ -68,13 +67,13 @@ export const useAccountStore = defineStore('account', () => {
         return response.ok
     }
 
-    const modifyUser = (userId: number, token: string, name?: string, profile_picture?: string) => {
+    const modifyUser = (userId: number, name?: string, profilePicture?: string) => {
         api.put(
-            '/users/' + userId,
+            'users/' + userId,
             {
                 json: {
                     name: name,
-                    profile_picture: profile_picture
+                    profilePicture: profilePicture
                 }
             });
     }

@@ -209,4 +209,25 @@ export async function getCurrentUser(req: FastifyRequest, reply: FastifyReply) {
   } catch {
     return reply.code(401).send({ message: "Unauthorized" });
   }
+  
+}
+
+export async function logoutUser(req: FastifyRequest, reply: FastifyReply) {
+  const refreshToken = req.cookies?.refresh_token;
+  if (refreshToken) {
+    await prisma.refreshToken.deleteMany({ where: { token: refreshToken } });
+  }
+  reply.clearCookie("access_token", {
+    path: "/",
+    httpOnly: true,
+    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+  });
+  reply.clearCookie("refresh_token", {
+    path: "/",
+    httpOnly: true,
+    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+  });
+  return reply.code(204).send();
 }

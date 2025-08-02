@@ -3,14 +3,14 @@ export interface User {
     name: string,
     email: string,
     password?: string,
-    profile_picture: string,
+    profilePicture: string,
     role: "ASSOCIATION" | "USER" | "ADMIN",
 }
 
 export interface modifyAssociation {
     name?: string,
     description?: string,
-    profile_picture?: string,
+    profilePicture?: string,
     banner_img?: string
 }
 
@@ -18,7 +18,7 @@ export interface Association {
     id: number,
     name: string,
     email: string,
-    profile_picture: string,
+    profilePicture: string,
     description?: string,
     banner_img?: string,
     web_site?: string,

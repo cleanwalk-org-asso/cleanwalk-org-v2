@@ -45,7 +45,7 @@ const filteredAssoList = computed(() => {
       class="asso-card"
     >
       <img :src="asso.banner_img || defaultBanner" alt="cover-img" class="cover" />
-      <img :src="asso.profile_picture" alt="asso-img" class="img" />
+      <img :src="asso.profilePicture" alt="asso-img" class="img" />
       <h3>{{ asso.name }}</h3>
     </router-link>
     <p v-if="filteredAssoList.length === 0">Aucune association correspondante</p>

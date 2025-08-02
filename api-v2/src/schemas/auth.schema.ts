@@ -6,7 +6,6 @@ export const CreateUserSchema = Type.Object({
   password: Type.String({ minLength: 8 }),
   role: Type.Union([
     Type.Literal("USER"),
-    Type.Literal("ADMIN"),
     Type.Literal("ASSOCIATION"),
   ]),
   profilePicture: Type.Optional(Type.String()),

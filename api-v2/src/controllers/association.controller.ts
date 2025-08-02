@@ -97,7 +97,7 @@ export async function updateAssociation(
     await prisma.user.update({
       where: { id: userId },
       data: {
-        profilePicture: body.profile_picture,
+        profilePicture: body.profilePicture,
       },
     });
 

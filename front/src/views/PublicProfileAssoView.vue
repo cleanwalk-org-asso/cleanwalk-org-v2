@@ -43,10 +43,10 @@ const updateMetaTags = (asso: Association) => {
   }
   
   // Update image if available
-  if (asso.profile_picture) {
+  if (asso.profilePicture) {
     const ogImage = document.querySelector('meta[property="og:image"]');
     if (ogImage) {
-      ogImage.setAttribute('content', asso.profile_picture);
+      ogImage.setAttribute('content', asso.profilePicture);
     }
   }
 

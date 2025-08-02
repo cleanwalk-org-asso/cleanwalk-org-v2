@@ -67,7 +67,7 @@ const login = async () => {
     email: json.user.email,
     name: json.user.name,
     id: json.user.id,
-    profile_picture: json.user.profile_picture,
+    profilePicture: json.user.profilePicture,
     role: json.user.role
     };
 
