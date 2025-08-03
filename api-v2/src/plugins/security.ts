@@ -79,4 +79,29 @@ export default fp(async (fastify: FastifyInstance) => {
       }
     },
   );
+
+  fastify.decorate(
+    "getUserId",
+    async function (req: FastifyRequest, reply: FastifyReply): Promise<string> {
+      try {
+        if (!req.user) {
+          await req.jwtVerify(); // Assure que le token est décodé
+        }
+
+        const id = req.user?.id;
+        if (!id) {
+          reply.code(401).send({ error: "Invalid or missing token" });
+          throw new Error("Invalid or missing token");
+        }
+        return id.toString();
+      } catch (err) {
+        reply.code(401).send({ error: "Invalid or missing token" });
+        throw err;
+      }
+    }
+  );
+
+  
 });
+
+

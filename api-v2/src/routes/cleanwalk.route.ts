@@ -13,15 +13,17 @@ import {
 import {
   CleanwalkSchema,
   CreateCleanwalkSchema,
+  SoloCleanwalkSchema,
   UpdateCleanwalkSchema
 } from "../schemas/cleanwalk.schema.js";
 
 export default async function cleanwalkRoutes(fastify: FastifyInstance) {
   fastify.get("/:cleanwalkId", {
+    preHandler: [fastify.getUserId],
     schema: {
       params: Type.Object({ cleanwalkId: Type.Integer() }),
       querystring: Type.Object({ user_id: Type.Optional(Type.Integer()) }),
-      response: { 200: CleanwalkSchema, 404: Type.Object({ message: Type.String() }) },
+      response: { 200: SoloCleanwalkSchema, 404: Type.Object({ message: Type.String() }) },
     },
     handler: getCleanwalkById,
   });

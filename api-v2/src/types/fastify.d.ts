@@ -15,5 +15,6 @@ declare module "fastify" {
     authenticate: any;
     authorizeUser: any;
     requireAdmin: any;
+    getUserId: (req: FastifyRequest, reply: FastifyReply) => Promise<string>;
   }
 }

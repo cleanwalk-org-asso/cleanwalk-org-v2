@@ -7,8 +7,8 @@ const prisma = new PrismaClient();
 
 export async function getCleanwalkById(req: FastifyRequest<{ Params: { cleanwalkId: number } }>, reply: FastifyReply) {
     const cleanwalkId = req.params.cleanwalkId;
-    const query = req.query as { user_id?: number };
-    const userId = query.user_id ? Number(query.user_id) : undefined;
+    const userId = (req as any).user?.id;
+    console.log("User ID from request:", userId);
 
     const cleanwalk = await prisma.cleanwalk.findUnique({
         where: { id: cleanwalkId },
@@ -35,7 +35,7 @@ export async function getCleanwalkById(req: FastifyRequest<{ Params: { cleanwalk
 
     const host = cleanwalk.participants[0]?.user;
 
-    reply.send({
+    return reply.send({
         id: cleanwalk.id,
         name: cleanwalk.name,
         pos_lat: cleanwalk.posLat,
@@ -46,9 +46,9 @@ export async function getCleanwalkById(req: FastifyRequest<{ Params: { cleanwalk
         address: cleanwalk.address,
         img_url: cleanwalk.imgUrl,
         host: host ? {
-            author_id: host.id,
+            id: host.id,
             name: host.name,
-            role_id: host.role,
+            role: host.role,
             profilePicture: host.profilePicture
         } : null,
         participant_count: participantCount,
@@ -58,68 +58,68 @@ export async function getCleanwalkById(req: FastifyRequest<{ Params: { cleanwalk
 
 
 export async function getAllCleanwalks(req: FastifyRequest, reply: FastifyReply) {
-  const now = new Date();
-  const twoMonthsLater = new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000); // ≈ 2 mois
+    const now = new Date();
+    const twoMonthsLater = new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000); // ≈ 2 mois
 
-  const cleanwalks = await prisma.cleanwalk.findMany({
-    where: {
-      dateBegin: {
-        lte: twoMonthsLater
-      },
-      // dateBegin + duration > now (fin dans le futur)
-      OR: [
-        {
-          dateBegin: {
-            gte: now
-          }
+    const cleanwalks = await prisma.cleanwalk.findMany({
+        where: {
+            dateBegin: {
+                lte: twoMonthsLater
+            },
+            // dateBegin + duration > now (fin dans le futur)
+            OR: [
+                {
+                    dateBegin: {
+                        gte: now
+                    }
+                },
+                {
+                    duration: {
+                        gt: 0
+                    },
+                    dateBegin: {
+                        lt: now
+                    }
+                }
+            ],
+            participants: {
+                some: { isHost: true }
+            }
         },
-        {
-          duration: {
-            gt: 0
-          },
-          dateBegin: {
-            lt: now
-          }
-        }
-      ],
-      participants: {
-        some: { isHost: true }
-      }
-    },
-    include: {
-      participants: {
-        where: { isHost: true },
         include: {
-          user: true
+            participants: {
+                where: { isHost: true },
+                include: {
+                    user: true
+                }
+            }
         }
-      }
-    }
-  });
+    });
 
-  const cleanwalkData = cleanwalks.map(cw => {
-    const host = cw.participants[0]?.user;
+    const cleanwalkData = cleanwalks.map(cw => {
+        const host = cw.participants[0]?.user;
 
-    return {
-      id: cw.id,
-      name: cw.name,
-      pos_lat: cw.posLat,
-      pos_long: cw.posLong,
-      date_begin: cw.dateBegin,
-      duration: cw.duration,
-      description: cw.description,
-      address: cw.address,
-      img_url: cw.imgUrl,
-      host: host
-        ? {
-            name: host.name,
-            role: host.role,
-            profilePicture: host.profilePicture
-          }
-        : null
-    };
-  });
+        return {
+            id: cw.id,
+            name: cw.name,
+            pos_lat: cw.posLat,
+            pos_long: cw.posLong,
+            date_begin: cw.dateBegin,
+            duration: cw.duration,
+            description: cw.description,
+            address: cw.address,
+            img_url: cw.imgUrl,
+            host: host
+                ? {
+                    name: host.name,
+                    role: host.role,
+                    profilePicture: host.profilePicture
+                }
+                : null
+        };
+    });
 
-  return reply.send(cleanwalkData);
+    return reply.send(cleanwalkData);
 }
 
 export async function checkUserParticipation(req: FastifyRequest<{ Querystring: { user_id?: number; cleanwalk_id?: number } }>, reply: FastifyReply) {
@@ -205,7 +205,7 @@ export async function updateCleanwalk(req: FastifyRequest, reply: FastifyReply) 
     reply.send({ message: "Cleanwalk updated successfully" });
 }
 
-export async function deleteCleanwalk(req: FastifyRequest<{ Params: {cleanwalkId: number} }>, reply: FastifyReply) {
+export async function deleteCleanwalk(req: FastifyRequest<{ Params: { cleanwalkId: number } }>, reply: FastifyReply) {
     const cleanwalkId = req.params.cleanwalkId;
     await prisma.cleanwalk.delete({ where: { id: cleanwalkId } });
     reply.send({ message: "Cleanwalk deleted successfully" });
