@@ -66,7 +66,6 @@ export async function getAllCleanwalks(req: FastifyRequest, reply: FastifyReply)
             participants: { some: { isHost: true } },
         },
         include: {
-            city: true,
             participants: {
                 include: { user: true },
                 where: { isHost: true }

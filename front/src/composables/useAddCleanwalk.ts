@@ -98,7 +98,8 @@ export function useCleanwalkForm() {
       minutes: parseInt(dateCleanwalk.value.hourBegin.split(':')[1]),
     });
 
-    const formattedStartDate = format(startDate, 'yyyy-MM-dd HH:mm:ss');
+    // Conversion en string ISO pour Prisma/Backend
+    newCleanwalk.value.date_begin = startDate.toISOString();
 
     const endDate = set(parse(dateCleanwalk.value.dateDay, 'yyyy-MM-dd', new Date()), {
       hours: parseInt(dateCleanwalk.value.hourEnd.split(':')[0]),
@@ -107,18 +108,19 @@ export function useCleanwalkForm() {
 
     const duration = differenceInMinutes(endDate, startDate);
 
-    newCleanwalk.value.date_begin = formattedStartDate;
     newCleanwalk.value.duration = duration;
     // Data will be saved automatically via the watcher
   };
 
   // Function to upload the image and create the cleanwalk
   const upload = async () => {
+    console.log('Uploading image and creating cleanwalk...');
     if (!dragDropRef.value) {
       return;
     }
     try {
       const response = await dragDropRef.value.handleUpload();
+      console.log('Image upload response:', response);
       if (response) {
         newCleanwalk.value.img_url = response;
         const response_cw = await createCleanwalk(newCleanwalk.value);

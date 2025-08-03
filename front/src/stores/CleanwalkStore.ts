@@ -41,7 +41,12 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
     }
 
     async function createCleanwalk(cleanwalk: CleanwalkCreation): Promise<CleanwalkCreation | undefined> {
-        const response = await api.post(route, cleanwalk as unknown as Record<string, unknown>);
+        const response = await api.post(route, {
+            json: cleanwalk
+        });
+
+        console.log('Create cleanwalk request:', cleanwalk);
+        console.log('Create cleanwalk response:', response);
         if (response.ok) {
             return await response.json() as unknown as CleanwalkCreation;
         }

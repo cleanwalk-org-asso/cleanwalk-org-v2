@@ -10,7 +10,6 @@ export const CleanwalkSchema = Type.Object({
   description: Type.Optional(Type.String()),
   address: Type.Optional(Type.String()),
   img_url: Type.Optional(Type.String()),
-  city_id: Type.Integer(),
 });
 
 export const CreateCleanwalkSchema = Type.Object({

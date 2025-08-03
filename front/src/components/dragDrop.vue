@@ -3,8 +3,7 @@ import { ref, type Ref } from 'vue';
 import { Camera, X } from 'lucide-vue-next';
 
 import { useAccountStore } from '@/stores/AccountStore';
-import apiService from '@/services/apiService';
-import type { ApiResponse } from '@/interfaces/apiResponseInterface';
+import api from '@/services/apiService';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import { FolderType } from '@/interfaces/FolderUploadinterfaces';
 
@@ -25,6 +24,11 @@ const props = defineProps({
   },
 
 });
+
+interface Response {
+  message: string;
+  url: string;
+}
 
 const accountStore = useAccountStore()
 const fileInput: Ref<HTMLInputElement | null> = ref(null);
@@ -77,15 +81,25 @@ const processFile = (file: File): void => {
 const handleUpload = async (): Promise<string | undefined> => {
   if (fileInput.value?.files?.length && fileInput.value) {
     // Utilisez votre fonction d'aide pour uploader l'image
-    const token = accountStore.getAccessToken();
-    const Response: ApiResponse = await apiService.uploadFile(fileInput.value.files[0], FolderType.CLEANWALKS, token!);
-    if (Response.success) {
-      // showToast("Image uploaded successfully", true);
+
+    const formData = new FormData()
+
+    formData.append('file', fileInput.value.files[0]);
+    formData.append('folder', FolderType.CLEANWALKS);
+    const response = await api.post('upload/image', {
+      body: formData
+    })
+    console.log('Upload response: dragdrop', response);
+
+    const data: Response = await response.json();
+    console.log('Upload data: dragdrop', data);
+    if (response.ok) {
       removeImage();
     } else {
-      showToast(Response.data.message as string, false);
+      showToast(data.message, false);
     }
-    return Response.data.img_url as string; //img name is in Response.data.filename
+    console.log('Image URL:', data.url);
+    return data.url;
   }
   showToast("No file selected", false);
   removeImage();
@@ -105,8 +119,8 @@ defineExpose({ handleUpload });
     <button v-if="imageSrc && !props.autoUpload" @click.stop="removeImage()" class="cross">
       <X />
     </button>
-    <div  class="drop-area" @dragover.prevent="dragOver" @dragleave.prevent="dragLeave" @drop.prevent="onFileDrop"
-      @click="fileInputClick" :class="{ 'dragover': isDragOver , [props.format]: true }"
+    <div class="drop-area" @dragover.prevent="dragOver" @dragleave.prevent="dragLeave" @drop.prevent="onFileDrop"
+      @click="fileInputClick" :class="{ 'dragover': isDragOver, [props.format]: true }"
       :style="{ backgroundImage: currentImg ? `url(${currentImg})` : 'none' }">
       <input type="file" ref="fileInput" @change="onFileChange" accept="image/jpeg, image/png" style="display: none" />
       <Camera :size="50" v-if="!imageSrc" />
