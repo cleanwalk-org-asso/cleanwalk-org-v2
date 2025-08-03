@@ -18,7 +18,6 @@ const props = defineProps<{
 
 const cleanwalkStore = useCleanwalkStore();
 const currenUserId = ref(useAccountStore().CurrentUser?.id);
-const token = ref(useAccountStore().getAccessToken());
 const showToast = useUtilsStore().showToast;
 
 const defaultCover = '/src/assets/default_cover.webp'
@@ -48,13 +47,13 @@ const toggleLeaveCwPopup = () => {
 }
 
 const handleJoinCleanwalk = async (data: { participantCount: number, isAnonymous: boolean }) => {
-    if (!props.cleanwalk || !currenUserId.value || !token.value) {
+    if (!props.cleanwalk || !currenUserId.value) {
         router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } });
         return;
     }
     
     try {
-        await cleanwalkStore.joinCleanwalk(props.cleanwalk.id!, token.value, data.participantCount, currenUserId.value);
+        await cleanwalkStore.joinCleanwalk(props.cleanwalk.id!, data.participantCount, currenUserId.value);
         
         // Update participation status
         currenCleanwalkParticipation.value = {
@@ -71,13 +70,13 @@ const handleJoinCleanwalk = async (data: { participantCount: number, isAnonymous
 }
 
 const leaveCleanwalk = async () => {
-    if (!props.cleanwalk || !currenUserId.value || !token.value) {
+    if (!props.cleanwalk || !currenUserId.value) {
         router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } });
         return;
     }
     
     try {
-        await cleanwalkStore.leaveCleanwalk(props.cleanwalk.id!, token.value, currenUserId.value);
+        await cleanwalkStore.leaveCleanwalk(props.cleanwalk.id!, currenUserId.value);
         
         // Update participation status
         currenCleanwalkParticipation.value = {
@@ -94,7 +93,7 @@ const leaveCleanwalk = async () => {
 }
 
 const ShowParticipationPopup = () => {
-    if (!currenUserId.value || !token.value) {
+    if (!currenUserId.value) {
         router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } });
         return;
     }

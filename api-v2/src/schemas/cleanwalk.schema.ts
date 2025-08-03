@@ -10,7 +10,16 @@ export const CleanwalkSchema = Type.Object({
   description: Type.Optional(Type.String()),
   address: Type.Optional(Type.String()),
   img_url: Type.Optional(Type.String()),
+  host: Type.Union([
+    Type.Object({
+      name: Type.String(),
+      role: Type.String(), // ou Type.Enum si tu as un enum de rôles
+      profilePicture: Type.String({ format: 'uri' }),
+    }),
+    Type.Null(),
+  ]),
 });
+
 
 export const CreateCleanwalkSchema = Type.Object({
   name: Type.String({ minLength: 1 }),

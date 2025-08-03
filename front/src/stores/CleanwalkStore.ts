@@ -54,15 +54,17 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
         return undefined;
     }
 
-    async function updateCleanwalk(cleanwalk: Cleanwalk, token: string): Promise<Cleanwalk | undefined> {
-        const response = await api.put(route + '/' + cleanwalk.id, cleanwalk as unknown as Record<string, unknown>);
+    async function updateCleanwalk(cleanwalk: Cleanwalk): Promise<Cleanwalk | undefined> {
+        const response = await api.put(route + '/' + cleanwalk.id, {
+            json: cleanwalk
+        });
         if (response.ok) {
             return await response.json() as unknown as Cleanwalk;
         }
         return undefined;
     }
 
-    async function joinCleanwalk(cleanwalkId: number, token: string, nb_participants: number, user_id: number): Promise<boolean> {
+    async function joinCleanwalk(cleanwalkId: number, nb_participants: number, user_id: number): Promise<boolean> {
         const response = await api.post(route + '/join',
             {
                 json: {
@@ -74,7 +76,7 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
         return response.ok;
     }
 
-    async function leaveCleanwalk(cleanwalkId: number, token: string, user_id: number): Promise<boolean> {
+    async function leaveCleanwalk(cleanwalkId: number, user_id: number): Promise<boolean> {
         const response = await api.delete(route + '/leave', 
             {
                 json: {
