@@ -14,7 +14,6 @@ import { Clock, MapPin } from 'lucide-vue-next';
 
 const cleanwalkStore = useCleanwalkStore();
 const currenUserId = ref(useAccountStore().CurrentUser?.id);
-const token = ref(useAccountStore().getAccessToken());
 const showToast = useUtilsStore().showToast;
 
 // Define props with modelValue for two-way binding
@@ -50,11 +49,11 @@ const getDate = () => {
 }
 
 const leaveCleanwalk = async () => {
-  if (!cleanwalk.value || !currenUserId.value || !token.value) {
+  if (!cleanwalk.value || !currenUserId.value) {
     router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } });
     return;
   }
-  await cleanwalkStore.leaveCleanwalk(cleanwalk.value.id, token.value, currenUserId.value);
+  await cleanwalkStore.leaveCleanwalk(cleanwalk.value.id, currenUserId.value);
   
   // Update the cleanwalk object through the computed setter
   const updatedCleanwalk = { ...cleanwalk.value };
@@ -66,11 +65,11 @@ const leaveCleanwalk = async () => {
 }
 
 const handleJoinCleanwalk = async (data: { participantCount: number, isAnonymous: boolean }) => {
-  if (!cleanwalk.value || !currenUserId.value || !token.value) {
+  if (!cleanwalk.value || !currenUserId.value) {
     router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } });
     return;
   }
-  await cleanwalkStore.joinCleanwalk(cleanwalk.value.id, token.value, data.participantCount, currenUserId.value);
+  await cleanwalkStore.joinCleanwalk(cleanwalk.value.id, data.participantCount, currenUserId.value);
   
   // Update the cleanwalk object through the computed setter
   const updatedCleanwalk = { ...cleanwalk.value };
@@ -82,11 +81,11 @@ const handleJoinCleanwalk = async (data: { participantCount: number, isAnonymous
 }
 
 const actionButton = () => {
-  if (!cleanwalk.value || !currenUserId.value || !token.value) {
+  if (!cleanwalk.value || !currenUserId.value) {
     router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } });
     return;
   }
-  if (cleanwalk.value.host.author_id === currenUserId.value) {
+  if (cleanwalk.value.host.id === currenUserId.value) {
     // edit cleanwalk
     router.push({ name: 'editCleanwalk', params: { id: cleanwalk.value.id.toString() } });
     return;
@@ -104,7 +103,7 @@ const actionButton = () => {
 }
 
 const getActionButtonText = (): string => {
-  if (cleanwalk.value?.host.author_id === currenUserId.value) {
+  if (cleanwalk.value?.host.id === currenUserId.value) {
     return "Editer la cleanwalk";
   }
   if (cleanwalk.value?.is_user_participant === true) {
@@ -185,7 +184,7 @@ onUnmounted(() => {
           </a>
         </div>
         
-        <div v-if="cleanwalk?.host.author_id === currenUserId" class="participant-count">
+        <div v-if="cleanwalk?.host.id === currenUserId" class="participant-count">
           {{ cleanwalk?.participant_count }} participant(s)
         </div>
         
@@ -255,7 +254,7 @@ onUnmounted(() => {
           </a>
         </div>
         
-        <div v-if="cleanwalk?.host.author_id === currenUserId">
+        <div v-if="cleanwalk?.host.id === currenUserId">
           {{ cleanwalk?.participant_count }} participant(s)
         </div>
         

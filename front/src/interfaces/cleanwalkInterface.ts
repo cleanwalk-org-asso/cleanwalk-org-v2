@@ -42,7 +42,7 @@ export interface SingleCleanwalk {
     city: string;
     img_url: string;
     host: {
-        author_id: number;
+        id: number;
         name: string;
         role_id: number;
         profilePicture: string;
