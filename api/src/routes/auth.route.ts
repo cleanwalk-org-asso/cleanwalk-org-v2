@@ -5,8 +5,11 @@ import {
   getCurrentUser,
   refreshTokenHandler,
   logoutUser,
+  resetPassword,
+  forgetPassword,
 } from "../controllers/auth.controller.js";
-import { CreateUserSchema, LoginSchema } from "../schemas/auth.schema.js";
+import { CreateUserSchema, LoginSchema, ForgotPasswordSchema, ResetPasswordSchema } from "../schemas/auth.schema.js";
+import { ErrorResponseSchema } from "../schemas/user.schema.js";
 
 export default async function authRoutes(app: FastifyInstance) {
   app.post(
@@ -35,4 +38,20 @@ export default async function authRoutes(app: FastifyInstance) {
   app.post("/refresh", refreshTokenHandler);
 
   app.get("/me", { preHandler: app.authenticate }, getCurrentUser);
+
+  // Route pour demander la réinitialisation du mot de passe
+
+  app.post("/forgot-password", {
+    schema: {
+      body: ForgotPasswordSchema,
+    },
+  }, forgetPassword);
+
+  // Route pour réinitialiser le mot de passe
+
+  app.post("/reset-password", {
+    schema: {
+      body: ResetPasswordSchema,
+    },
+  }, resetPassword);
 }
