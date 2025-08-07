@@ -11,10 +11,12 @@ const router = useRouter();
 
 const emailForgotPassword = async () => {
   try {
-    const response = await apiService.kyPostWithoutToken( "/users/send-reset-email", {
+    const response = await apiService.post( "/users/send-reset-email", {
+      json: {
         email: email.value,
+      },
     });
-    if (response.success) {
+    if (response.ok) {
       showToast("Demande de réinitialisation du mot de passe réussie. Veuillez vérifier votre email.", true);
       router.push({ name: 'login' });
     } else {
