@@ -16,6 +16,8 @@ import { articleRoutes } from "./routes/article.route.js";
 import uploadRoutes from "./routes/upload.route.js";
 import s3Plugin from "./plugins/s3.js";
 import dotenv from "dotenv";
+import oauthPlugin from '@fastify/oauth2';
+
 
 dotenv.config();
 
@@ -54,6 +56,25 @@ server.register(swaggerUi, {
 });
 server.register(jwtPlugin);
 server.register(loggingPlugin);
+
+
+
+server.register(oauthPlugin, {
+  name: 'googleOAuth2',
+  scope: ['email', 'profile'],
+  credentials: {
+    client: {
+      id: process.env.GOOGLE_CLIENT_ID!,
+      secret: process.env.GOOGLE_CLIENT_SECRET!
+    },
+    auth: oauthPlugin.GOOGLE_CONFIGURATION
+  },
+  // register a fastify url to start the redirect flow
+  startRedirectPath: '/auth/google',
+  callbackUri: process.env.CALLBACK_URL!,
+})
+
+server.decorate('FRONTEND_URL', process.env.FRONTEND_URL);
 
 //routes
 server.register(userRoutes, { prefix: '/users' });

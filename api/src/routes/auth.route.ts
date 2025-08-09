@@ -1,3 +1,4 @@
+import { googleOAuthCallback } from "../controllers/auth.controller.js";
 import { FastifyInstance } from "fastify";
 import {
   registerUser,
@@ -9,9 +10,9 @@ import {
   forgetPassword,
 } from "../controllers/auth.controller.js";
 import { CreateUserSchema, LoginSchema, ForgotPasswordSchema, ResetPasswordSchema } from "../schemas/auth.schema.js";
-import { ErrorResponseSchema } from "../schemas/user.schema.js";
 
 export default async function authRoutes(app: FastifyInstance) {
+  app.get("/login/google/callback", googleOAuthCallback);
   app.post(
     "/register",
     {

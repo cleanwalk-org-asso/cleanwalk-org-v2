@@ -345,3 +345,109 @@ export async function resetPassword(request: FastifyRequest, reply: FastifyReply
     });
   }
 }
+
+export async function googleOAuthCallback(
+  request: FastifyRequest,
+  reply: FastifyReply
+) {
+  try {
+    // 1. Récupération du token Google
+    const result = await new Promise<any>((resolve, reject) => {
+      (request.server as any).googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(
+        request,
+        (err: any, tokenResult: any) => {
+          if (err) return reject(err);
+          resolve(tokenResult);
+        }
+      );
+    });
+
+    // 2. Appel à Google pour récupérer les infos utilisateur
+    const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+      headers: {
+        Authorization: `Bearer ${result.token.access_token}`,
+      },
+    });
+
+    if (!response.ok) {
+      return reply.status(response.status).send({
+        error: 'Failed to fetch user info',
+      });
+    }
+
+    const userInfo = await response.json();
+
+    // 3. Vérifie si l'utilisateur existe
+    let user = await prisma.user.findUnique({ where: { email: userInfo.email } });
+
+    // 4. Si l'utilisateur n'existe pas, on le crée
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          name: userInfo.name,
+          email: userInfo.email,
+          password: null,
+          profilePicture: userInfo.picture,
+          role: 'USER', // ou 'BENEVOLE', à adapter selon votre modèle
+        },
+      });
+    }
+
+    // 5. Supprime les anciens refresh token
+    const oldRefreshToken = request.cookies?.refresh_token;
+    if (oldRefreshToken) {
+      await prisma.refreshToken.deleteMany({ where: { token: oldRefreshToken } });
+      reply.clearCookie("refresh_token", {
+        path: "/",
+        httpOnly: true,
+        sameSite: "strict",
+        secure: process.env.NODE_ENV === "production",
+      });
+    }
+
+    // 6. Génération du JWT
+    const jwt = await reply.jwtSign(
+      { id: user.id, role: user.role },
+      { expiresIn: '1h' }
+    );
+
+    // 7. Création du refresh token
+    const refreshToken = randomUUID();
+    const refreshExpires = addMinutes(new Date(), 60 * 24 * 7); // 7 jours
+
+    await prisma.refreshToken.create({
+      data: {
+        token: refreshToken,
+        userId: user.id,
+        expiresAt: refreshExpires,
+      },
+    });
+
+    // 8. Pose des cookies
+    reply.setCookie("access_token", jwt, {
+      httpOnly: true,
+      sameSite: "strict",
+      path: "/",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: ACCESS_TOKEN_MAX_AGE,
+    });
+
+    reply.setCookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      sameSite: "strict",
+      path: "/",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: REFRESH_TOKEN_MAX_AGE,
+    });
+
+    reply.redirect((request.server as any).FRONTEND_URL);
+
+  } catch (error: any) {
+    return reply.status(500).send({
+      error: 'OAuth callback failed',
+      details: error.message,
+    });
+  }
+}
+
+
