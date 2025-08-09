@@ -9,8 +9,5 @@ npm-debug.log
 *.pyc
 __pycache__/
 
-Dockerfile
-.dockerignore
-
 .git
 .gitignore
