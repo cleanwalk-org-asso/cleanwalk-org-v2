@@ -50,7 +50,7 @@ const structuredData = computed(() => {
     'organizer': {
       '@type': 'Organization',
       'name': props.cleanwalk.host.name,
-      'image': props.cleanwalk.host.profile_picture
+      'image': props.cleanwalk.host.profilePicture
     }
   };
 });

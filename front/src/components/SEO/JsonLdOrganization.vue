@@ -18,8 +18,8 @@ const structuredData = computed(() => {
     'name': props.organization.name,
     'description': props.organization.description,
     'url': `${window.location.origin}/associations/${props.organization.id}`,
-    'logo': props.organization.profile_picture,
-    'image': props.organization.banner_img || props.organization.profile_picture,
+    'logo': props.organization.profilePicture,
+    'image': props.organization.banner_img || props.organization.profilePicture,
     '@id': `${window.location.origin}/associations/${props.organization.id}#organization`
   };
 });

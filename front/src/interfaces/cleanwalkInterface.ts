@@ -12,7 +12,7 @@ export interface Cleanwalk {
     host? : {
         id?: number,
         name: string,
-        profile_picture: string,
+        profilePicture: string,
         role_id: number,
     }
 }
@@ -42,10 +42,10 @@ export interface SingleCleanwalk {
     city: string;
     img_url: string;
     host: {
-        author_id: number;
+        id: number;
         name: string;
         role_id: number;
-        profile_picture: string;
+        profilePicture: string;
     };
     participant_count: number;
     is_user_participant: boolean;

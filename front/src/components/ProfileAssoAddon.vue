@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, type Ref } from 'vue';
 import { useAccountStore } from '@/stores/AccountStore';
-import apiService from '@/services/apiService';
-import type { ApiResponse } from '@/interfaces/apiResponseInterface';
+import api from '@/services/apiService';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import type { Association } from '@/interfaces/userInterface';
 import { FolderType } from '@/interfaces/FolderUploadinterfaces';
@@ -17,13 +16,19 @@ const props = defineProps<{
 }>();
 
 const currentBanner = ref(props.Asso?.banner_img);
-const currentPP = ref(props.Asso?.profile_picture);
+const currentPP = ref(props.Asso?.profilePicture);
 
 onMounted(() => {
     if (!props.Asso) {
         return;
     }
 });
+
+interface Response {
+  message: string;
+  url: string;
+}
+
 
 
 const fileInputPP: Ref<HTMLInputElement | null> = ref(null);
@@ -35,13 +40,19 @@ const handleUpload = async (fileInput: HTMLInputElement, folderType: FolderType)
         showToast("No file selected", false);
         return undefined;
     }
-    // Utilisez votre fonction d'aide pour uploader l'image
-    const token = accountStore.getAccessToken();
-    const Response: ApiResponse = await apiService.uploadFile(fileInput.files[0], folderType, token!);
-    if (Response.success) {
-        return Response.data.img_url as string; //img name is in Response.data.filename
+
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+    formData.append('folderType', folderType);
+
+    const response = await api.post('upload/image', {
+      body: formData
+    })
+    const data:Response = await response.json();
+    if (response.ok) {
+         return data.url;; //img name is in Response.data.filename
     } else {
-        showToast(Response.data.message as string, false);
+        showToast(data.message, false);
         return undefined;
     }
 };
@@ -50,7 +61,7 @@ const uploadProfilePicture = async () => {
     const img_url = await handleUpload(fileInputPP.value!, FolderType.ASSO_PP);
     if(!img_url) return;
     currentPP.value = img_url;
-    accountStore.modifyAssociation({profile_picture: img_url});
+    accountStore.modifyAssociation({profilePicture: img_url});
     showToast("Votre photo de profil a été modifiée", true);
 };
 

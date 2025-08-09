@@ -1,0 +1,37 @@
+meta {
+  name: register
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{host}}/auth/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "admin",
+    "email": "admin@admin.com",
+    "password": "password",
+    "role": "ADMIN"
+  }
+}
+
+body:text {
+  {
+    "email": "frin.arthur@gmail.com",
+    "password": "azerty"
+  }
+}
+
+body:form-urlencoded {
+  email: {{email}}
+  password: {{password}}
+}
+
+body:multipart-form {
+  email: {{email}}
+  password: {{password}}
+}

@@ -68,7 +68,7 @@ watch(() => route.name, (newName) => {
         <div v-if="user">
             <router-link :to="{name:'menuProfile'}" class="account">
                 <div>{{ user.name }}</div>
-                <img :src="user.profile_picture" alt="profile_picture">
+                <img :src="user.profilePicture" alt="profilePicture">
             </router-link>
         </div>
         <div class="infos" v-else>

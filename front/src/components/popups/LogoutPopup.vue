@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useAccountStore } from '@/stores/AccountStore';
+import {X} from 'lucide-vue-next';
 
 const lougout = useAccountStore().logout;
 
@@ -14,7 +15,9 @@ defineProps({
 <template>
     <div v-if="isVisible" class="popup" @click="togglePopup!">
         <div class="popup-content" @click.stop>
-            <div class="cross"><iconCross @click="togglePopup!" /></div>
+            <div class="cross" @click="togglePopup!">
+                <X/>
+            </div>
             <h2>Se déconnecter</h2>
             <p>Etes vous certain de vouloir vous déconnecter ?</p>
             <div class="btn-container">

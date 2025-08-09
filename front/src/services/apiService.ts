@@ -1,129 +1,49 @@
+import ky, { HTTPError } from 'ky'
 
-import ky from 'ky';
-import { HTTPError } from 'ky';
+let isRefreshing = false
+let refreshPromise: Promise<Response> | null = null
 
-// const apiUrl = '/api'; // This is the proxy defined in vite.config.ts
-const apiUrl = import.meta.env.VITE_API_URL;
+const api = ky.create({
+  prefixUrl: import.meta.env.VITE_API_URL,
+  credentials: 'include', // Nécessaire pour httpOnly cookies
+  hooks: {
+    beforeRequest: [
+      request => {
+        // Exemple: tu pourrais ajouter des headers ici si besoin
+      }
+    ],
+    afterResponse: [
+      async (request, options, response) => {
+        if (response.status !== 401) return response
 
-import type { ApiResponse } from '@/interfaces/apiResponseInterface';
-import type { FolderType } from '@/interfaces/FolderUploadinterfaces';
-
-const kyGet = async (route: string):Promise<ApiResponse> => {
-    try {
-        const response:Record<string, unknown> = await ky.get(apiUrl + route, {
-            headers: {
-                'X-API-Key': import.meta.env.VITE_API_KEY,
-            },
-        }).json();
-
-        return { success: true, data: response };
-    } catch (error) {
-        console.error('Error fetching data:', error);
-        return { success: false, data: { message: 'An unknown error occurred' } };
-    }
-};
-
-const kyPost = async (route: string, data:  Record<string, unknown>, access_token: string) => {
-    try {
-        const response:Record<string, unknown> = await ky.post(apiUrl + route, {
-            json: data,
-            headers: {
-                'X-API-Key': import.meta.env.VITE_API_KEY,
-                'Authorization': 'Bearer ' + access_token,
-            },
-        }).json();
-
-        return { success: true, data: response };
-    } catch (error) {
-        console.error('Error sending data:', error);
-        if (error instanceof HTTPError) {
-            // You can get the error response body as JSON
-            const errorData: Record<string, unknown> = await error.response.json();
-            return { success: false, data: errorData };
+        // Éviter les multiples refresh simultanés
+        if (!isRefreshing) {
+          isRefreshing = true
+          refreshPromise = fetch(`${import.meta.env.VITE_API_URL}/auth/refresh`, {
+            method: 'POST',
+            credentials: 'include',
+          }).finally(() => {
+            isRefreshing = false
+          })
         }
-        return { success: false, data: { message: 'An unknown error occurred' } };
-    }
-};
 
-const kyPostWithoutToken = async (route: string, data: Record<string, unknown>): Promise<ApiResponse> => {
-    try {
-        const response: Record<string, unknown> = await ky.post(apiUrl + route, {
-            json: data,
-            headers: {
-                'X-API-Key': import.meta.env.VITE_API_KEY,
-            },
-        }).json();
+        const refreshResponse = await refreshPromise
 
-        return { success: true, data: response };
-    } catch (error) {
-        console.error('Error sending data:', error);
-        if (error instanceof HTTPError) {
-            // You can get the error response body as JSON
-            const errorData: Record<string, unknown> = await error.response.json();
-            return { success: false, data: errorData };
+        if (refreshResponse && refreshResponse.ok) {
+          // Rejoue la requête d'origine
+          return ky(request, options)
         }
-        return { success: false, data: { message: 'An unknown error occurred' } };
-    }
-};
 
-const kyPut = async (route: string, data:Record<string, unknown>, access_token:string):Promise<ApiResponse> => {
-    try {
-        const response:Record<string, unknown> = await ky.put(apiUrl + route, {
-            json: data,
-            headers: {
-                'X-API-Key': import.meta.env.VITE_API_KEY,
-                'Authorization': 'Bearer ' + access_token,
-            },
-        }).json();
-        return { success: true, data: response };
-    } catch (error) {
-        console.error('Error updating data:', error);
-        return { success: false, data: { message: 'An unknown error occurred' } };
-    }
-};
+        // Échec du refresh
+        if (refreshResponse) {
+          throw new HTTPError(refreshResponse, request, options)
+        } else {
+          // Crée une réponse vide pour satisfaire le type
+          throw new HTTPError(new Response(null, { status: 500, statusText: 'Refresh failed' }), request, options)
+        }
+      }
+    ],
+  }
+})
 
-const kyDelete = async (route: string, data:Record<string, unknown>, access_token: string):Promise<ApiResponse> => {
-    try {
-        const response:Record<string, unknown> = await ky.delete(apiUrl + route, {
-            json: data,
-            headers: {
-                'X-API-Key': import.meta.env.VITE_API_KEY,
-                'Authorization': 'Bearer ' + access_token,
-            },
-        }).json();
-
-        return { success: true, data: response };
-    } catch (error) {
-        console.error('Error deleting data:', error);
-        return { success: false, data: { message: 'An unknown error occurred' } };
-    }
-};
-
-async function uploadFile(file: File, folder: FolderType, token: string): Promise<ApiResponse> {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('folder', folder);
-
-    try {
-        const response:Record<string, unknown> = await ky.post(apiUrl + '/upload', {
-            body: formData,
-            headers: {
-                'X-API-Key': import.meta.env.VITE_API_KEY,
-                'Authorization': 'Bearer ' + token,
-            },
-        }).json();
-
-        return { success: true, data: response };
-    } catch (error) {
-        console.error('Error uploading file:', error);
-        return { success: false, data: { message: 'An unknown error occurred' } };
-    }
-}
-export default {
-    kyGet,
-    kyPost,
-    kyPut,
-    kyDelete,
-    kyPostWithoutToken,
-    uploadFile
-};
+export default api

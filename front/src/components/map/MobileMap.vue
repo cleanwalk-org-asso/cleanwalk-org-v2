@@ -22,7 +22,7 @@ const {
     mapClick,
 } = useCleanwalkMap();
 
-const userImg = useAccountStore().CurrentUser?.profile_picture;
+const userImg = useAccountStore().CurrentUser?.profilePicture;
 
 const cleanwalkStore = useCleanwalkStore();
 
@@ -199,7 +199,7 @@ function mapClickEvent() {
                         </div>
                     </div>
                     <div class="right">
-                        <img :src="selectedCleanwalk.host!.profile_picture" alt="profile_picture">
+                        <img :src="selectedCleanwalk.host!.profilePicture" alt="profilePicture">
                         <div class="name">{{ selectedCleanwalk.host!.name }}</div>
                     </div>
                 </router-link>

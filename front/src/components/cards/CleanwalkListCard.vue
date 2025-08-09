@@ -8,6 +8,8 @@ import dateService from '@/services/dateService';
 // Get cleanwalk from props
 const { cleanwalk } = defineProps<{ cleanwalk: Cleanwalk }>()
 
+console.log('cleanwalk', cleanwalk);
+
 const defaultCover = '/src/assets/default_cover.webp'
 
 

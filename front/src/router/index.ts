@@ -167,17 +167,11 @@ const router = createRouter({
 // Navigation Guard
 router.beforeEach(async (to, from, next) => {
   const store = useAccountStore()
-
-  if (!store.isLoggedIn) {
-    await store.tokenLogin()
-  }
+  const requiresAuth = to.meta.requiresAuth || false
+  const isAuthenticated = await store.checkAuth()
 
   if (to.name === 'home' && isMobile.value) {
     return next({ name: 'map' })
-  }
-
-  if (to.meta.requiresAuth && !store.isLoggedIn) {
-    return next({ name: 'login', query: { redirect: to.fullPath } })
   }
 
   // SEO dynamique
@@ -198,7 +192,12 @@ router.beforeEach(async (to, from, next) => {
     ogImage.setAttribute('content', `${window.location.origin}${meta.ogImage}`)
   }
 
-  next()
+  if (requiresAuth && !isAuthenticated) {
+    next({ name: 'login', query: { redirect: to.fullPath } })
+  } else {
+    next()
+  }
+
 })
 
 export default router

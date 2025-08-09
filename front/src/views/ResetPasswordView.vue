@@ -19,10 +19,12 @@ const resetPassword = async () => {
     return;
   }
   try {
-    const response = await apiService.kyPostWithoutToken(`/users/reset-password/${token}`, {
-      new_password: newPassword.value
+    const response = await apiService.post(`/users/reset-password/${token}`, {
+      json: {
+        new_password: newPassword.value,
+      },
     });
-    if (response.success) {
+    if (response.ok) {
       showToast("Mot de passe réinitialisé avec succès. Vous pouvez maintenant vous connecter.", true);
       router.push({ name: 'login' });
     } else {

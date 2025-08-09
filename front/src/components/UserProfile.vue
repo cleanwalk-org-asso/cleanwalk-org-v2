@@ -11,13 +11,13 @@ import BaseTextarea from './base/BaseTextarea.vue';
 import LogoutButton from './buttons/LogoutButton.vue';
 import { RefreshCcw } from 'lucide-vue-next';
 
-const getToken = useAccountStore().getAccessToken;
 const showToast = useUtilsStore().showToast;
+
+const accountStore = useAccountStore();
 
 const currentMdp = ref('');
 const newMdp = ref('');
 const confirmNewMdp = ref('');
-const accountStore = useAccountStore();
 
 const currentUser = ref(useAccountStore().CurrentUser);
 const association: Ref<Association | undefined> = ref(undefined);
@@ -33,7 +33,7 @@ onMounted(async () => {
         router.push({ name: 'login' });
         return;
     }
-    if (currentUser.value?.role === 'organization') {
+    if (currentUser.value?.role === 'ASSOCIATION') {
         association.value = await accountStore.getOrganizationById(currentUser.value.id!);
         currentDescription.value = association.value?.description;
     }
@@ -45,7 +45,7 @@ watch(() => userName.value, () => {
         clearTimeout(debounceTimeoutName);
     }
 
-    if (userName.value === useAccountStore().CurrentUser?.name) {
+    if (userName.value === accountStore.CurrentUser?.name) {
         return;
     }
 
@@ -56,7 +56,7 @@ watch(() => userName.value, () => {
             showToast('Veuillez entrer un nom valide', false);
             return;
         }
-        useAccountStore().modifyUser(currentUser.value!.id!, getToken()!, userName.value);
+        accountStore.modifyUser(currentUser.value!.id!, userName.value);
         showToast('Votre nom a été modifié', true);
         useAccountStore().CurrentUser!.name = userName.value;
         debounceTimeoutName = undefined;
@@ -74,7 +74,7 @@ watch(() => currentDescription.value, () => {
     }
 
     debounceTimeoutDescription = setTimeout(() => {
-        useAccountStore().modifyAssociation({ description: currentDescription.value });
+        accountStore.modifyAssociation({ description: currentDescription.value });
         showToast('Votre description a été modifiée', true);
         debounceTimeoutDescription = undefined;
     }, 2000);
@@ -91,7 +91,7 @@ const changePassword = async () => {
         return;
     }
 
-    const response = await useAccountStore().changePassword(currentUser.value!.id!, getToken()!, currentMdp.value, newMdp.value);
+    const response = await accountStore.changePassword(currentUser.value!.id!, currentMdp.value, newMdp.value);
     if (response) {
         showToast('Votre mot de passe a été modifié', true);
     } else {
@@ -103,7 +103,7 @@ const changePassword = async () => {
 };
 
 const changeUserPP = () => {
-    currentUser.value!.profile_picture = 'https://api.dicebear.com/8.x/fun-emoji/svg?seed=' + uuidv4();
+    currentUser.value!.profilePicture = 'https://api.dicebear.com/8.x/fun-emoji/svg?seed=' + uuidv4();
 
     // Clear the previous timeout if it exists
     if (debounceTimeoutName) {
@@ -112,9 +112,9 @@ const changeUserPP = () => {
 
     // Set a new timeout
     debounceTimeoutName = setTimeout(() => {
-        useAccountStore().modifyUser(currentUser.value!.id!, getToken()!, undefined, currentUser.value!.profile_picture);
+        accountStore.modifyUser(currentUser.value!.id!, undefined, currentUser.value!.profilePicture);
         showToast('Votre photo de profil a été modifiée', true);
-        useAccountStore().CurrentUser!.profile_picture = currentUser.value!.profile_picture;
+        useAccountStore().CurrentUser!.profilePicture = currentUser.value!.profilePicture;
         debounceTimeoutName = undefined; // Reset the timeout variable
     }, 2000);
 };
@@ -124,8 +124,8 @@ const changeUserPP = () => {
 
         <profile-asso-addon v-if="association" :Asso="association"/>
         
-        <div class="img-user" v-if="currentUser?.role !== 'organization'">
-            <img class="pp" :src="currentUser?.profile_picture" alt="cover-img">
+        <div class="img-user" v-if="currentUser?.role !== 'ASSOCIATION'">
+            <img class="pp" :src="currentUser?.profilePicture" alt="cover-img">
             <div @click="changeUserPP()" class="icon-shuffle-arrow">
                 <RefreshCcw color="#fff" :size="20" />
             </div>

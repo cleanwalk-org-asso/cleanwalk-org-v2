@@ -1,17 +1,17 @@
 meta {
   name: upldate user
   type: http
-  seq: 4
+  seq: 2
 }
 
 put {
-  url: {{host}}/users
+  url: {{host}}/users/1
   body: json
   auth: none
 }
 
 body:json {
   {
-    "profile_picture": "new_image_url"
+    "profilePicture": "test"
   }
 }

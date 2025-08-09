@@ -1,102 +1,118 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue';
-import type { Ref } from 'vue';
-import type { User, Association, modifyAssociation } from '@/interfaces/userInterface';
-import apiService from '@/services/apiService';
-import router from '@/router';
-import type { ApiResponse } from '@/interfaces/apiResponseInterface';
+import { ref } from 'vue'
+import type { Ref } from 'vue'
+import type { User, Association, modifyAssociation } from '@/interfaces/userInterface'
+import api from '@/services/apiService'
+import router from '@/router'
 
 export const useAccountStore = defineStore('account', () => {
-    const tokenName = 'access_token';
-    const CurrentUser: Ref<User|undefined> = ref();
-    const isLoggedIn = ref(false);
-
-    const setToken = (token: string) => {
-        //set token in local storage
-        localStorage.setItem(tokenName, token);
-        
-    }
+    const CurrentUser: Ref<User | undefined> = ref()
+    const isLoggedIn = ref(false)
 
     const getOrganizationById = async (organizationId: number) => {
-        const response: ApiResponse = await apiService.kyGet('/users/association/' + organizationId);
-        if (!response.success) {
-            return undefined;
+        const response = await api.get('/users/association/' + organizationId);
+
+        if (!response.ok) {
+            return undefined
         }
-        return response.data as unknown as Association;
+        const data = await response.json()
+        return data as unknown as Association
     }
 
     async function logout() {
-        isLoggedIn.value = false;
-        localStorage.removeItem(tokenName);
-        CurrentUser.value = undefined;
-        router.push({ name: 'login' });
+        isLoggedIn.value = false
+        await api.post('auth/logout')
+        CurrentUser.value = undefined
+        router.push({ name: 'login' })
     }
 
-    async function tokenLogin(): Promise<boolean> {
-        const token:string = getAccessToken() as string;
-        if (!token) {
-            isLoggedIn.value = false;
-            return isLoggedIn.value;
+    const checkAuth = async () => {
+
+        console.log('Checking authentication...')
+
+        // Check if the user is already logged in
+        if (isLoggedIn.value === true && CurrentUser.value) {
+            console.log('User is already logged in:', CurrentUser.value)
+            return true
         }
-        
-        const response:ApiResponse = await apiService.kyPost('/users/token-login', {}, token);
-        if (response.success !== true) {
-            isLoggedIn.value = false;
-            return isLoggedIn.value;
+        try {
+            const res = await api.get('auth/me')
+            console.log('Authentication check response:', res.status)
+            if (res.ok) {
+                const userData = await res.json() as User
+                CurrentUser.value = userData
+                isLoggedIn.value = true
+                return true
+            }
+        } catch (error) {
+            isLoggedIn.value = false
+            CurrentUser.value = undefined
         }
-        
-        isLoggedIn.value = true;
-        const user: User = {
-            email: response.data.email as string,
-            name: response.data.name as string,
-            id: response.data.id as number,
-            role: response.data.role as 'organization' | 'user',
-            profile_picture: response.data.profile_picture as string,
-        }
-        CurrentUser.value = user;
-        return isLoggedIn.value;
+        return false
     }
 
-    const changePassword = async (userId: number, token: string, oldPassword: string, newPassword: string) => {
-        const response: ApiResponse = await apiService.kyPut('/users/password/' + userId, {
-            old_password: oldPassword,
-            new_password: newPassword
-        }, token);
-        return response.success;
+    const changePassword = async (
+        userId: number,
+        oldPassword: string,
+        newPassword: string
+    ) => {
+        const response = await api.put(
+            '/users/password/' + userId,
+            {
+                json: {
+                    old_password: oldPassword,
+                    new_password: newPassword
+                }
+            });
+        return response.ok
     }
 
-    const getAccessToken = ():string | undefined => {
-        return localStorage.getItem(tokenName) as string;
-    }
-
-    const modifyUser = (userId: number, token: string, name?: string, profile_picture?: string) => {
-        apiService.kyPut('/users/' + userId, {
-            name: name,
-            profile_picture: profile_picture,
-        }, token);
+    const modifyUser = (userId: number, name?: string, profilePicture?: string) => {
+        api.put(
+            'users/' + userId,
+            {
+                json: {
+                    name: name,
+                    profilePicture: profilePicture
+                }
+            });
     }
 
     const modifyAssociation = (asso: modifyAssociation) => {
-        apiService.kyPut('/users/association/' + CurrentUser.value!.id, asso as Record<string, unknown>, getAccessToken()!);
-    };
+        api.put(
+            '/users/association/' + CurrentUser.value!.id,
+            asso as Record<string, unknown>,
+        );
+    }
 
     const getAssoList = async () => {
-        const response: ApiResponse = await apiService.kyGet('/users/associations');
-        return response.data as unknown as Association[];
+        const response = await api.get('/users/associations');
+        return await response.json() as unknown as Association[]
     }
 
     const googleLoginSignup = async (credential: string, redirectPath?: string) => {
-        const response: ApiResponse = await apiService.kyPostWithoutToken('/users/google-login', {'token': credential});
-        if (response.success !== true) {
-            return false;
+        const response = await api.post('/users/google-login', {
+            json: {
+                token: credential
+            }
+        });
+        if (response.ok === false) {
+            return false
         }
-        setToken(response.data.access_token as string);
-        isLoggedIn.value = true;
-        CurrentUser.value = response.data.user as User;
-        
-        // Ne redirige plus automatiquement, cela sera géré par le composant appelant
-        return true;
+        isLoggedIn.value = true
+        return true
     }
 
-    return { setToken, logout, isLoggedIn, tokenLogin, CurrentUser, getAccessToken, modifyUser, changePassword, getOrganizationById, modifyAssociation, getAssoList, googleLoginSignup };
+    return {
+        logout,
+        isLoggedIn,
+        CurrentUser,
+        modifyUser,
+        changePassword,
+        getOrganizationById,
+        modifyAssociation,
+        getAssoList,
+        googleLoginSignup,
+        checkAuth
+    }
 })

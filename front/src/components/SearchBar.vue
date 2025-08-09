@@ -14,7 +14,7 @@ const props = defineProps({
 const emit = defineEmits(['updateSearch'])
 
 const accountStore = useAccountStore()
-const userImg = ref(accountStore.CurrentUser?.profile_picture)
+const userImg = ref(accountStore.CurrentUser?.profilePicture)
 const inputActive = ref(false)
 
 function handleInput(event: Event) {
