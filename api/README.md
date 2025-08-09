@@ -1,4 +1,4 @@
-# 🌱 API Fastify + Prisma + TypeScript
+# 🌱 API Fastify + Prisma + TypeScript 
 
 API backend moderne construite avec :
 
