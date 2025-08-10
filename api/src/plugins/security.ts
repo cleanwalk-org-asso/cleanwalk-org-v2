@@ -85,18 +85,16 @@ export default fp(async (fastify: FastifyInstance) => {
     async function (req: FastifyRequest, reply: FastifyReply): Promise<string> {
       try {
         if (!req.user) {
-          await req.jwtVerify(); // Assure que le token est décodé
+          try {
+            await req.jwtVerify();
+          } catch (err) {
+            return "";
+          }
         }
-
         const id = req.user?.id;
-        if (!id) {
-          reply.code(401).send({ error: "Invalid or missing token" });
-          throw new Error("Invalid or missing token");
-        }
-        return id.toString();
+        return id ? id.toString() : "";
       } catch (err) {
-        reply.code(401).send({ error: "Invalid or missing token" });
-        throw err;
+        return "";
       }
     }
   );
