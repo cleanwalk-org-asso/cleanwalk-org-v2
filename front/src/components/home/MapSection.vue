@@ -45,7 +45,7 @@ onMounted(async () => {
                 <div v-for="cleanwalk in cleanwalkStore.cleanwalksTab" :key="cleanwalk.id">
                     <l-marker :lat-lng="L.latLng(cleanwalk.pos_lat, cleanwalk.pos_long)">
                         <l-icon :icon-size="[25, 41]" :icon-anchor="[12, 41]"
-                            :iconUrl="cleanwalk.host?.role_id === 1 ? blueMapIcon : greenMapIcon">
+                            :iconUrl="cleanwalk.host?.role === 'ASSOCIATION' ? greenMapIcon : blueMapIcon">
                         </l-icon>
                     </l-marker>
                 </div>

@@ -377,10 +377,14 @@ export async function googleOAuthCallback(
 
     const userInfo = await response.json();
 
-    // 3. Vérifie si l'utilisateur existe
+    // 3. Récupère le rôle depuis le cookie (par défaut USER)
+    let role: any = request.cookies?.desired_role ?? 'USER';
+    reply.clearCookie('desired_role');
+
+    // 4. Vérifie si l'utilisateur existe
     let user = await prisma.user.findUnique({ where: { email: userInfo.email } });
 
-    // 4. Si l'utilisateur n'existe pas, on le crée
+    // 5. Si l'utilisateur n'existe pas, on le crée avec le rôle choisi
     if (!user) {
       user = await prisma.user.create({
         data: {
@@ -388,9 +392,12 @@ export async function googleOAuthCallback(
           email: userInfo.email,
           password: null,
           profilePicture: userInfo.picture,
-          role: 'USER', // ou 'BENEVOLE', à adapter selon votre modèle
+          role,
         },
       });
+      if (role === 'ASSOCIATION') {
+        await prisma.organization.create({ data: { userId: user.id } });
+      }
     }
 
     // 5. Supprime les anciens refresh token

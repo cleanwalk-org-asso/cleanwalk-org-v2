@@ -11,7 +11,22 @@ import {
 } from "../controllers/auth.controller.js";
 import { CreateUserSchema, LoginSchema, ForgotPasswordSchema, ResetPasswordSchema } from "../schemas/auth.schema.js";
 
+  // Route prep pour stocker le rôle dans un cookie avant le login Google
 export default async function authRoutes(app: FastifyInstance) {
+
+   app.get("/login/google/role/:role", async (req, reply) => {
+    const allowedRoles = ["USER", "ASSOCIATION"];
+    const role = allowedRoles.includes((req.params as any).role) ? (req.params as any).role : "USER";
+    reply.setCookie("desired_role", role, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 600,
+    });
+    return reply.redirect("/auth/google");
+  });
+ 
   app.get("/login/google/callback", googleOAuthCallback);
   app.post(
     "/register",
