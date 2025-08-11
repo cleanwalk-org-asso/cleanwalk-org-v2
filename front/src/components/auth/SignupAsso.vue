@@ -4,6 +4,7 @@ import api from '@/services/apiService';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import router from '@/router';
 import BaseInput from '@/components/base/BaseInput.vue';
+import GoogleButton from '../buttons/Button/GoogleButton.vue';
 
 const showToast = useUtilsStore().showToast;
 
@@ -68,12 +69,12 @@ const signup = async () => {
         <h1>
             Bienvenue sur la plateforme Cleanwalk.org
         </h1>
-        <!-- <GoogleLogin :callback="callback" />
+        <GoogleButton role="ASSOCIATION" />
         <div class="or">
             <div class="line"></div>
             <span>ou</span>
             <div class="line"></div>
-        </div> -->
+        </div>
         <form @submit.prevent="signup()">
             <BaseInput v-model="name" label="Nom de votre association/Organization ?" name="name" type="text"
                 placeholder="Cleanwalk.org" />

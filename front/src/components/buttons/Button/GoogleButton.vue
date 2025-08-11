@@ -1,8 +1,16 @@
 <script setup lang="ts">
 
+const props = defineProps<{
+    role?: 'ASSOCIATION' | 'USER';
+}>();
+
 const loginWithGoogle = () => {
   // Redirige l'utilisateur vers le backend (déclenche le flow OAuth)
-  window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
+  if (props.role) {
+      window.location.href = `${import.meta.env.VITE_API_URL}/auth/login/google/role/${props.role}`;
+  } else {
+      window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
+  }
 }
 </script>
 

@@ -5,16 +5,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import router from '@/router';
 import BaseInput from '@/components/base/BaseInput.vue';
-import { GoogleLogin } from 'vue3-google-login';
 import { useAccountStore } from '@/stores/AccountStore';
-import { type CallbackTypes } from 'vue3-google-login';
+import GoogleButton from '../buttons/Button/GoogleButton.vue';
 
 const accountStore = useAccountStore();
 const showToast = useUtilsStore().showToast;
 
-const callbackGoogleLogin: CallbackTypes.CredentialCallback = async (response) => {
-    await accountStore.googleLoginSignup(response.credential);
-};
 
 interface SignupResponse {
     id: string;
@@ -76,7 +72,7 @@ const signup = async () => {
             Choisissez le type de compte qui vous correspond :
         </h1>
 
-        <GoogleLogin :callback="callbackGoogleLogin" />
+        <GoogleButton role="USER" />
         <div class="or">
             <div class="line"></div>
             <span>ou</span>
