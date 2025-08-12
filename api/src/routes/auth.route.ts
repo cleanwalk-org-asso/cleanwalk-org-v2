@@ -53,7 +53,7 @@ export default async function authRoutes(app: FastifyInstance) {
 
   app.post("/refresh", refreshTokenHandler);
 
-  app.get("/me", { preHandler: app.authenticate }, getCurrentUser);
+  app.get("/me", getCurrentUser);
 
   // Route pour demander la réinitialisation du mot de passe
 

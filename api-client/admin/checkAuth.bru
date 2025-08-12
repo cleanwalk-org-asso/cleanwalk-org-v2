@@ -1,0 +1,15 @@
+meta {
+  name: checkAuth
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{host}}/admin/me
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}
