@@ -14,13 +14,23 @@ export default fp(async (fastify: FastifyInstance) => {
       cookieName: "access_token",
       signed: false,
     },
+    namespace: "user",
+  });
+
+  fastify.register(jwt, {
+    secret: process.env.JWT_SECRET!,
+    cookie: {
+      cookieName: "admin_token",
+      signed: false,
+    },
+    namespace: "admin",
   });
 
   fastify.decorate(
     "authenticate",
     async function (req: FastifyRequest, reply: FastifyReply) {
       try {
-        await req.jwtVerify();
+        await req.userJwtVerify();
       } catch (err) {
         reply.code(401).send({ error: "Unauthorized" });
       }
@@ -86,7 +96,7 @@ export default fp(async (fastify: FastifyInstance) => {
       try {
         if (!req.user) {
           try {
-            await req.jwtVerify();
+            await req.userJwtVerify();
           } catch (err) {
             return "";
           }

@@ -17,7 +17,7 @@ import uploadRoutes from "./routes/upload.route.js";
 import s3Plugin from "./plugins/s3.js";
 import dotenv from "dotenv";
 import oauthPlugin from '@fastify/oauth2';
-
+import adminRoutes from "./routes/admin.route.js";
 
 dotenv.config();
 
@@ -84,6 +84,7 @@ server.register(cityRoutes, { prefix: '/cities' });
 server.register(cleanwalkRoutes, { prefix: '/cleanwalks' });
 server.register(articleRoutes, { prefix: '/articles' });
 server.register(uploadRoutes, { prefix: '/upload' });
+server.register(adminRoutes, { prefix: '/admin' });
 server.register(s3Plugin);
 
 server.get("/ping", async (request, reply) => {

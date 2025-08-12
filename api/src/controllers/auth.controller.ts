@@ -78,7 +78,7 @@ export async function loginUser(
     return reply.status(401).send({ message: "Invalid credentials" });
   }
 
-  const token = await reply.jwtSign(
+  const token = await reply.userJwtSign(
     { id: user.id, role: user.role },
     { expiresIn: "1h" },
   );
@@ -159,7 +159,7 @@ export async function refreshTokenHandler(
   });
 
   // Crée un nouveau JWT
-  const jwt = await reply.jwtSign(
+  const jwt = await reply.userJwtSign(
     { id: existing.user.id, role: existing.user.role },
     { expiresIn: "1h" },
   );
@@ -188,7 +188,7 @@ export async function refreshTokenHandler(
 
 export async function getCurrentUser(req: FastifyRequest, reply: FastifyReply) {
   try {
-    const decoded = (await req.jwtVerify()) as { id: number; role: string };
+    const decoded = (await req.userJwtVerify()) as { id: number; role: string };
 
     const user = await prisma.user.findUnique({
       where: { id: decoded.id },
@@ -250,7 +250,7 @@ export async function forgetPassword(request: FastifyRequest, reply: FastifyRepl
     });
   }
 
-  const resetToken = await reply.jwtSign(
+  const resetToken = await reply.userJwtSign(
     { 
       id: user.id, 
       role: user.role,
@@ -413,7 +413,7 @@ export async function googleOAuthCallback(
     }
 
     // 6. Génération du JWT
-    const jwt = await reply.jwtSign(
+    const jwt = await reply.userJwtSign(
       { id: user.id, role: user.role },
       { expiresIn: '1h' }
     );
