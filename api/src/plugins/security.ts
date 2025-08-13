@@ -38,54 +38,37 @@ export default fp(async (fastify: FastifyInstance) => {
   );
 
   fastify.decorate(
-    "authorizeUser",
-    async function (req: FastifyRequest, reply: FastifyReply) {
-      try {
-        // Vérifier que l'utilisateur est authentifié
-        if (!req.user) {
-          return reply.code(401).send({ error: "Authentication required" });
-        }
+  "authorizeUser",
+  async function (req: FastifyRequest, reply: FastifyReply) {
+    const { id } = req.params as { id: string };
 
-        const { id } = req.params as { id: string };
-        const userId = req.user.id;
-        const userRole = req.user.role;
+    try {
+      await req.adminJwtVerify();
+      return;
+    } catch (_) {
+    }
 
-        // Admin peut accéder à toutes les ressources
-        if (userRole === "ADMIN") {
-          return;
-        }
+    try {
+      await req.userJwtVerify();
+    } catch (_) {
+      return reply.code(401).send({ error: "Unauthorized" });
+    }
 
-        // Utilisateur normal ne peut accéder qu'à ses propres données
-        if (userId.toString() !== id) {
-          return reply.code(403).send({ 
-            error: "Forbidden: You can only access your own resources" 
-          });
-        }
-      } catch (err) {
-        reply.code(500).send({ error: "Authorization check failed" });
-      }
-    },
-  );
+    const userId = String(req.user?.id ?? "");
+    if (userId !== String(id)) {
+      return reply.code(403).send({ error: "Forbidden: You can only access your own resources" });
+    }
+  },
+);
+
 
   fastify.decorate(
     "requireAdmin",
     async function (req: FastifyRequest, reply: FastifyReply) {
       try {
-        // Vérifier que l'utilisateur est authentifié
-        if (!req.user) {
-          return reply.code(401).send({ error: "Authentication required" });
-        }
-
-        const userRole = req.user.role;
-
-        // Vérifier si l'utilisateur est admin
-        if (userRole !== "ADMIN") {
-          return reply.code(403).send({ 
-            error: "Forbidden: Admin access required" 
-          });
-        }
+        await req.adminJwtVerify();
       } catch (err) {
-        reply.code(500).send({ error: "Admin check failed" });
+        reply.code(401).send({ error: "Unauthorized" });
       }
     },
   );

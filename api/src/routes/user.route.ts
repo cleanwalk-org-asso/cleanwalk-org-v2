@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { getAllUsers, getUserById, updateUser } from "../controllers/user.controller.js";
+import { getAllUsers, getUserById, updateUser, deleteUser } from "../controllers/user.controller.js";
 import { 
   UpdateUserSchema, 
   UserResponseSchema, 
@@ -19,7 +19,7 @@ export default async function userRoutes(app: FastifyInstance) {
   }, getAllUsers);
 
   app.get("/:id", {
-    preHandler: [app.authenticate, app.authorizeUser],
+    preHandler: [app.authorizeUser],
     schema: {
       params: UserParamsSchema,
       response: {
@@ -41,4 +41,8 @@ export default async function userRoutes(app: FastifyInstance) {
       },
     },
   }, updateUser);
+
+  app.delete("/:id", {
+    preHandler: [app.authorizeUser],
+  }, deleteUser);  
 }
