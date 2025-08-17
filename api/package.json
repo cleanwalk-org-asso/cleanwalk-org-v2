@@ -22,6 +22,8 @@
     "@fastify/jwt": "^9.1.0",
     "@fastify/multipart": "^9.0.3",
     "@fastify/oauth2": "^8.1.2",
+    "@fastify/rate-limit": "^10.3.0",
+    "@fastify/redis": "^7.0.2",
     "@fastify/swagger": "^9.5.1",
     "@fastify/swagger-ui": "^5.2.3",
     "@fastify/type-provider-typebox": "^5.2.0",
@@ -33,7 +35,9 @@
     "dotenv": "^17.2.1",
     "fastify": "^5.4.0",
     "fastify-plugin": "^5.0.1",
+    "i": "^0.3.7",
     "nodemailer": "^7.0.5",
+    "npm": "^11.5.2",
     "sharp": "^0.34.3",
     "undici": "^7.13.0"
   },

@@ -11,6 +11,12 @@ export default async function authRoutes(app: FastifyInstance) {
       schema: {
         body: LoginSchema,
       },
+      config: {
+        rateLimit: {
+          max: 5,
+          timeWindow: '1 minute',
+        },
+      },
     },
     loginAdmin,
   );

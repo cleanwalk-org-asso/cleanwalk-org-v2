@@ -34,6 +34,12 @@ export default async function authRoutes(app: FastifyInstance) {
       schema: {
         body: CreateUserSchema,
       },
+      config: {
+        rateLimit: {
+          max: 5,
+          timeWindow: '1 minute',
+        },
+      },
     },
     registerUser,
   );
@@ -43,6 +49,12 @@ export default async function authRoutes(app: FastifyInstance) {
     {
       schema: {
         body: LoginSchema,
+      },
+      config: {
+        rateLimit: {
+          max: 10,
+          timeWindow: '1 minute',
+        },
       },
     },
     loginUser,
