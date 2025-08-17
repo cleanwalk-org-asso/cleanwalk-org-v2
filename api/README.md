@@ -1,12 +1,17 @@
 # 🌱 API Fastify + Prisma + TypeScript 
 
-API backend moderne construite avec :
+API backend construite avec :
 
 - [Fastify](https://www.fastify.io/)
 - [Prisma ORM](https://www.prisma.io/)
 - [TypeScript](https://www.typescriptlang.org/)
 
 ---
+
+### base de donnée et outils:
+- PostgreSQL (via prisma)
+- Bucket storage (images)
+- redis (rate-limit + token-reset)
 
 ## 🚀 Commandes de développement
 
