@@ -11,7 +11,7 @@ const router = useRouter();
 
 const emailForgotPassword = async () => {
   try {
-    const response = await apiService.post( "/users/send-reset-email", {
+    const response = await apiService.post( "auth/forgot-password", {
       json: {
         email: email.value,
       },

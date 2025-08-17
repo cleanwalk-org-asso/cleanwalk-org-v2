@@ -10,7 +10,6 @@ Cleanwalk.org is a website to find clean walks all over France.
 ## Requirements
 
 - Docker and docker compose [install link ->](https://docs.docker.com/engine/install/)
-- MySQL DataBase
 - node.js [install link ->](https://nodejs.org/fr)
 - *(optional)* python3 [install link ->](https://www.python.org/downloads/)
 

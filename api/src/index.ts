@@ -18,6 +18,9 @@ import s3Plugin from "./plugins/s3.js";
 import dotenv from "dotenv";
 import oauthPlugin from '@fastify/oauth2';
 import adminRoutes from "./routes/admin.route.js";
+import fastifyRedis from '@fastify/redis';
+import rateLimit from '@fastify/rate-limit'
+
 
 dotenv.config();
 
@@ -41,6 +44,7 @@ server.register(cors, {
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 });
+
 server.register(multipart);
 server.register(prismaPlugin);
 server.register(swagger, {
@@ -57,8 +61,6 @@ server.register(swaggerUi, {
 server.register(jwtPlugin);
 server.register(loggingPlugin);
 
-
-
 server.register(oauthPlugin, {
   name: 'googleOAuth2',
   scope: ['email', 'profile'],
@@ -74,7 +76,25 @@ server.register(oauthPlugin, {
   callbackUri: process.env.CALLBACK_URL!,
 })
 
-server.decorate('FRONTEND_URL', process.env.FRONTEND_URL);
+server.decorate('config', {
+  isProduction: process.env.NODE_ENV === 'production',
+  FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:5173',
+  SMTP_SECURE: process.env.SMTP_SECURE === 'true',
+});
+
+// Register Redis
+server.register(fastifyRedis, { url: process.env.REDIS_URL });
+
+await server.register(rateLimit, {
+  global: false,
+  redis: server.redis,
+  addHeaders: {
+    'x-ratelimit-limit': true,
+    'x-ratelimit-remaining': true,
+    'x-ratelimit-reset': true,
+    'retry-after': true,
+  },
+})
 
 //routes
 server.register(userRoutes, { prefix: '/users' });

@@ -5,6 +5,7 @@ import { CreateUserInput, LoginInput } from "../schemas/auth.schema.js";
 import { randomUUID } from "crypto";
 import { addMinutes } from "date-fns";
 import { generatePasswordResetEmail, sendMail } from "../utils/mailer.js";
+import { hashToken, generateOpaqueToken, tokenKey, userKey, TOKEN_TTL_SEC } from "../utils/crypro.js";
 
 const ACCESS_TOKEN_MAX_AGE = 60 * 60; // 1 heure en secondes
 const REFRESH_TOKEN_MAX_AGE = 60 * 60 * 24 * 30; // 30 jours en secondes
@@ -68,7 +69,7 @@ export async function loginUser(
       path: "/",
       httpOnly: true,
       sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",
+      secure: reply.server.config.isProduction,
     });
   }
 
@@ -98,7 +99,7 @@ export async function loginUser(
     httpOnly: true,
     sameSite: "strict",
     path: "/",
-    secure: process.env.NODE_ENV === "production",
+    secure: reply.server.config.isProduction,
     maxAge: ACCESS_TOKEN_MAX_AGE,
   });
 
@@ -106,7 +107,7 @@ export async function loginUser(
     httpOnly: true,
     sameSite: "strict",
     path: "/",
-    secure: process.env.NODE_ENV === "production",
+    secure: reply.server.config.isProduction,
     maxAge: REFRESH_TOKEN_MAX_AGE,
   });
 
@@ -169,7 +170,7 @@ export async function refreshTokenHandler(
     httpOnly: true,
     sameSite: "strict",
     path: "/",
-    secure: process.env.NODE_ENV === "production",
+    secure: reply.server.config.isProduction,
     maxAge: REFRESH_TOKEN_MAX_AGE,
   });
 
@@ -178,7 +179,7 @@ export async function refreshTokenHandler(
     httpOnly: true,
     sameSite: "strict",
     path: "/",
-    secure: process.env.NODE_ENV === "production",
+    secure: reply.server.config.isProduction,
     maxAge: ACCESS_TOKEN_MAX_AGE,
   });
 
@@ -222,129 +223,115 @@ export async function logoutUser(req: FastifyRequest, reply: FastifyReply) {
     path: "/",
     httpOnly: true,
     sameSite: "strict",
-    secure: process.env.NODE_ENV === "production",
+    secure: reply.server.config.isProduction,
   });
   reply.clearCookie("refresh_token", {
     path: "/",
     httpOnly: true,
     sameSite: "strict",
-    secure: process.env.NODE_ENV === "production",
+    secure: reply.server.config.isProduction,
   });
   return reply.code(204).send();
 }
 
 export async function forgetPassword(request: FastifyRequest, reply: FastifyReply) {
   const { email } = request.body as { email: string };
+  if (!email) return reply.code(400).send({ error: "L'email est obligatoire." });
 
-  if (!email) {
-    return reply.code(400).send({ error: "L'email est obligatoire." });
-  }
+  const prisma = request.server.prisma;
+  const redis  = request.server.redis;
 
-  const user = await request.server.prisma.user.findUnique({
-    where: { email }
-  });
+  const user = await prisma.user.findUnique({ where: { email } });
 
-  if (!user) {
-    return reply.send({ 
-      message: "Si un compte existe avec cet email, un lien de réinitialisation sera envoyé."
-    });
-  }
+  // Réponse neutre pour ne pas divulguer l’existence du compte
+  const neutral = { message: "Si un compte existe avec cet email, un lien de réinitialisation sera envoyé." };
 
-  const resetToken = await reply.userJwtSign(
-    { 
-      id: user.id, 
-      role: user.role,
-      email: user.email,
-      purpose: 'password-reset'
-    },
-    { 
-      expiresIn: '1h' 
-    }
-  );
+  if (!user) return reply.send(neutral);
 
-  // Générer et envoyer l'email
+  // Révoquer un éventuel ancien token
+  const oldHash = await redis.get(userKey(user.id));
+  if (oldHash) await redis.del(tokenKey(oldHash));
+
+  // Générer token opaque + hash
+  const token = generateOpaqueToken(32);     // ~256 bits
+  const hash  = hashToken(token);
+
+  // Enregistrer de manière éphémère (30 min)
+  // NX optionnel (collisions extrêmement improbables)
+  await redis.set(tokenKey(hash), String(user.id), 'EX', TOKEN_TTL_SEC);
+  await redis.set(userKey(user.id), hash, 'EX', TOKEN_TTL_SEC);
+
+  // Envoyer l’email
   try {
-    const emailContent = generatePasswordResetEmail(email, resetToken);
+    const emailContent = generatePasswordResetEmail(email, token); // <-- adapter: passe l’URL, plus le token
     await sendMail({
       to: email,
       subject: emailContent.subject,
       html: emailContent.html,
       text: emailContent.text
     });
-
-    return reply.send({ 
-      message: "Si un compte existe avec cet email, un lien de réinitialisation sera envoyé." 
-    });
-  } catch (error) {
-    console.error('Error sending password reset email:', error);
-    return reply.code(500).send({ 
-      error: "Une erreur est survenue lors de l'envoi de l'email."
-    });
+    return reply.send(neutral);
+  } catch (err) {
+    request.log.error({ err }, 'Error sending password reset email');
+    return reply.code(500).send({ error: "Une erreur est survenue lors de l'envoi de l'email." });
   }
 }
 
 export async function resetPassword(request: FastifyRequest, reply: FastifyReply) {
-  const { token, newPassword } = request.body as { 
-    token: string;
-    newPassword: string;
-  };
-
-  if (!token || !newPassword) {
-    return reply.code(400).send({ 
-      error: "Le token et le nouveau mot de passe sont obligatoires." 
-    });
+  const { token, password } = request.body as { token: string; password: string };
+  if (!token || !password) {
+    return reply.code(400).send({ error: "Le token et le nouveau mot de passe sont obligatoires." });
   }
 
-  try {
-    // Vérifier le JWT token
-    const payload = await request.server.jwt.verify(token) as { 
-      id: string; 
-      email: string;
-      purpose: string;
-    };
-    
-    // Vérifier si c'est bien un token de réinitialisation de mot de passe
-    if (payload.purpose !== 'password-reset') {
-      return reply.code(400).send({ 
-        error: "Ce lien de réinitialisation est invalide." 
-      });
-    }
-    
-    // Vérifier si l'utilisateur existe
-    const user = await request.server.prisma.user.findUnique({
-      where: { 
-        id: Number(payload.id),
-        email: payload.email
-      }
-    });
+  const prisma = request.server.prisma;
+  const redis  = request.server.redis;
 
-    if (!user) {
-      return reply.code(400).send({ 
-        error: "Ce lien de réinitialisation est invalide ou a expiré." 
-      });
-    }
+  const hash = hashToken(token);
+  const tKey = tokenKey(hash);
 
-    // Hacher le nouveau mot de passe
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+  // Consommation atomique du token (GETDEL depuis Redis 6.2)
+  let userIdStr: string | null = null;
+  const redisAny = redis as any;
 
-    // Mettre à jour le mot de passe
-    await request.server.prisma.user.update({
-      where: { id: user.id },
-      data: {
-        password: hashedPassword
-      }
-    });
-
-    return reply.send({ 
-      message: "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter avec votre nouveau mot de passe." 
-    });
-  } catch (error) {
-    // Si le token est expiré ou invalide, JWT va lancer une erreur
-    return reply.code(400).send({ 
-      error: "Ce lien de réinitialisation est invalide ou a expiré." 
-    });
+  if (typeof redisAny.getdel === 'function') {
+    userIdStr = await redisAny.getdel(tKey);
+  } else {
+    // Fallback Lua pour faire GET+DEL atomique si GETDEL indisponible
+    userIdStr = await redis.eval(
+      "local v=redis.call('GET', KEYS[1]); if v then redis.call('DEL', KEYS[1]) end; return v",
+      1,
+      tKey
+    ) as string | null;
   }
+
+  if (!userIdStr) {
+    return reply.code(400).send({ error: "Ce lien de réinitialisation est invalide ou a expiré." });
+  }
+
+  const userId = Number(userIdStr);
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) {
+    // Nettoyage défensif : pointer userKey peut exister sans user
+    await redis.del(userKey(userId));
+    return reply.code(400).send({ error: "Ce lien de réinitialisation est invalide ou a expiré." });
+  }
+
+  // (Optionnel) forcer une politique de mot de passe ici
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { password: hashedPassword }
+  });
+
+  // Nettoyer le pointeur utilisateur (si présent)
+  await redis.del(userKey(userId));
+
+  // (Optionnel) invalider les sessions en cours / refresh tokens de cet utilisateur
+
+  return reply.send({ message: "Votre mot de passe a été réinitialisé avec succès." });
 }
+
 
 export async function googleOAuthCallback(
   request: FastifyRequest,
@@ -408,7 +395,7 @@ export async function googleOAuthCallback(
         path: "/",
         httpOnly: true,
         sameSite: "strict",
-        secure: process.env.NODE_ENV === "production",
+        secure: reply.server.config.isProduction,
       });
     }
 
@@ -435,7 +422,7 @@ export async function googleOAuthCallback(
       httpOnly: true,
       sameSite: "strict",
       path: "/",
-      secure: process.env.NODE_ENV === "production",
+      secure: reply.server.config.isProduction,
       maxAge: ACCESS_TOKEN_MAX_AGE,
     });
 
@@ -443,7 +430,7 @@ export async function googleOAuthCallback(
       httpOnly: true,
       sameSite: "strict",
       path: "/",
-      secure: process.env.NODE_ENV === "production",
+      secure: reply.server.config.isProduction,
       maxAge: REFRESH_TOKEN_MAX_AGE,
     });
 
