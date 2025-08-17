@@ -2,10 +2,14 @@ import nodemailer from 'nodemailer';
 
 // Create a transporter using the fake SMTP server (MailHog)
 const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'localhost', // Using localhost since we're running outside Docker
-  port: Number(process.env.SMTP_PORT) || 1025,
-  secure: false,
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT),
+  secure: true,
   ignoreTLS: true,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
 });
 
 interface SendMailOptions {
@@ -21,7 +25,7 @@ interface SendMailOptions {
 export async function sendMail({ to, subject, text, html }: SendMailOptions) {
   try {
     const info = await transporter.sendMail({
-      from: `"Budgetor" <noreply@balancetoncompte.fr>`,
+      from:`"Cleanwalk.org" <${process.env.SMTP_USER}>`,
       to,
       subject,
       text,
@@ -40,8 +44,8 @@ export async function sendMail({ to, subject, text, html }: SendMailOptions) {
  * Generate a password reset email with JWT token
  */
 export function generatePasswordResetEmail(email: string, resetToken: string) {
-  const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}`;
-  
+  const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
   const html = `
     <h1>Réinitialisation de votre mot de passe</h1>
     <p>Vous avez demandé à réinitialiser votre mot de passe. Cliquez sur le lien ci-dessous pour définir un nouveau mot de passe :</p>
@@ -49,7 +53,7 @@ export function generatePasswordResetEmail(email: string, resetToken: string) {
     <p>Si vous n'avez pas demandé cette réinitialisation, vous pouvez ignorer cet email.</p>
     <p>Le lien expirera dans 1 heure.</p>
   `;
-  
+
   const text = `
     Réinitialisation de votre mot de passe
     
@@ -61,7 +65,7 @@ export function generatePasswordResetEmail(email: string, resetToken: string) {
     
     Le lien expirera dans 1 heure.
   `;
-  
+
   return {
     subject: 'Réinitialisation de votre mot de passe',
     html,

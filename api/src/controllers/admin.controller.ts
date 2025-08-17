@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { LoginInput } from "../schemas/auth.schema.js";
 
-const ADMIN_TOKEN_MAX_AGE = 60 * 30; // 1 heure en secondes
+const ADMIN_TOKEN_MAX_AGE = 60 * 30; // 30 minutes
 
 const prisma = new PrismaClient();
 
@@ -33,7 +33,7 @@ export async function loginAdmin(
     httpOnly: true,
     sameSite: "strict",
     path: "/",
-    secure: process.env.NODE_ENV === "production",
+    secure: reply.server.config.isProduction,
     maxAge: ADMIN_TOKEN_MAX_AGE,
   });
 

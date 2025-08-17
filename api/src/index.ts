@@ -74,7 +74,11 @@ server.register(oauthPlugin, {
   callbackUri: process.env.CALLBACK_URL!,
 })
 
-server.decorate('FRONTEND_URL', process.env.FRONTEND_URL);
+server.decorate('config', {
+  isProduction: process.env.NODE_ENV === 'production',
+  FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:5173',
+  SMTP_SECURE: process.env.SMTP_SECURE === 'true',
+});
 
 //routes
 server.register(userRoutes, { prefix: '/users' });

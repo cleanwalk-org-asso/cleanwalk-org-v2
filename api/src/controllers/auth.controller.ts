@@ -68,7 +68,7 @@ export async function loginUser(
       path: "/",
       httpOnly: true,
       sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",
+      secure: reply.server.config.isProduction,
     });
   }
 
@@ -98,7 +98,7 @@ export async function loginUser(
     httpOnly: true,
     sameSite: "strict",
     path: "/",
-    secure: process.env.NODE_ENV === "production",
+    secure: reply.server.config.isProduction,
     maxAge: ACCESS_TOKEN_MAX_AGE,
   });
 
@@ -106,7 +106,7 @@ export async function loginUser(
     httpOnly: true,
     sameSite: "strict",
     path: "/",
-    secure: process.env.NODE_ENV === "production",
+    secure: reply.server.config.isProduction,
     maxAge: REFRESH_TOKEN_MAX_AGE,
   });
 
@@ -169,7 +169,7 @@ export async function refreshTokenHandler(
     httpOnly: true,
     sameSite: "strict",
     path: "/",
-    secure: process.env.NODE_ENV === "production",
+    secure: reply.server.config.isProduction,
     maxAge: REFRESH_TOKEN_MAX_AGE,
   });
 
@@ -178,7 +178,7 @@ export async function refreshTokenHandler(
     httpOnly: true,
     sameSite: "strict",
     path: "/",
-    secure: process.env.NODE_ENV === "production",
+    secure: reply.server.config.isProduction,
     maxAge: ACCESS_TOKEN_MAX_AGE,
   });
 
@@ -222,13 +222,13 @@ export async function logoutUser(req: FastifyRequest, reply: FastifyReply) {
     path: "/",
     httpOnly: true,
     sameSite: "strict",
-    secure: process.env.NODE_ENV === "production",
+    secure: reply.server.config.isProduction,
   });
   reply.clearCookie("refresh_token", {
     path: "/",
     httpOnly: true,
     sameSite: "strict",
-    secure: process.env.NODE_ENV === "production",
+    secure: reply.server.config.isProduction,
   });
   return reply.code(204).send();
 }
@@ -250,11 +250,11 @@ export async function forgetPassword(request: FastifyRequest, reply: FastifyRepl
     });
   }
 
-  const resetToken = await reply.userJwtSign(
+  const resetToken = await reply.server.jwt.sign(
     { 
       id: user.id, 
       role: user.role,
-      email: user.email,
+      email: user.email!,
       purpose: 'password-reset'
     },
     { 
@@ -284,12 +284,12 @@ export async function forgetPassword(request: FastifyRequest, reply: FastifyRepl
 }
 
 export async function resetPassword(request: FastifyRequest, reply: FastifyReply) {
-  const { token, newPassword } = request.body as { 
+  const { token, password } = request.body as { 
     token: string;
-    newPassword: string;
+    password: string;
   };
 
-  if (!token || !newPassword) {
+  if (!token || !password) {
     return reply.code(400).send({ 
       error: "Le token et le nouveau mot de passe sont obligatoires." 
     });
@@ -325,7 +325,7 @@ export async function resetPassword(request: FastifyRequest, reply: FastifyReply
     }
 
     // Hacher le nouveau mot de passe
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     // Mettre à jour le mot de passe
     await request.server.prisma.user.update({
@@ -408,7 +408,7 @@ export async function googleOAuthCallback(
         path: "/",
         httpOnly: true,
         sameSite: "strict",
-        secure: process.env.NODE_ENV === "production",
+        secure: reply.server.config.isProduction,
       });
     }
 
@@ -435,7 +435,7 @@ export async function googleOAuthCallback(
       httpOnly: true,
       sameSite: "strict",
       path: "/",
-      secure: process.env.NODE_ENV === "production",
+      secure: reply.server.config.isProduction,
       maxAge: ACCESS_TOKEN_MAX_AGE,
     });
 
@@ -443,7 +443,7 @@ export async function googleOAuthCallback(
       httpOnly: true,
       sameSite: "strict",
       path: "/",
-      secure: process.env.NODE_ENV === "production",
+      secure: reply.server.config.isProduction,
       maxAge: REFRESH_TOKEN_MAX_AGE,
     });
 
