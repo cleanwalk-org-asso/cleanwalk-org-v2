@@ -434,7 +434,7 @@ export async function googleOAuthCallback(
       maxAge: REFRESH_TOKEN_MAX_AGE,
     });
 
-    reply.redirect((request.server as any).FRONTEND_URL);
+    reply.redirect(request.server.config.FRONTEND_URL);
 
   } catch (error: any) {
     return reply.status(500).send({
