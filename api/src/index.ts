@@ -20,7 +20,7 @@ import oauthPlugin from '@fastify/oauth2';
 import adminRoutes from "./routes/admin.route.js";
 import fastifyRedis from '@fastify/redis';
 import rateLimit from '@fastify/rate-limit'
-
+import { cleanwalkChatRoutes } from "./routes/cleanwalkChat.route.js";
 
 dotenv.config();
 
@@ -106,6 +106,7 @@ server.register(articleRoutes, { prefix: '/articles' });
 server.register(uploadRoutes, { prefix: '/upload' });
 server.register(adminRoutes, { prefix: '/admin' });
 server.register(s3Plugin);
+await server.register(cleanwalkChatRoutes);
 
 server.get("/ping", async (request, reply) => {
   return "pong\n";
