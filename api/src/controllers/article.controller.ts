@@ -1,9 +1,6 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { PrismaClient } from "@prisma/client";
 import { Static } from "@sinclair/typebox";
 import { CreateArticleSchema, UpdateArticleSchema, ArticleParamsSchema } from "../schemas/article.schema.js";
-
-const prisma = new PrismaClient();
 
 export async function getArticleById(
   req: FastifyRequest<{ Params: Static<typeof ArticleParamsSchema> }>,
@@ -11,6 +8,7 @@ export async function getArticleById(
 ) {
   try {
     const { articleId } = req.params;
+    const prisma = req.server.prisma;
 
     const article = await prisma.article.findUnique({
       where: { id: articleId },
@@ -57,6 +55,7 @@ export async function getAllArticles(
   reply: FastifyReply,
 ) {
   try {
+    const prisma = req.server.prisma;
     const articles = await prisma.article.findMany({
       include: {
         categories: {
@@ -101,7 +100,7 @@ export async function createArticle(
 ) {
   try {
     const data = req.body;
-
+    const prisma = req.server.prisma;
     const article = await prisma.article.create({
       data: {
         title: data.title,
@@ -134,7 +133,7 @@ export async function updateArticle(
   try {
     const { articleId } = req.params;
     const data = req.body;
-
+    const prisma = req.server.prisma;
     const existingArticle = await prisma.article.findUnique({
       where: { id: articleId }
     });
@@ -180,7 +179,7 @@ export async function deleteArticle(
 ) {
   try {
     const { articleId } = req.params;
-
+    const prisma = req.server.prisma;
     const existingArticle = await prisma.article.findUnique({
       where: { id: articleId }
     });

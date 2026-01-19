@@ -1,8 +1,5 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { PrismaClient } from "@prisma/client";
 import { UpdateAssociationInput } from "../schemas/association.schema.js";
-
-const prisma = new PrismaClient();
 
 export async function getAssociationById(
   req: FastifyRequest<{ Params: { id: number } }>,
@@ -76,6 +73,7 @@ export async function updateAssociation(
 ) {
   const userId = Number(req.params.id);
   const body = req.body;
+  const prisma = req.server.prisma;
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user)
     return reply.code(404).send({ message: "Utilisateur introuvable" });

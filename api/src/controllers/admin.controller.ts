@@ -1,11 +1,8 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { LoginInput } from "../schemas/auth.schema.js";
 
 const ADMIN_TOKEN_MAX_AGE = 60 * 30; // 30 minutes
-
-const prisma = new PrismaClient();
 
 export async function loginAdmin(
   req: FastifyRequest<{ Body: LoginInput }>,
@@ -14,6 +11,7 @@ export async function loginAdmin(
 
   const { email, password } = req.body;
 
+  const prisma = req.server.prisma;
   const user = await prisma.user.findUnique({ where: { email } });
 
   if (!user || user.role !== "ADMIN") {
@@ -50,6 +48,7 @@ export async function loginAdmin(
 }
 
 export async function logoutUser(req: FastifyRequest, reply: FastifyReply) {
+  const prisma = req.server.prisma;
   const refreshToken = req.cookies?.refresh_token;
   if (refreshToken) {
     await prisma.refreshToken.deleteMany({ where: { token: refreshToken } });
@@ -67,6 +66,7 @@ export async function getAdmin(req: FastifyRequest, reply: FastifyReply) {
   try {
     const decoded = (await req.adminJwtVerify()) as { id: number; role: string };
 
+    const prisma = req.server.prisma;
     const user = await prisma.user.findUnique({
       where: { id: decoded.id },
       select: {

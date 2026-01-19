@@ -1,13 +1,11 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
 
 export async function getCity(
   req: FastifyRequest<{ Params: {cityId: number} }>,
   reply: FastifyReply
 ) {
   const cityId = req.params.cityId;
+  const prisma = req.server.prisma;
   const city = await prisma.city.findUnique({ where: { id: cityId } });
   if (city) {
     reply.send(city);
@@ -20,6 +18,7 @@ export async function getAllCities(
   req: FastifyRequest,
   reply: FastifyReply
 ) {
+  const prisma = req.server.prisma;
   const cities = await prisma.city.findMany();
   if (cities.length > 0) {
     reply.send(cities);
@@ -33,6 +32,7 @@ export async function createCity(
   reply: FastifyReply
 ) {
   const { name } = req.body;
+  const prisma = req.server.prisma;
   const newCity = await prisma.city.create({ data: { name } });
   reply.status(201).send({ message: "City created successfully", city: newCity });
 }
@@ -43,6 +43,7 @@ export async function updateCity(
 ) {
   const cityId = req.params.cityId;
   const { name } = req.body;
+  const prisma = req.server.prisma;
   const city = await prisma.city.findUnique({ where: { id: cityId } });
   if (city) {
     await prisma.city.update({ where: { id: cityId }, data: { name } });
@@ -57,6 +58,7 @@ export async function deleteCity(
   reply: FastifyReply
 ) {
   const cityId = req.params.cityId;
+  const prisma = req.server.prisma;
   const city = await prisma.city.findUnique({ where: { id: cityId } });
   if (city) {
     await prisma.city.delete({ where: { id: cityId } });
