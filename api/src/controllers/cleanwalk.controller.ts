@@ -1,15 +1,13 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { PrismaClient } from "@prisma/client";
 import { Static } from "@sinclair/typebox";
 import { CreateCleanwalkSchema, UpdateCleanwalkSchema } from "../schemas/cleanwalk.schema.js";
-
-const prisma = new PrismaClient();
 
 export async function getCleanwalkById(req: FastifyRequest<{ Params: { cleanwalkId: number } }>, reply: FastifyReply) {
     const cleanwalkId = req.params.cleanwalkId;
     const userId = (req as any).user?.id;
     console.log("User ID from request:", userId);
 
+    const prisma = req.server.prisma;
     const cleanwalk = await prisma.cleanwalk.findUnique({
         where: { id: cleanwalkId },
         include: {
@@ -60,7 +58,7 @@ export async function getCleanwalkById(req: FastifyRequest<{ Params: { cleanwalk
 export async function getAllCleanwalks(req: FastifyRequest, reply: FastifyReply) {
     const now = new Date();
     const twoMonthsLater = new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000); // ≈ 2 mois
-
+    const prisma = req.server.prisma;
     const cleanwalks = await prisma.cleanwalk.findMany({
         where: {
             dateBegin: {
@@ -129,7 +127,7 @@ export async function checkUserParticipation(req: FastifyRequest<{ Querystring: 
         reply.status(400).send({ message: "User ID and Cleanwalk ID are required" });
         return;
     }
-
+    const prisma = req.server.prisma;
     const participation = await prisma.cleanwalkUser.findFirst({ where: { userId, cleanwalkId } });
 
     if (participation) {
@@ -145,6 +143,7 @@ export async function checkUserParticipation(req: FastifyRequest<{ Querystring: 
 
 export async function createCleanwalk(req: FastifyRequest, reply: FastifyReply) {
     const data: Static<typeof CreateCleanwalkSchema> = req.body as Static<typeof CreateCleanwalkSchema>;
+    const prisma = req.server.prisma;
     let city = await prisma.city.findFirst({ where: { name: data.city } });
     if (!city) {
         city = await prisma.city.create({ data: { name: data.city } });
@@ -175,6 +174,7 @@ export async function createCleanwalk(req: FastifyRequest, reply: FastifyReply) 
 
 export async function joinCleanwalk(req: FastifyRequest, reply: FastifyReply) {
     const data = req.body as { cleanwalk_id: number; user_id: number; nb_person: number };
+    const prisma = req.server.prisma;
     await prisma.cleanwalkUser.create({
         data: {
             cleanwalkId: data.cleanwalk_id,
@@ -190,6 +190,7 @@ export async function updateCleanwalk(req: FastifyRequest, reply: FastifyReply) 
     const params = req.params as { cleanwalkId: number };
     const cleanwalkId = Number(params.cleanwalkId);
     const data: Static<typeof UpdateCleanwalkSchema> = req.body as Static<typeof UpdateCleanwalkSchema>;
+    const prisma = req.server.prisma;
     let cityId;
     if (data.city) {
         let city = await prisma.city.findFirst({ where: { name: data.city } });
@@ -206,6 +207,7 @@ export async function updateCleanwalk(req: FastifyRequest, reply: FastifyReply) 
 }
 
 export async function deleteCleanwalk(req: FastifyRequest<{ Params: { cleanwalkId: number } }>, reply: FastifyReply) {
+    const prisma = req.server.prisma;
     const cleanwalkId = req.params.cleanwalkId;
     await prisma.cleanwalk.delete({ where: { id: cleanwalkId } });
     reply.send({ message: "Cleanwalk deleted successfully" });
@@ -213,6 +215,7 @@ export async function deleteCleanwalk(req: FastifyRequest<{ Params: { cleanwalkI
 
 export async function leaveCleanwalk(req: FastifyRequest, reply: FastifyReply) {
     const data = req.body as { cleanwalk_id: number; user_id: number };
+    const prisma = req.server.prisma;
     await prisma.cleanwalkUser.deleteMany({ where: { cleanwalkId: data.cleanwalk_id, userId: data.user_id } });
     reply.send({ message: "User removed from the cleanwalk successfully" });
 }

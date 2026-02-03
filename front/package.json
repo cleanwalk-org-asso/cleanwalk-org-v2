@@ -14,12 +14,14 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.1.18",
     "@vue-leaflet/vue-leaflet": "^0.10.1",
     "date-fns": "^3.3.1",
     "ky": "^1.2.0",
     "leaflet": "^1.9.4",
     "lucide-vue-next": "^0.511.0",
     "pinia": "^2.1.7",
+    "tailwindcss": "^4.1.18",
     "uuid": "^9.0.1",
     "vue": "^3.4.15",
     "vue-router": "^4.2.5"

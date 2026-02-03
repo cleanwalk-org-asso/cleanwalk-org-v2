@@ -13,6 +13,7 @@ import { useUtilsStore } from '@/stores/UtilsStore';
 import api from '@/services/apiService';
 import BaseInput from './base/BaseInput.vue';
 import BaseTextarea from './base/BaseTextarea.vue';
+import NavBar from './NavBar.vue';
 
 const showToast = useUtilsStore().showToast;
 
@@ -119,22 +120,25 @@ const handleSelectAddress = (addressData: { address: string, lat: string, lon: s
 </script>
 
 <template>
-  <div v-if="currentCleanwalk" class="container">
-    <div class="banner">
-      <dragDrop ref="dragDropRef" :current-img="currentCleanwalk.img_url" format="card" />
+  <NavBar />
+  <div class="flex flex-col items-center pt-10">
+    <div v-if="currentCleanwalk" class="container max-w-3xl">
+      <div class="banner">
+        <dragDrop ref="dragDropRef" :current-img="currentCleanwalk.img_url" format="card" />
+      </div>
+      <BaseInput v-model="currentCleanwalk.name" name="name" type="text" label="Nom de la cleanwalk"
+        placeholder="Saisissez le nom de votre évènement" />
+      <AutocompleteAddress v-model:query="currentCleanwalk.address" @select-suggestion="handleSelectAddress" />
+      <label for="description">Description</label>
+      <BaseTextarea name="descrition" v-model="currentCleanwalk.description" id="description" :rows="4"></BaseTextarea>
+      <BaseInput v-model="dateCleanwalk.dateDay" name="date" type="date" label="Date de l'évènement" />
+      <BaseInput v-model="dateCleanwalk.hourBegin" name="hourBegin" type="time" label="Heure de début" />
+      <BaseInput v-model="dateCleanwalk.hourEnd" name="hourEnd" type="time" label="Heure de fin" />
+  
+      <button @click="validate()" class="validate button-primary">
+        Valider
+      </button>
     </div>
-    <BaseInput v-model="currentCleanwalk.name" name="name" type="text" label="Nom de la cleanwalk"
-      placeholder="Saisissez le nom de votre évènement" />
-    <AutocompleteAddress v-model:query="currentCleanwalk.address" @select-suggestion="handleSelectAddress" />
-    <label for="description">Description</label>
-    <BaseTextarea name="descrition" v-model="currentCleanwalk.description" id="description" :rows="4"></BaseTextarea>
-    <BaseInput v-model="dateCleanwalk.dateDay" name="date" type="date" label="Date de l'évènement" />
-    <BaseInput v-model="dateCleanwalk.hourBegin" name="hourBegin" type="time" label="Heure de début" />
-    <BaseInput v-model="dateCleanwalk.hourEnd" name="hourEnd" type="time" label="Heure de fin" />
-
-    <button @click="validate()" class="validate button-primary">
-      Valider
-    </button>
   </div>
 </template>
 

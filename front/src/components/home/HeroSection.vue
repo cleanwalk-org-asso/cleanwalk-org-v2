@@ -4,7 +4,7 @@
             <div>   
                 La plateforme française
             </div>
-            <div>
+            <div class="bg-red-400">
                 qui centralise les ramassages citoyens de déchets !
             </div>
         </h1>

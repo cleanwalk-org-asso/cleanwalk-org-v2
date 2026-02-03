@@ -1,5 +1,4 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { CreateUserInput, LoginInput } from "../schemas/auth.schema.js";
 import { randomUUID } from "crypto";
@@ -10,12 +9,12 @@ import { hashToken, generateOpaqueToken, tokenKey, userKey, TOKEN_TTL_SEC } from
 const ACCESS_TOKEN_MAX_AGE = 60 * 60; // 1 heure en secondes
 const REFRESH_TOKEN_MAX_AGE = 60 * 60 * 24 * 30; // 30 jours en secondes
 
-const prisma = new PrismaClient();
-
 export async function registerUser(
   req: FastifyRequest<{ Body: CreateUserInput }>,
   reply: FastifyReply,
 ) {
+
+  const prisma = req.server.prisma;
   const body = req.body;
 
   const existing = await prisma.user.findUnique({
@@ -59,6 +58,7 @@ export async function loginUser(
   reply: FastifyReply,
 ) {
 
+  const prisma = req.server.prisma;
   const { email, password } = req.body;
 
   // Supprime l'ancien refresh token si présent
@@ -132,7 +132,7 @@ export async function refreshTokenHandler(
   if (!refreshToken) {
     return reply.code(401).send({ message: "No refresh token provided" });
   }
-
+  const prisma = req.server.prisma;
   const existing = await prisma.refreshToken.findUnique({
     where: { token: refreshToken },
     include: { user: true },
@@ -191,6 +191,7 @@ export async function getCurrentUser(req: FastifyRequest, reply: FastifyReply) {
   try {
     const decoded = (await req.userJwtVerify()) as { id: number; role: string };
 
+    const prisma = req.server.prisma;
     const user = await prisma.user.findUnique({
       where: { id: decoded.id },
       select: {
@@ -216,6 +217,7 @@ export async function getCurrentUser(req: FastifyRequest, reply: FastifyReply) {
 
 export async function logoutUser(req: FastifyRequest, reply: FastifyReply) {
   const refreshToken = req.cookies?.refresh_token;
+  const prisma = req.server.prisma;
   if (refreshToken) {
     await prisma.refreshToken.deleteMany({ where: { token: refreshToken } });
   }
@@ -339,6 +341,7 @@ export async function googleOAuthCallback(
 ) {
   try {
     // 1. Récupération du token Google
+    const prisma = request.server.prisma;
     const result = await new Promise<any>((resolve, reject) => {
       (request.server as any).googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(
         request,
@@ -369,6 +372,7 @@ export async function googleOAuthCallback(
     reply.clearCookie('desired_role');
 
     // 4. Vérifie si l'utilisateur existe
+    
     let user = await prisma.user.findUnique({ where: { email: userInfo.email } });
 
     // 5. Si l'utilisateur n'existe pas, on le crée avec le rôle choisi

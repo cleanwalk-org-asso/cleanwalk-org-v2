@@ -115,27 +115,36 @@ export function useCleanwalkForm() {
   // Function to upload the image and create the cleanwalk
   const upload = async () => {
     console.log('Uploading image and creating cleanwalk...');
-    if (!dragDropRef.value) {
-      return;
-    }
     try {
-      const response = await dragDropRef.value.handleUpload();
-      console.log('Image upload response:', response);
-      if (response) {
-        newCleanwalk.value.img_url = response;
-        const response_cw = await createCleanwalk(newCleanwalk.value);
-        if (response_cw) {
-          // Clear form data from storage after successful creation
-          clearStorage();
-          showToast('Your cleanwalk has been successfully published', true);
-          setTimeout(() => {
-            router.push({name: 'map'}).then(() => router.go(0));
-          }, 1000);
-        } else {
-          showToast('Error while creating the event', false);
+      // Try to upload image if it exists and dragDropRef is available
+      if (dragDropRef.value) {
+        try {
+          const response = await dragDropRef.value.handleUpload();
+          console.log('Image upload response:', response);
+          if (response) {
+            newCleanwalk.value.img_url = response;
+          }
+        } catch (error) {
+          console.log('No image uploaded, using default cover');
         }
+      }
+      
+      // If no image URL, use default cover image
+      if (!newCleanwalk.value.img_url) {
+        newCleanwalk.value.img_url = new URL('@/assets/default_cover.webp', import.meta.url).href;
+      }
+
+      // Create cleanwalk with or without custom image
+      const response_cw = await createCleanwalk(newCleanwalk.value);
+      if (response_cw) {
+        // Clear form data from storage after successful creation
+        clearStorage();
+        showToast('Your cleanwalk has been successfully published', true);
+        setTimeout(() => {
+          router.push({name: 'map'}).then(() => router.go(0));
+        }, 1000);
       } else {
-        showToast('Error during image upload', false);
+        showToast('Error while creating the event', false);
       }
     } catch (error) {
       showToast('Error during image upload', false);

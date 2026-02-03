@@ -72,9 +72,9 @@ const props = defineProps({
     border-radius: 8px;
     padding: 12px;
     margin-top: 0.5rem;
-    font-size: 14px;
     font-style: normal;
     font-weight: 500;
+    color: #1E293B;
 
     &::placeholder {
       color: #94A3B8;

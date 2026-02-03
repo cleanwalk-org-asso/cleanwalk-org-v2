@@ -1,10 +1,10 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "./generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model RefreshToken {
@@ -53,6 +53,17 @@ model Cleanwalk {
   cityId       Int
   city         City            @relation(fields: [cityId], references: [id])
   participants CleanwalkUser[]
+  messages     CleanwalkChatMessage[]
+}
+
+model CleanwalkChatMessage {
+  id           Int       @id @default(autoincrement())
+  cleanwalkId  Int
+  user         String
+  text         String
+  avatar       String?
+  createdAt    DateTime  @default(now())
+  cleanwalk    Cleanwalk @relation(fields: [cleanwalkId], references: [id], onDelete: Cascade)
 }
 
 model CleanwalkUser {

@@ -61,9 +61,9 @@ watch(() => route.name, (newName) => {
                 :class="{ 'active': currentPage === 'map' || currentPage === 'cleanwalk' }">Carte</router-link>
             <router-link class="link" :to="{name: 'addCleanwalk'}" :class="{ 'active': currentPage.includes('add') }">Ajouter
                 cleanwalk</router-link>
-            <router-link class="link" :to="{ name: 'associations'}"
+            <!-- <router-link class="link" :to="{ name: 'associations'}"
                 :class="{ 'active': currentPage === 'associations' || currentPage === 'associations' }">Découvrir</router-link>
-            <router-link class="link" :to="{name: 'menu'}" :class="{ 'active': currentPage.includes('menu') }">Menu</router-link>
+            <router-link class="link" :to="{name: 'menu'}" :class="{ 'active': currentPage.includes('menu') }">Menu</router-link> -->
         </div>
         <div v-if="user">
             <router-link :to="{name:'menuProfile'}" class="account">

@@ -36,6 +36,7 @@ const backButton = () => {
             </button>
             <input
                 @click="inputActive = true"
+                class="h-4"
                 name="search"
                 type="text"
                 placeholder="Rechercher une cleanwalk"
@@ -148,7 +149,6 @@ const backButton = () => {
             }
 
             label {
-                padding-top: 8px;
                 padding-right: 10px;
             }
 

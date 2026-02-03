@@ -167,9 +167,9 @@ function mapClickEvent() {
                 <button @click="backButton()">
                     <ChevronLeft color="#94A3B8" />
                 </button>
-                <input @click="hideCleanwalkList()" name="search" autocomplete="off" type="text" placeholder="Rechercher une cleanwalk" v-model="searchInput" />
+                <input @click="hideCleanwalkList()" class="h-4" name="search" autocomplete="off" type="text" placeholder="Rechercher une cleanwalk" v-model="searchInput" />
                 <label for="search" @click="cardListBool = true">
-                    <Search color="#94A3B8" :size="20" />
+                    <Search class="block" color="#94A3B8" :size="20" />
                 </label>
             </div>
             <RouterLink to="/menu/profile" class="pp" v-if="userImg">
@@ -260,6 +260,9 @@ main {
         }
         .info {
             background-color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border-radius: 8px;
             border: 1px solid #CBD5E1;
             width: 38px;
@@ -289,7 +292,6 @@ main {
                 }
 
                 label {
-                    padding-top: 7px;
                     display: block;
                 }
 
@@ -323,8 +325,7 @@ main {
                 }
 
                 label {
-                    padding-top: 8px;
-                    padding-right: 10px;
+                    padding-right: 8px;
                 }
 
             }

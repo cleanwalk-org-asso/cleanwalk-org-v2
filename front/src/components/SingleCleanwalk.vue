@@ -11,9 +11,12 @@ import TopBar from './TopBar.vue';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
 import { Clock, MapPin } from 'lucide-vue-next';
+import CleanwalkChat from './CleanwalkChat.vue';
 
 const cleanwalkStore = useCleanwalkStore();
-const currenUserId = ref(useAccountStore().CurrentUser?.id);
+const accountStore = useAccountStore();
+const currenUserId = ref(accountStore.CurrentUser?.id);
+const currentUsername = computed(() => accountStore.CurrentUser?.name ?? 'Anonyme');
 const showToast = useUtilsStore().showToast;
 
 // Define props with modelValue for two-way binding
@@ -207,7 +210,7 @@ onUnmounted(() => {
         </p>
       </div>
       
-      <div class="map-section">
+      <div class="right-section">
         <h3>Localisation</h3>
         <div class="map-container">
           <MapSoloCw 
@@ -215,7 +218,15 @@ onUnmounted(() => {
             :cleanwalk = "cleanwalk"
           />
         </div>
+        <div>
+          <CleanwalkChat
+            v-if="cleanwalk?.id"
+            :username="currentUsername"
+            :cleanwalkId="cleanwalk.id.toString()"
+          />
+        </div>
       </div>
+
     </div>
 
     <div class="container" v-if="!isDesktop">
@@ -275,6 +286,14 @@ onUnmounted(() => {
         <p class="description">
           {{ cleanwalk?.description }}
         </p>
+
+        <div class="mt-6">
+          <CleanwalkChat
+            v-if="cleanwalk?.id"
+            :username="currentUsername"
+            :cleanwalkId="cleanwalk.id.toString()"
+          />
+        </div>
       </div>
     </div>
   </main>
@@ -313,7 +332,7 @@ main {
     padding: 0;
   }
 
-  .map-section {
+  .right-section {
     flex: 1;
     
     h3 {
