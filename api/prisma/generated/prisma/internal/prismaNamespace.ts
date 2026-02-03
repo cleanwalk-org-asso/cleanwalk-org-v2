@@ -80,12 +80,12 @@ export type PrismaVersion = {
 }
 
 /**
- * Prisma Client JS version: 7.2.0
- * Query Engine version: 0c8ef2ce45c83248ab3df073180d5eda9e8be7a3
+ * Prisma Client JS version: 7.3.0
+ * Query Engine version: 9d6ad21cbbceab97458517b147a6a09ff43aa735
  */
 export const prismaVersion: PrismaVersion = {
-  client: "7.2.0",
-  engine: "0c8ef2ce45c83248ab3df073180d5eda9e8be7a3"
+  client: "7.3.0",
+  engine: "9d6ad21cbbceab97458517b147a6a09ff43aa735"
 }
 
 /**
@@ -388,6 +388,7 @@ export const ModelName = {
   User: 'User',
   Organization: 'Organization',
   Cleanwalk: 'Cleanwalk',
+  CleanwalkChatMessage: 'CleanwalkChatMessage',
   CleanwalkUser: 'CleanwalkUser',
   Article: 'Article',
   City: 'City',
@@ -408,7 +409,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "refreshToken" | "user" | "organization" | "cleanwalk" | "cleanwalkUser" | "article" | "city" | "category" | "categoryArticle"
+    modelProps: "refreshToken" | "user" | "organization" | "cleanwalk" | "cleanwalkChatMessage" | "cleanwalkUser" | "article" | "city" | "category" | "categoryArticle"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -705,6 +706,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.CleanwalkCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.CleanwalkCountAggregateOutputType> | number
+        }
+      }
+    }
+    CleanwalkChatMessage: {
+      payload: Prisma.$CleanwalkChatMessagePayload<ExtArgs>
+      fields: Prisma.CleanwalkChatMessageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CleanwalkChatMessageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CleanwalkChatMessagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CleanwalkChatMessageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CleanwalkChatMessagePayload>
+        }
+        findFirst: {
+          args: Prisma.CleanwalkChatMessageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CleanwalkChatMessagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CleanwalkChatMessageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CleanwalkChatMessagePayload>
+        }
+        findMany: {
+          args: Prisma.CleanwalkChatMessageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CleanwalkChatMessagePayload>[]
+        }
+        create: {
+          args: Prisma.CleanwalkChatMessageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CleanwalkChatMessagePayload>
+        }
+        createMany: {
+          args: Prisma.CleanwalkChatMessageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CleanwalkChatMessageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CleanwalkChatMessagePayload>[]
+        }
+        delete: {
+          args: Prisma.CleanwalkChatMessageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CleanwalkChatMessagePayload>
+        }
+        update: {
+          args: Prisma.CleanwalkChatMessageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CleanwalkChatMessagePayload>
+        }
+        deleteMany: {
+          args: Prisma.CleanwalkChatMessageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CleanwalkChatMessageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CleanwalkChatMessageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CleanwalkChatMessagePayload>[]
+        }
+        upsert: {
+          args: Prisma.CleanwalkChatMessageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CleanwalkChatMessagePayload>
+        }
+        aggregate: {
+          args: Prisma.CleanwalkChatMessageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCleanwalkChatMessage>
+        }
+        groupBy: {
+          args: Prisma.CleanwalkChatMessageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CleanwalkChatMessageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CleanwalkChatMessageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CleanwalkChatMessageCountAggregateOutputType> | number
         }
       }
     }
@@ -1169,6 +1244,18 @@ export const CleanwalkScalarFieldEnum = {
 export type CleanwalkScalarFieldEnum = (typeof CleanwalkScalarFieldEnum)[keyof typeof CleanwalkScalarFieldEnum]
 
 
+export const CleanwalkChatMessageScalarFieldEnum = {
+  id: 'id',
+  cleanwalkId: 'cleanwalkId',
+  user: 'user',
+  text: 'text',
+  avatar: 'avatar',
+  createdAt: 'createdAt'
+} as const
+
+export type CleanwalkChatMessageScalarFieldEnum = (typeof CleanwalkChatMessageScalarFieldEnum)[keyof typeof CleanwalkChatMessageScalarFieldEnum]
+
+
 export const CleanwalkUserScalarFieldEnum = {
   userId: 'userId',
   cleanwalkId: 'cleanwalkId',
@@ -1460,6 +1547,7 @@ export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   organization?: Prisma.OrganizationOmit
   cleanwalk?: Prisma.CleanwalkOmit
+  cleanwalkChatMessage?: Prisma.CleanwalkChatMessageOmit
   cleanwalkUser?: Prisma.CleanwalkUserOmit
   article?: Prisma.ArticleOmit
   city?: Prisma.CityOmit

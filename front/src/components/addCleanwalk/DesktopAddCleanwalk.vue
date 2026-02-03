@@ -64,6 +64,11 @@ const next = () => {
     showToast('Please enter a description for your event', false);
     return;
   }
+  if (progress.value === 4) {
+    // Étape image est optionnelle, on peut passer directement à l'aperçu
+    progress.value = 5;
+    return;
+  }
   if (progress.value === 5) {
     upload();
     return;
@@ -133,8 +138,8 @@ const clearFormCache = () => {
         <BaseTextarea v-if="progress === 3" v-model="newCleanwalk.description" name="description" id="description"
           label="Description" :rows="4" />
         <dragDrop ref="dragDropRef" v-if="progress >= 4" :auto-upload="false" format="card" />
-        <div v-if="progress === 5" class="preview">
-          <h3>{{ newCleanwalk.name }}</h3>
+        <div v-if="progress === 5" class="preview pt-4 flex flex-col gap-4">
+          <h3 class="text-md">{{ newCleanwalk.name }}</h3>
           <div class="date-locate">
             <div class="divtop">
               <Clock :size="16" />

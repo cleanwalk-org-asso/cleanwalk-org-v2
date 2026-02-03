@@ -60,6 +60,11 @@ export type Organization = Prisma.OrganizationModel
  */
 export type Cleanwalk = Prisma.CleanwalkModel
 /**
+ * Model CleanwalkChatMessage
+ * 
+ */
+export type CleanwalkChatMessage = Prisma.CleanwalkChatMessageModel
+/**
  * Model CleanwalkUser
  * 
  */

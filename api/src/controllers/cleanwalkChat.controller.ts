@@ -19,6 +19,7 @@ export class CleanwalkChatController {
 
   handleConnection(socket: WebSocket, req: FastifyRequest<{ Params: { id: string } }>) {
     const cleanwalkId = req.params.id;
+    const cleanwalkIdNum = Number(cleanwalkId);
 
     let room = this.rooms.get(cleanwalkId);
     if (!room) {
@@ -29,18 +30,65 @@ export class CleanwalkChatController {
     room.clients.add(socket);
     this.fastify.log.info(`🟢 Client connecté à la Cleanwalk ${cleanwalkId}`);
 
-    socket.on("message", (raw) => {
+    if (!Number.isNaN(cleanwalkIdNum)) {
+      (async () => {
+        try {
+          const history = await this.fastify.prisma.cleanwalkChatMessage.findMany({
+            where: { cleanwalkId: cleanwalkIdNum },
+            orderBy: { createdAt: "asc" },
+            take: 50,
+          });
+
+          socket.send(
+            JSON.stringify({
+              type: "history",
+              messages: history.map((msg) => ({
+                user: msg.user,
+                text: msg.text,
+                avatar: msg.avatar ?? undefined,
+                date: msg.createdAt.toISOString(),
+              })),
+            })
+          );
+        } catch (err) {
+          this.fastify.log.error("⚠️ Erreur lors de la récupération de l'historique :", err as any);
+        }
+      })();
+    }
+
+    socket.on("message", async (raw) => {
       try {
-        const msg = JSON.parse(raw.toString()) as ChatMessage;
+        const rawText = raw.toString();
+        if (!rawText.trim().startsWith("{")) {
+          return;
+        }
+
+        const msg = JSON.parse(rawText) as ChatMessage;
+        if (!msg.user || !msg.text) {
+          return;
+        }
         this.fastify.log.info(`💬 [${cleanwalkId}] ${msg.user}: ${msg.text}`);
+
+        let savedDate = new Date();
+        if (!Number.isNaN(cleanwalkIdNum)) {
+          const saved = await this.fastify.prisma.cleanwalkChatMessage.create({
+            data: {
+              cleanwalkId: cleanwalkIdNum,
+              user: msg.user,
+              text: msg.text,
+              avatar: msg.avatar,
+            },
+          });
+          savedDate = saved.createdAt;
+        }
 
         for (const client of room!.clients) {
           if (client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify({ ...msg, date: new Date().toISOString() }));
+            client.send(JSON.stringify({ ...msg, date: savedDate.toISOString() }));
           }
         }
-      } catch (err) {
-        this.fastify.log.error("⚠️ Message JSON invalide :", err as any);
+      } catch {
+        return;
       }
     });
 

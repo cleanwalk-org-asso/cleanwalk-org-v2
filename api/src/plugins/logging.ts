@@ -28,16 +28,17 @@ const loggingPlugin: FastifyPluginAsync = async (fastify) => {
 
   // Log les erreurs
   fastify.setErrorHandler(async (error, request, reply) => {
+    const err = error as Error & { statusCode?: number };
     fastify.log.error({
       error: {
-        message: error.message,
-        stack: error.stack,
-        statusCode: error.statusCode || 500
+        message: err.message,
+        stack: err.stack,
+        statusCode: err.statusCode || 500
       },
       method: request.method,
       url: request.url,
       timestamp: new Date().toISOString()
-    }, `Error occurred: ${error.message}`);
+    }, `Error occurred: ${err.message}`);
 
     // Renvoyer l'erreur au handler par défaut
     throw error;

@@ -274,6 +274,7 @@ export type CleanwalkWhereInput = {
   cityId?: Prisma.IntFilter<"Cleanwalk"> | number
   city?: Prisma.XOR<Prisma.CityScalarRelationFilter, Prisma.CityWhereInput>
   participants?: Prisma.CleanwalkUserListRelationFilter
+  messages?: Prisma.CleanwalkChatMessageListRelationFilter
 }
 
 export type CleanwalkOrderByWithRelationInput = {
@@ -289,6 +290,7 @@ export type CleanwalkOrderByWithRelationInput = {
   cityId?: Prisma.SortOrder
   city?: Prisma.CityOrderByWithRelationInput
   participants?: Prisma.CleanwalkUserOrderByRelationAggregateInput
+  messages?: Prisma.CleanwalkChatMessageOrderByRelationAggregateInput
 }
 
 export type CleanwalkWhereUniqueInput = Prisma.AtLeast<{
@@ -307,6 +309,7 @@ export type CleanwalkWhereUniqueInput = Prisma.AtLeast<{
   cityId?: Prisma.IntFilter<"Cleanwalk"> | number
   city?: Prisma.XOR<Prisma.CityScalarRelationFilter, Prisma.CityWhereInput>
   participants?: Prisma.CleanwalkUserListRelationFilter
+  messages?: Prisma.CleanwalkChatMessageListRelationFilter
 }, "id">
 
 export type CleanwalkOrderByWithAggregationInput = {
@@ -354,6 +357,7 @@ export type CleanwalkCreateInput = {
   address: string
   city: Prisma.CityCreateNestedOneWithoutCleanwalksInput
   participants?: Prisma.CleanwalkUserCreateNestedManyWithoutCleanwalkInput
+  messages?: Prisma.CleanwalkChatMessageCreateNestedManyWithoutCleanwalkInput
 }
 
 export type CleanwalkUncheckedCreateInput = {
@@ -368,6 +372,7 @@ export type CleanwalkUncheckedCreateInput = {
   address: string
   cityId: number
   participants?: Prisma.CleanwalkUserUncheckedCreateNestedManyWithoutCleanwalkInput
+  messages?: Prisma.CleanwalkChatMessageUncheckedCreateNestedManyWithoutCleanwalkInput
 }
 
 export type CleanwalkUpdateInput = {
@@ -381,6 +386,7 @@ export type CleanwalkUpdateInput = {
   address?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.CityUpdateOneRequiredWithoutCleanwalksNestedInput
   participants?: Prisma.CleanwalkUserUpdateManyWithoutCleanwalkNestedInput
+  messages?: Prisma.CleanwalkChatMessageUpdateManyWithoutCleanwalkNestedInput
 }
 
 export type CleanwalkUncheckedUpdateInput = {
@@ -395,6 +401,7 @@ export type CleanwalkUncheckedUpdateInput = {
   address?: Prisma.StringFieldUpdateOperationsInput | string
   cityId?: Prisma.IntFieldUpdateOperationsInput | number
   participants?: Prisma.CleanwalkUserUncheckedUpdateManyWithoutCleanwalkNestedInput
+  messages?: Prisma.CleanwalkChatMessageUncheckedUpdateManyWithoutCleanwalkNestedInput
 }
 
 export type CleanwalkCreateManyInput = {
@@ -512,6 +519,20 @@ export type FloatFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type CleanwalkCreateNestedOneWithoutMessagesInput = {
+  create?: Prisma.XOR<Prisma.CleanwalkCreateWithoutMessagesInput, Prisma.CleanwalkUncheckedCreateWithoutMessagesInput>
+  connectOrCreate?: Prisma.CleanwalkCreateOrConnectWithoutMessagesInput
+  connect?: Prisma.CleanwalkWhereUniqueInput
+}
+
+export type CleanwalkUpdateOneRequiredWithoutMessagesNestedInput = {
+  create?: Prisma.XOR<Prisma.CleanwalkCreateWithoutMessagesInput, Prisma.CleanwalkUncheckedCreateWithoutMessagesInput>
+  connectOrCreate?: Prisma.CleanwalkCreateOrConnectWithoutMessagesInput
+  upsert?: Prisma.CleanwalkUpsertWithoutMessagesInput
+  connect?: Prisma.CleanwalkWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CleanwalkUpdateToOneWithWhereWithoutMessagesInput, Prisma.CleanwalkUpdateWithoutMessagesInput>, Prisma.CleanwalkUncheckedUpdateWithoutMessagesInput>
+}
+
 export type CleanwalkCreateNestedOneWithoutParticipantsInput = {
   create?: Prisma.XOR<Prisma.CleanwalkCreateWithoutParticipantsInput, Prisma.CleanwalkUncheckedCreateWithoutParticipantsInput>
   connectOrCreate?: Prisma.CleanwalkCreateOrConnectWithoutParticipantsInput
@@ -568,6 +589,76 @@ export type CleanwalkUncheckedUpdateManyWithoutCityNestedInput = {
   deleteMany?: Prisma.CleanwalkScalarWhereInput | Prisma.CleanwalkScalarWhereInput[]
 }
 
+export type CleanwalkCreateWithoutMessagesInput = {
+  name: string
+  posLat: number
+  posLong: number
+  dateBegin: Date | string
+  imgUrl?: string | null
+  duration: number
+  description: string
+  address: string
+  city: Prisma.CityCreateNestedOneWithoutCleanwalksInput
+  participants?: Prisma.CleanwalkUserCreateNestedManyWithoutCleanwalkInput
+}
+
+export type CleanwalkUncheckedCreateWithoutMessagesInput = {
+  id?: number
+  name: string
+  posLat: number
+  posLong: number
+  dateBegin: Date | string
+  imgUrl?: string | null
+  duration: number
+  description: string
+  address: string
+  cityId: number
+  participants?: Prisma.CleanwalkUserUncheckedCreateNestedManyWithoutCleanwalkInput
+}
+
+export type CleanwalkCreateOrConnectWithoutMessagesInput = {
+  where: Prisma.CleanwalkWhereUniqueInput
+  create: Prisma.XOR<Prisma.CleanwalkCreateWithoutMessagesInput, Prisma.CleanwalkUncheckedCreateWithoutMessagesInput>
+}
+
+export type CleanwalkUpsertWithoutMessagesInput = {
+  update: Prisma.XOR<Prisma.CleanwalkUpdateWithoutMessagesInput, Prisma.CleanwalkUncheckedUpdateWithoutMessagesInput>
+  create: Prisma.XOR<Prisma.CleanwalkCreateWithoutMessagesInput, Prisma.CleanwalkUncheckedCreateWithoutMessagesInput>
+  where?: Prisma.CleanwalkWhereInput
+}
+
+export type CleanwalkUpdateToOneWithWhereWithoutMessagesInput = {
+  where?: Prisma.CleanwalkWhereInput
+  data: Prisma.XOR<Prisma.CleanwalkUpdateWithoutMessagesInput, Prisma.CleanwalkUncheckedUpdateWithoutMessagesInput>
+}
+
+export type CleanwalkUpdateWithoutMessagesInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  posLat?: Prisma.FloatFieldUpdateOperationsInput | number
+  posLong?: Prisma.FloatFieldUpdateOperationsInput | number
+  dateBegin?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  imgUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  duration?: Prisma.IntFieldUpdateOperationsInput | number
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.CityUpdateOneRequiredWithoutCleanwalksNestedInput
+  participants?: Prisma.CleanwalkUserUpdateManyWithoutCleanwalkNestedInput
+}
+
+export type CleanwalkUncheckedUpdateWithoutMessagesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  posLat?: Prisma.FloatFieldUpdateOperationsInput | number
+  posLong?: Prisma.FloatFieldUpdateOperationsInput | number
+  dateBegin?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  imgUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  duration?: Prisma.IntFieldUpdateOperationsInput | number
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  cityId?: Prisma.IntFieldUpdateOperationsInput | number
+  participants?: Prisma.CleanwalkUserUncheckedUpdateManyWithoutCleanwalkNestedInput
+}
+
 export type CleanwalkCreateWithoutParticipantsInput = {
   name: string
   posLat: number
@@ -578,6 +669,7 @@ export type CleanwalkCreateWithoutParticipantsInput = {
   description: string
   address: string
   city: Prisma.CityCreateNestedOneWithoutCleanwalksInput
+  messages?: Prisma.CleanwalkChatMessageCreateNestedManyWithoutCleanwalkInput
 }
 
 export type CleanwalkUncheckedCreateWithoutParticipantsInput = {
@@ -591,6 +683,7 @@ export type CleanwalkUncheckedCreateWithoutParticipantsInput = {
   description: string
   address: string
   cityId: number
+  messages?: Prisma.CleanwalkChatMessageUncheckedCreateNestedManyWithoutCleanwalkInput
 }
 
 export type CleanwalkCreateOrConnectWithoutParticipantsInput = {
@@ -619,6 +712,7 @@ export type CleanwalkUpdateWithoutParticipantsInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.CityUpdateOneRequiredWithoutCleanwalksNestedInput
+  messages?: Prisma.CleanwalkChatMessageUpdateManyWithoutCleanwalkNestedInput
 }
 
 export type CleanwalkUncheckedUpdateWithoutParticipantsInput = {
@@ -632,6 +726,7 @@ export type CleanwalkUncheckedUpdateWithoutParticipantsInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   cityId?: Prisma.IntFieldUpdateOperationsInput | number
+  messages?: Prisma.CleanwalkChatMessageUncheckedUpdateManyWithoutCleanwalkNestedInput
 }
 
 export type CleanwalkCreateWithoutCityInput = {
@@ -644,6 +739,7 @@ export type CleanwalkCreateWithoutCityInput = {
   description: string
   address: string
   participants?: Prisma.CleanwalkUserCreateNestedManyWithoutCleanwalkInput
+  messages?: Prisma.CleanwalkChatMessageCreateNestedManyWithoutCleanwalkInput
 }
 
 export type CleanwalkUncheckedCreateWithoutCityInput = {
@@ -657,6 +753,7 @@ export type CleanwalkUncheckedCreateWithoutCityInput = {
   description: string
   address: string
   participants?: Prisma.CleanwalkUserUncheckedCreateNestedManyWithoutCleanwalkInput
+  messages?: Prisma.CleanwalkChatMessageUncheckedCreateNestedManyWithoutCleanwalkInput
 }
 
 export type CleanwalkCreateOrConnectWithoutCityInput = {
@@ -723,6 +820,7 @@ export type CleanwalkUpdateWithoutCityInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   participants?: Prisma.CleanwalkUserUpdateManyWithoutCleanwalkNestedInput
+  messages?: Prisma.CleanwalkChatMessageUpdateManyWithoutCleanwalkNestedInput
 }
 
 export type CleanwalkUncheckedUpdateWithoutCityInput = {
@@ -736,6 +834,7 @@ export type CleanwalkUncheckedUpdateWithoutCityInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   participants?: Prisma.CleanwalkUserUncheckedUpdateManyWithoutCleanwalkNestedInput
+  messages?: Prisma.CleanwalkChatMessageUncheckedUpdateManyWithoutCleanwalkNestedInput
 }
 
 export type CleanwalkUncheckedUpdateManyWithoutCityInput = {
@@ -757,10 +856,12 @@ export type CleanwalkUncheckedUpdateManyWithoutCityInput = {
 
 export type CleanwalkCountOutputType = {
   participants: number
+  messages: number
 }
 
 export type CleanwalkCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   participants?: boolean | CleanwalkCountOutputTypeCountParticipantsArgs
+  messages?: boolean | CleanwalkCountOutputTypeCountMessagesArgs
 }
 
 /**
@@ -780,6 +881,13 @@ export type CleanwalkCountOutputTypeCountParticipantsArgs<ExtArgs extends runtim
   where?: Prisma.CleanwalkUserWhereInput
 }
 
+/**
+ * CleanwalkCountOutputType without action
+ */
+export type CleanwalkCountOutputTypeCountMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CleanwalkChatMessageWhereInput
+}
+
 
 export type CleanwalkSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -794,6 +902,7 @@ export type CleanwalkSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   cityId?: boolean
   city?: boolean | Prisma.CityDefaultArgs<ExtArgs>
   participants?: boolean | Prisma.Cleanwalk$participantsArgs<ExtArgs>
+  messages?: boolean | Prisma.Cleanwalk$messagesArgs<ExtArgs>
   _count?: boolean | Prisma.CleanwalkCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["cleanwalk"]>
 
@@ -842,6 +951,7 @@ export type CleanwalkOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 export type CleanwalkInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   city?: boolean | Prisma.CityDefaultArgs<ExtArgs>
   participants?: boolean | Prisma.Cleanwalk$participantsArgs<ExtArgs>
+  messages?: boolean | Prisma.Cleanwalk$messagesArgs<ExtArgs>
   _count?: boolean | Prisma.CleanwalkCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CleanwalkIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -856,6 +966,7 @@ export type $CleanwalkPayload<ExtArgs extends runtime.Types.Extensions.InternalA
   objects: {
     city: Prisma.$CityPayload<ExtArgs>
     participants: Prisma.$CleanwalkUserPayload<ExtArgs>[]
+    messages: Prisma.$CleanwalkChatMessagePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1264,6 +1375,7 @@ export interface Prisma__CleanwalkClient<T, Null = never, ExtArgs extends runtim
   readonly [Symbol.toStringTag]: "PrismaPromise"
   city<T extends Prisma.CityDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CityDefaultArgs<ExtArgs>>): Prisma.Prisma__CityClient<runtime.Types.Result.GetResult<Prisma.$CityPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   participants<T extends Prisma.Cleanwalk$participantsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Cleanwalk$participantsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CleanwalkUserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  messages<T extends Prisma.Cleanwalk$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Cleanwalk$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CleanwalkChatMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1720,6 +1832,30 @@ export type Cleanwalk$participantsArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.CleanwalkUserScalarFieldEnum | Prisma.CleanwalkUserScalarFieldEnum[]
+}
+
+/**
+ * Cleanwalk.messages
+ */
+export type Cleanwalk$messagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CleanwalkChatMessage
+   */
+  select?: Prisma.CleanwalkChatMessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CleanwalkChatMessage
+   */
+  omit?: Prisma.CleanwalkChatMessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CleanwalkChatMessageInclude<ExtArgs> | null
+  where?: Prisma.CleanwalkChatMessageWhereInput
+  orderBy?: Prisma.CleanwalkChatMessageOrderByWithRelationInput | Prisma.CleanwalkChatMessageOrderByWithRelationInput[]
+  cursor?: Prisma.CleanwalkChatMessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CleanwalkChatMessageScalarFieldEnum | Prisma.CleanwalkChatMessageScalarFieldEnum[]
 }
 
 /**

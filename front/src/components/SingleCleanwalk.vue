@@ -14,7 +14,9 @@ import { Clock, MapPin } from 'lucide-vue-next';
 import CleanwalkChat from './CleanwalkChat.vue';
 
 const cleanwalkStore = useCleanwalkStore();
-const currenUserId = ref(useAccountStore().CurrentUser?.id);
+const accountStore = useAccountStore();
+const currenUserId = ref(accountStore.CurrentUser?.id);
+const currentUsername = computed(() => accountStore.CurrentUser?.name ?? 'Anonyme');
 const showToast = useUtilsStore().showToast;
 
 // Define props with modelValue for two-way binding
@@ -217,7 +219,11 @@ onUnmounted(() => {
           />
         </div>
         <div>
-          <CleanwalkChat :username="'test'" :cleanwalkId="'4'"  />
+          <CleanwalkChat
+            v-if="cleanwalk?.id"
+            :username="currentUsername"
+            :cleanwalkId="cleanwalk.id.toString()"
+          />
         </div>
       </div>
 
@@ -280,6 +286,14 @@ onUnmounted(() => {
         <p class="description">
           {{ cleanwalk?.description }}
         </p>
+
+        <div class="mt-6">
+          <CleanwalkChat
+            v-if="cleanwalk?.id"
+            :username="currentUsername"
+            :cleanwalkId="cleanwalk.id.toString()"
+          />
+        </div>
       </div>
     </div>
   </main>

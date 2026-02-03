@@ -10,32 +10,33 @@ interface Message {
 export function useCleanwalkChat(cleanwalkId: string, username: string, avatar?: string) {
   // URL du serveur WebSocket Fastify
   const wsUrl = `ws://localhost:8080/ws/cleanwalk/${cleanwalkId}`;
-  const socket = new WebSocket(wsUrl);
+  const socket = ref<WebSocket | null>(null);
 
   const messages = ref<Message[]>([]);
   const newMessage = ref("");
 
   onMounted(() => {
-    socket.onopen = () => {
-      console.log("🟢 Connecté à la room", cleanwalkId);
+    const ws = new WebSocket(wsUrl);
+    socket.value = ws;
+
+    ws.onopen = () => {};
+
+    ws.onmessage = (event) => {
+      const payload = JSON.parse(event.data);
+      if (payload?.type === "history" && Array.isArray(payload.messages)) {
+        messages.value = payload.messages;
+        return;
+      }
+      messages.value.push(payload);
     };
 
-    socket.onmessage = (event) => {
-      const msg = JSON.parse(event.data);
-      messages.value.push(msg);
-    };
+    ws.onclose = () => {};
 
-    socket.onclose = () => {
-      console.log("🔴 Déconnecté du chat Cleanwalk");
-    };
-
-    socket.onerror = (err) => {
-      console.error("❌ Erreur WebSocket :", err);
-    };
+    ws.onerror = () => {};
   });
 
   onUnmounted(() => {
-    socket.close();
+    socket.value?.close();
   });
 
   const sendMessage = () => {
@@ -46,7 +47,7 @@ export function useCleanwalkChat(cleanwalkId: string, username: string, avatar?:
         text: newMessage.value,
         date: new Date().toISOString(),
       };
-      socket.send(JSON.stringify(msg));
+      socket.value?.send(JSON.stringify(msg));
       newMessage.value = "";
     }
   };
