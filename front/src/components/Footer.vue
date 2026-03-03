@@ -24,7 +24,7 @@ import LinkedIn from './icons/LinkedIn.vue';
                         <a href="https://www.facebook.com/cleanwalk.org" target="_blank">
                             <Facebook class="w-6 h-6" />
                         </a>
-                        <a href="https://www.instagram.com/cleanwalk.org/" target="_blank">
+                        <a href="https://www.instagram.com/cleanwalk_org/" target="_blank">
                             <Insta class="w-6 h-6" />
                         </a>
                         <a href="https://www.linkedin.com/company/cleanwalkorg/" target="_blank">
@@ -44,7 +44,21 @@ import LinkedIn from './icons/LinkedIn.vue';
                 </div>
             </div>
             <div class="flex">
-
+                <div>
+                    <div class="font-bold">Ressources</div>
+                    <div class="w-32">FAQ <br>
+                        <router-link to="/cleanwalk-guide">Guide de la Cleanwalk</router-link>
+                    </div>
+                </div>
+                <div>
+                    <div class="font-bold">Menu</div>
+                    <div class="w-38">
+                        <router-link to="/carte">Carte des ramassages</router-link>
+                        <!-- <router-link to="/evenements">Événements</router-link>
+                        Le Blog
+                        L’association -->
+                    </div>
+                </div>
             </div>
         </div>
 

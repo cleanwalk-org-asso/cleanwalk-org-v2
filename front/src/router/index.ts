@@ -96,6 +96,16 @@ const router = createRouter({
             ogImage: '/default-banner.svg'
           }
         },
+        {
+          path: 'cleanwalk-guide',
+          name: 'cleanwalkGuide',
+          component: () => import('@/views/CleanwalkGuideView.vue'),
+          meta: {
+            title: 'Guide de la Cleanwalk | Cleanwalk.org',
+            description: 'Découvrez comment organiser une cleanwalk étape par étape.',
+            ogImage: '/default-banner.svg'
+          }
+        },
         // {
         //   path: 'privacy-policy',
         //   name: 'privacyPolicy',

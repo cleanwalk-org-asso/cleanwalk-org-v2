@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col p-8 items-left gap-8">
+    <div class="flex flex-col p-8 items-left gap-8 md:px-32">
         <h2 class="text-primary font-catamaran font-black text-2xl flex flex-col">
             <span>
                 Découvrez les ramassages

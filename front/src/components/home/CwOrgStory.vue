@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col py-16 pl-8 items-left gap-8">
+    <div class="flex flex-col py-16 pl-8 items-left gap-8 md:px-32">
         <h3 class="text-primary font-black text-2xl">
             L’impact de Cleanwalk.org
         </h3>
