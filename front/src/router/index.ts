@@ -106,6 +106,16 @@ const router = createRouter({
             ogImage: '/default-banner.svg'
           }
         },
+        {
+          path: 'notre-histoire',
+          name: 'cleanwalkHistory',
+          component: () => import('@/views/CleanwalkHistoryView.vue'),
+          meta: {
+            title: 'Notre histoire | Cleanwalk.org',
+            description: 'Découvrez l’histoire de Cleanwalk.org, de sa création à son renouveau.',
+            ogImage: '/default-banner.svg'
+          }
+        },
         // {
         //   path: 'privacy-policy',
         //   name: 'privacyPolicy',

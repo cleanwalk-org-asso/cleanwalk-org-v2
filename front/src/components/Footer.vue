@@ -10,14 +10,14 @@ import LinkedIn from './icons/LinkedIn.vue';
     <footer class="flex flex-col bg-[#37363F] text-[#E5E7EB] p-12">
         <div class="flex justify-between">
             <div>
-                <img src="../assets/logo.svg" alt="logo cleanwalk.org" class="w-48.5 mx-auto pb-10">
+                <img src="../assets/logo.svg" alt="logo cleanwalk.org" class="w-48.5 mx-auto pb-4">
                 <p>
                     La plateforme qui centralise les actions <br> citoyennes de ramassage des déchets
                 </p>
             </div>
             <div class="flex gap-12">
                 <div>
-                    <div class="font-bold">
+                    <div class="font-bold pb-2">
                         Nos réseaux sociaux
                     </div>
                     <div class="flex gap-4 mt-4">
@@ -30,37 +30,46 @@ import LinkedIn from './icons/LinkedIn.vue';
                         <a href="https://www.linkedin.com/company/cleanwalkorg/" target="_blank">
                             <LinkedIn class="w-6 h-6" />
                         </a>
-                        <a href="https://discord.gg/cleanwalk" target="_blank">
+                        <a href="https://discord.gg/gPQn9YcrTZ" target="_blank">
                             <Discord class="w-6 h-6" />
                         </a>
                     </div>
                 </div>
 
                 <div>
-                    <div class="font-bold">Nous contacter</div>
+                    <div class="font-bold pb-2.5">Nous contacter</div>
                     <div>
-                        contact@cleanwalk.org
+                        <a href="mailto:contact@cleanwalk.org">contact@cleanwalk.org</a>
                     </div>
                 </div>
             </div>
             <div class="flex">
                 <div>
                     <div class="font-bold">Ressources</div>
-                    <div class="w-32">FAQ <br>
+                    <div class="w-48">
+                        <router-link to="/notre-histoire">Histoire de Cleanwalk.org</router-link> <br>
                         <router-link to="/cleanwalk-guide">Guide de la Cleanwalk</router-link>
                     </div>
                 </div>
                 <div>
                     <div class="font-bold">Menu</div>
                     <div class="w-38">
-                        <router-link to="/carte">Carte des ramassages</router-link>
-                        <!-- <router-link to="/evenements">Événements</router-link>
-                        Le Blog
-                        L’association -->
+                        <router-link to="/carte">Carte des ramassages</router-link><br>
+                        <a href="https://www.helloasso.com/associations/cleanwalk-org">l'association</a>
                     </div>
                 </div>
             </div>
         </div>
-
+        <div class="h-px bg-white/20 my-8"></div>
+        <div class="flex items-center justify-between text-xs text-[#E5E7EB]/80 pt-4">
+            <div class="flex gap-4">
+                <span class="underline">Mentions légales</span>
+                <span class="underline">Conditions générales d'utilisations</span>
+            </div>
+            <div class="flex gap-6">
+                <span>Cleanwalk.org 2025 - Association de loi 1901</span>
+                <span>Développé par nos bénévoles.</span>
+            </div>
+        </div>
     </footer>
 </template>

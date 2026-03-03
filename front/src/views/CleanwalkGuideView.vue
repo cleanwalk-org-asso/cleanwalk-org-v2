@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const defaultCover = new URL('../assets/default_cover.webp', import.meta.url).href
+
 const preparation = [
   { text: 'Fixez une date + un horaire' },
   { text: "Repérez et/ou déterminez un lieu de départ et/ou un lieu d'arrivée" },
@@ -103,15 +105,10 @@ const dernierEffort = [
   <div class="min-h-screen bg-white font-sans flex flex-col items-center w-full">
 
     <!-- Hero -->
-    <section class="bg-[#132778] text-white pb-24 pt-8 px-8 flex flex-col items-center relative overflow-hidden w-full">
-      <div class="absolute inset-0 opacity-5 pointer-events-none">
-        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-          <pattern id="dots" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
-            <circle cx="2" cy="2" r="2" fill="white"/>
-          </pattern>
-          <rect width="100%" height="100%" fill="url(#dots)"/>
-        </svg>
-      </div>
+    <section
+      class="text-white pb-24 pt-8 px-8 flex flex-col items-center relative overflow-hidden w-full bg-cover bg-center"
+      :style="{ backgroundImage: `linear-gradient(rgba(19, 39, 120, 0.78), rgba(19, 39, 120, 0.78)), url(${defaultCover})` }"
+    >
       <div class="relative z-10 max-w-3xl mx-auto flex flex-col items-center">
         <h1 class="text-5xl md:text-6xl font-black tracking-tight mb-6 leading-tight text-center">
           Comment organiser<br>une <span class="text-[#72BDA3]">Cleanwalk</span>&nbsp;?

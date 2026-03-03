@@ -26,7 +26,7 @@ const currentUser = accountStore.CurrentUser!;
             </router-link>
         </div>
         <ul class="list">
-            <li v-if="currentUser">
+            <!-- <li v-if="currentUser">
                 <CalendarDays />
                 <h3>Mes évènements</h3>
                 <ChevronRight :size="22"/>
@@ -35,21 +35,27 @@ const currentUser = accountStore.CurrentUser!;
                 <Settings />
                 <h3>Paramètres</h3>
                 <ChevronRight :size="22"/>
+            </li> -->
+            <li>
+                <router-link :to="{ name: 'cleanwalkHistory' }" class="item-link">
+                    <History />
+                    <h3>L'histoire de Cleanwalk.org</h3>
+                    <ChevronRight :size="22"/>
+                </router-link>
             </li>
             <li>
-                <History />
-                <h3>L'histoire de Cleanwalk.org</h3>
-                <ChevronRight :size="22"/>
+                <router-link :to="{ name: 'cleanwalkGuide' }" class="item-link">
+                    <File />
+                    <h3>Guide de la cleanwalk</h3>
+                    <ChevronRight :size="22"/>
+                </router-link>
             </li>
             <li>
-                <File />
-                <h3>Guide de la cleanwalk</h3>
-                <ChevronRight :size="22"/>
-            </li>
-            <li>
-                <Send />
-                <h3>Nous contacter</h3>
-                <ChevronRight :size="22"/>
+                <a href="mailto:contact@cleanwalk.org" class="item-link">
+                    <Send />
+                    <h3>Nous contacter</h3>
+                    <ChevronRight :size="22"/>
+                </a>
             </li>
         </ul>
 
@@ -129,6 +135,15 @@ const currentUser = accountStore.CurrentUser!;
             border-radius: 8px;
             align-items: center;
             padding: 12px;
+
+            .item-link {
+                stroke: #94A3B8;
+                color: inherit;
+                text-decoration: none;
+                display: flex;
+                width: 100%;
+                align-items: center;
+            }
         }
     }
 

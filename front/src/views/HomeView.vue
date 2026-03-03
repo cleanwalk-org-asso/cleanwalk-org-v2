@@ -7,6 +7,7 @@ import DonationCwAsso from '@/components/home/DonationCwAsso.vue';
 import HeroSection from '@/components/home/HeroSection.vue';
 import MapSection from '@/components/home/MapSection.vue';
 import Questions from '@/components/home/Questions.vue';
+import SocialMediaSection from '@/components/home/SocialMediaSection.vue';
 import StatSection from '@/components/home/StatSection.vue';
 import NavBar from '@/components/NavBar.vue';
 
@@ -25,5 +26,5 @@ import NavBar from '@/components/NavBar.vue';
     <AccountSelector />
     <DonationCwAsso />
     <Questions />
-    <Footer />
+    <SocialMediaSection />
 </template>
