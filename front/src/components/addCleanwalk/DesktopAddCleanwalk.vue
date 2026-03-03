@@ -115,7 +115,7 @@ const clearFormCache = () => {
   <section class="section">
     <div class="container">
       <div class="header">
-        <div>
+        <div class="pt-4">
           <h1>Organiser un ramassage</h1>
           <h2>{{ titles[progress - 1] }}</h2>
         </div>

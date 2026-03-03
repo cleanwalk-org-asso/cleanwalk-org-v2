@@ -1,1 +1,11 @@
 @import "tailwindcss";
+
+@theme {
+    --color-primary: #132778;
+    --color-secondary: #72BDA3;
+    --color-border: #CBD5E1;
+    --color-text: #373646;
+    --color-base : #CBD5E133;
+
+    --font-catamaran: "Catamaran", sans-serif;
+}

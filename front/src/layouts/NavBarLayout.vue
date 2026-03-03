@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Footer from '@/components/Footer.vue';
 import NavBar from '@/components/NavBar.vue';
 </script>
 
@@ -7,6 +8,7 @@ import NavBar from '@/components/NavBar.vue';
     <NavBar />
     <main class="main-content">
       <router-view />
+      <Footer class="hidden md:block"></Footer>
     </main>
   </div>
 </template>

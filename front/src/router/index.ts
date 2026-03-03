@@ -96,6 +96,26 @@ const router = createRouter({
             ogImage: '/default-banner.svg'
           }
         },
+        {
+          path: 'cleanwalk-guide',
+          name: 'cleanwalkGuide',
+          component: () => import('@/views/CleanwalkGuideView.vue'),
+          meta: {
+            title: 'Guide de la Cleanwalk | Cleanwalk.org',
+            description: 'Découvrez comment organiser une cleanwalk étape par étape.',
+            ogImage: '/default-banner.svg'
+          }
+        },
+        {
+          path: 'notre-histoire',
+          name: 'cleanwalkHistory',
+          component: () => import('@/views/CleanwalkHistoryView.vue'),
+          meta: {
+            title: 'Notre histoire | Cleanwalk.org',
+            description: 'Découvrez l’histoire de Cleanwalk.org, de sa création à son renouveau.',
+            ogImage: '/default-banner.svg'
+          }
+        },
         // {
         //   path: 'privacy-policy',
         //   name: 'privacyPolicy',
@@ -170,9 +190,9 @@ router.beforeEach(async (to, from, next) => {
   const requiresAuth = to.meta.requiresAuth || false
   const isAuthenticated = await store.checkAuth()
 
-  if (to.name === 'home' && isMobile.value) {
-    return next({ name: 'map' })
-  }
+  // if (to.name === 'home' && isMobile.value) {
+  //   return next({ name: 'map' })
+  // }
 
   // SEO dynamique
   const meta = to.meta

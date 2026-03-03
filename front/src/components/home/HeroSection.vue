@@ -1,48 +1,15 @@
 <template>
-    <section class="hero">
-        <h1>
-            <div>   
+    <section 
+        class="h-122.75 bg-cover bg-center flex justify-center items-center text-primary px-2"
+        style="background-image: url('/src/assets/home-banner.webp')"
+    >
+        <h1 class="flex flex-col gap-4 mb-28 font-bold">
+            <div class=" text-3xl font-bold bg-secondary rounded-lg leading-9.5 py-2.5 px-2.5 w-fit bg-white/80 shadow-[0px_4px_5.3px_rgba(0,0,0,0.08)]">
                 La plateforme française
             </div>
-            <div class="bg-red-400">
+            <div class="text-3xl font-bold bg-secondary rounded-lg leading-9.5 py-2.5 px-2.5 w-fit bg-white/80">
                 qui centralise les ramassages citoyens de déchets !
             </div>
         </h1>
     </section>
 </template>
-
-<style lang="scss" scoped>
-    .hero {
-        background-image: url('../../assets/home-banner.webp');
-        height: 694px;
-        background-size: cover;
-        background-position: center;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: var(--color-primary);
-        display: flex;
-        gap: 1rem;
-        
-    }
-
-    h1 {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-        margin-bottom: 6.8rem;
-
-        div {
-            text-shadow: 0px 4px 5.3px rgba(0, 0, 0, 0.08);
-            font-family: "DM Sans";
-            font-size: 48px;
-            font-style: normal;
-            font-weight: 900;
-            background-color: var(--color-secondary);
-            border-radius: 8px;
-            line-height: 38px;
-            padding: 10px;
-            width: fit-content;
-        }
-    }
-</style>

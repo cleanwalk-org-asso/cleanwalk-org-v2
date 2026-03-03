@@ -296,7 +296,7 @@ const getConseil = () => {
       flex-direction: column;
       align-items: start;
       gap: 0.5rem;
-      background-color: var(--color-secondary);
+      background-color: #E1F4F8;
       padding: 0.5rem;
       border-radius: 8px;
       width: 100%;
