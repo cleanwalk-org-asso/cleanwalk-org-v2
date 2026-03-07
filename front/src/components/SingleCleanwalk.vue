@@ -142,7 +142,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <TopBar backUrl="/" pageName="Cleanwalk" />
+  <TopBar backUrl="/carte" pageName="Cleanwalk" />
   <LeaveCwPopup :isVisible="showLeaveCwPopup" :tooglePopup="toogleLeaveCwPopup" :leaveCw="leaveCleanwalk" />
   <ParticipationPopup :isVisible="showParticipationPopup" @close="toggleParticipationPopup" @confirm="handleJoinCleanwalk" format="screen" />
   

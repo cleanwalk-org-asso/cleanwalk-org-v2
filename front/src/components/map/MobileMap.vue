@@ -3,7 +3,7 @@ import "leaflet/dist/leaflet.css";
 import { LMap, LTileLayer, LMarker, LIcon } from "@vue-leaflet/vue-leaflet";
 import L, { LatLng, LatLngBounds, type PointExpression } from "leaflet";
 import { ref, type Ref, onMounted, nextTick } from "vue";
-import { Clock, Search, Info, MapPin, ChevronLeft } from "lucide-vue-next";
+import { Clock, Search, Info, MapPin, ChevronLeft, LogIn } from "lucide-vue-next";
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
 import dateService from "@/services/dateService";
 import cleanwalkCard from '@/components/cards/CleanwalkListCard.vue';
@@ -175,9 +175,9 @@ function mapClickEvent() {
             <RouterLink to="/menu/profile" class="pp" v-if="userImg">
                 <img :src="userImg" alt="user img">
             </RouterLink>
-            <button class="info" v-else>
-                <Info color="#94A3B8"/>
-            </button>
+            <RouterLink :to="{ name: 'login' }" class="info" v-else>
+                <LogIn color="#94A3B8"/>
+            </RouterLink>
         </div>
         <div ref="draggableCard" class="draggable-card">
             <div class="card-handle" @click="!selectedCleanwalk && (cardListBool = true);">
