@@ -1,6 +1,11 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 import Footer from '@/components/Footer.vue';
 import NavBar from '@/components/NavBar.vue';
+
+const route = useRoute();
+const showFooter = computed(() => route.name !== 'map');
 </script>
 
 <template>
@@ -8,7 +13,7 @@ import NavBar from '@/components/NavBar.vue';
     <NavBar />
     <main class="main-content">
       <router-view />
-      <Footer class="hidden md:block"></Footer>
+      <Footer v-if="showFooter" class="hidden md:block"></Footer>
     </main>
   </div>
 </template>
