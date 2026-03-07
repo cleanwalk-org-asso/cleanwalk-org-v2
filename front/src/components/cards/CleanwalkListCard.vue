@@ -5,12 +5,11 @@
 import { MapPin, Clock, Map } from 'lucide-vue-next';
 import type { Cleanwalk } from '@/interfaces/cleanwalkInterface';
 import dateService from '@/services/dateService';
+import defaultCover from '@/assets/default_cover.webp'
 // Get cleanwalk from props
 const { cleanwalk } = defineProps<{ cleanwalk: Cleanwalk }>()
 
 console.log('cleanwalk', cleanwalk);
-
-const defaultCover = '/src/assets/default_cover.webp'
 
 
 </script>
