@@ -25,7 +25,7 @@ watch(() => route.name, (newName) => {
 <template>
     <nav class="nav" v-if="isMobile">
         <ul class="container" :class="{ 'shadow': currentPage !== 'home' }">
-            <li :class="{ 'active': currentPage === 'home' || currentPage === 'cleanwalk' }">
+            <li :class="{ 'active': currentPage === 'home'}">
                 <router-link :to="{ name: 'home' }" class="redirect">
                     <House />
                     <div>Accueil</div>

@@ -44,7 +44,7 @@ const { messages, newMessage, sendMessage } = useCleanwalkChat(
             />
             <button
                 @click="sendMessage"
-                class="rounded-lg bg-primary text-white px-4 py-2 text-sm font-semibold hover:opacity-90 transition"
+                class="rounded-lg bg-primary text-white px-4! py-2! text-sm font-semibold hover:opacity-90 transition"
             >
                 Envoyer
             </button>

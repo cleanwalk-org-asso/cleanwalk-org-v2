@@ -8,8 +8,9 @@ interface Message {
 }
 
 export function useCleanwalkChat(cleanwalkId: string, username: string, avatar?: string) {
-  // URL du serveur WebSocket Fastify
-  const wsUrl = `ws://localhost:8080/ws/cleanwalk/${cleanwalkId}`;
+  const apiBaseUrl = String(import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+  const wsBaseUrl = apiBaseUrl.replace(/^http/, "ws");
+  const wsUrl = `${wsBaseUrl}/ws/cleanwalk/${cleanwalkId}`;
   const socket = ref<WebSocket | null>(null);
 
   const messages = ref<Message[]>([]);
