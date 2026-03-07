@@ -69,7 +69,7 @@ const signup = async () => {
     <section class="container">
 
         <h1>
-            Choisissez le type de compte qui vous correspond :
+            Créer votre compte personnel
         </h1>
 
         <GoogleButton role="USER" />

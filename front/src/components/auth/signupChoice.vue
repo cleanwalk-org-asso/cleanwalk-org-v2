@@ -49,10 +49,11 @@ import { User, Users } from 'lucide-vue-next';
 
     .go-login {
         color: var(--text-color-secondary);
-        font-size: 12px;
+        font-size: 16px;
         width: 100%;
         text-align: left;
         margin-top: 2rem;
+        padding-left: 2rem;
 
         span {
             color: var(--text-color-primary);

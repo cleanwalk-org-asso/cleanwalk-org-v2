@@ -67,7 +67,7 @@ const signup = async () => {
     <section class="container">
 
         <h1>
-            Bienvenue sur la plateforme Cleanwalk.org
+            Créer votre compte association
         </h1>
         <GoogleButton role="ASSOCIATION" />
         <div class="or">
