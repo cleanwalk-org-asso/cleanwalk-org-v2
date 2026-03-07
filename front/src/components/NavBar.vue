@@ -3,7 +3,7 @@ import { useAccountStore } from '@/stores/AccountStore';
 import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useDevice } from '@/composables/useDevice';
-import { Plus, MapPin, Compass, Menu } from 'lucide-vue-next';
+import { Plus, MapPin, Compass, Menu, House } from 'lucide-vue-next';
 
 const currentPage = ref('');
 const route = useRoute();
@@ -24,27 +24,33 @@ watch(() => route.name, (newName) => {
 </script>
 <template>
     <nav class="nav" v-if="isMobile">
-        <ul class="container" :class="{ 'shadow': currentPage !== 'map' }">
+        <ul class="container" :class="{ 'shadow': currentPage !== 'home' }">
+            <li :class="{ 'active': currentPage === 'home' || currentPage === 'cleanwalk' }">
+                <router-link :to="{ name: 'home' }" class="redirect">
+                    <House />
+                    <div>Accueil</div>
+                </router-link>
+            </li>
             <li :class="{ 'active': currentPage === 'map' || currentPage === 'cleanwalk' }">
-                <router-link :to="{name: 'map'}" class="redirect">
+                <router-link :to="{ name: 'map' }" class="redirect">
                     <MapPin />
                     <div>Carte</div>
                 </router-link>
             </li>
             <li :class="{ 'active': currentPage.includes('add') }">
-                <router-link :to="{ name: 'addCleanwalk'}" class="redirect">
+                <router-link :to="{ name: 'addCleanwalk' }" class="redirect">
                     <Plus />
                     <div>Ajouter </div>
                 </router-link>
             </li>
-            <li :class="{ 'active': currentPage === 'associations' || currentPage === 'associations' }">
-                <router-link :to="{ name: 'associations'}" class="redirect">
+            <!-- <li :class="{ 'active': currentPage === 'associations' || currentPage === 'associations' }">
+                <router-link :to="{ name: 'associations' }" class="redirect">
                     <Compass />
                     <div>Découvrir</div>
                 </router-link>
-            </li>
+            </li> -->
             <li :class="{ 'active': currentPage.includes('menu') }">
-                <router-link :to="{ name:'menu'}" class="redirect">
+                <router-link :to="{ name: 'menu' }" class="redirect">
                     <Menu />
                     <div>Menu</div>
                 </router-link>
@@ -52,28 +58,31 @@ watch(() => route.name, (newName) => {
         </ul>
     </nav>
     <nav class="nav-desktop" v-else>
-        <router-link  to="/">
+        <router-link to="/">
             <img class="logo" src="../assets/logo.svg" alt="logo cleanwalk.org">
         </router-link>
         <div class="links">
-            <router-link class="link" :to="{name: 'home'}" :class="{ 'active': currentPage === 'home' }">Accueil</router-link>
-            <router-link class="link" :to="{name: 'map'}"
+            <router-link class="link" :to="{ name: 'home' }"
+                :class="{ 'active': currentPage === 'home' }">Accueil</router-link>
+            <router-link class="link" :to="{ name: 'map' }"
                 :class="{ 'active': currentPage === 'map' || currentPage === 'cleanwalk' }">Carte</router-link>
-            <router-link class="link" :to="{name: 'addCleanwalk'}" :class="{ 'active': currentPage.includes('add') }">Ajouter
+            <router-link class="link" :to="{ name: 'addCleanwalk' }"
+                :class="{ 'active': currentPage.includes('add') }">Ajouter
                 cleanwalk</router-link>
-            <!-- <router-link class="link" :to="{ name: 'associations'}"
-                :class="{ 'active': currentPage === 'associations' || currentPage === 'associations' }">Découvrir</router-link>
-            <router-link class="link" :to="{name: 'menu'}" :class="{ 'active': currentPage.includes('menu') }">Menu</router-link> -->
+            <!-- <router-link class="link" :to="{ name: 'associations' }"
+                :class="{ 'active': currentPage === 'associations' || currentPage === 'associations' }">Découvrir</router-link> -->
+            <router-link class="link" :to="{ name: 'menu' }"
+                :class="{ 'active': currentPage.includes('menu') }">Menu</router-link>
         </div>
         <div v-if="user">
-            <router-link :to="{name:'menuProfile'}" class="account">
+            <router-link :to="{ name: 'menuProfile' }" class="account">
                 <div>{{ user.name }}</div>
                 <img :src="user.profilePicture" alt="profilePicture">
             </router-link>
         </div>
         <div class="infos" v-else>
-            <router-link :to="{name: 'login'}">Se connecter</router-link>
-            <router-link :to="{name:'signup'}">S'inscrire</router-link>
+            <router-link :to="{ name: 'login' }">Se connecter</router-link>
+            <router-link :to="{ name: 'signup' }">S'inscrire</router-link>
         </div>
 
     </nav>

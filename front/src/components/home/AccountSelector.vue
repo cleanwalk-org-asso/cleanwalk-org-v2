@@ -19,8 +19,8 @@
                     <li class="list-disc">Profil privé</li>
                 </ul>
                 <button class="w-full">
-                    <router-link :to="{ name: 'map' }" class="py-2 block bg-primary text-white! rounded-md font-catamaran font-medium">
-                        Creer son compte personnel
+                    <router-link :to="{ name: 'signupPerso' }" class="py-2 block bg-primary text-white! rounded-md font-catamaran font-medium">
+                        Créer son compte personnel
                     </router-link>
                  </button>
             </div>
@@ -33,11 +33,11 @@
                     <li class="list-disc">Organisez vos propres cleanwalks</li>
                     <li class="list-disc">Rejoignez des initiatives près de chez vous</li>
                     <li class="list-disc">Ressources organisateurs</li>
-                    <li class="list-disc">Profil pulic</li>
+                    <li class="list-disc">Profil pulic (A venir)</li>
                 </ul>
                 <button class="w-full">
-                    <router-link :to="{ name: 'map' }" class="py-2 block bg-primary text-white! rounded-md font-catamaran font-medium">
-                        Creer son compte personnel
+                    <router-link :to="{ name: 'signupAsso' }" class="py-2 block bg-primary text-white! rounded-md font-catamaran font-medium">
+                        Créer son compte association
                     </router-link>
                  </button>
     

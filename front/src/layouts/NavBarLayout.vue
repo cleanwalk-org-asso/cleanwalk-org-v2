@@ -5,7 +5,7 @@ import Footer from '@/components/Footer.vue';
 import NavBar from '@/components/NavBar.vue';
 
 const route = useRoute();
-const showFooter = computed(() => route.name !== 'map');
+const showFooter = computed(() => route.name !== 'map' && route.name !== 'addCleanwalk');
 </script>
 
 <template>

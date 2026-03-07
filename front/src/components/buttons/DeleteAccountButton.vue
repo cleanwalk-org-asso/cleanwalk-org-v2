@@ -30,7 +30,7 @@ const togglePopup = () => {
     border: none;
     padding: 0;
     color: #FF5757;
-    font-size: 12px;
+    font-size: 16px;
     font-weight: 400;
     text-decoration: underline;
     cursor: pointer;
