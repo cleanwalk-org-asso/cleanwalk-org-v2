@@ -7,5 +7,7 @@ import TopBar from '@/components/TopBar.vue';
 
 <template>
     <TopBar back-url="/" pageName="Modifier une cleanwalk"/>
-    <EditCleanwalk />
+    <div class="pb-24!">
+        <EditCleanwalk />
+    </div>
 </template>
