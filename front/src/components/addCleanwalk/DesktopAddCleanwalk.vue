@@ -112,7 +112,7 @@ const clearFormCache = () => {
 </script>
 
 <template>
-  <section class="section">
+  <section class="section pb-8">
     <div class="container">
       <div class="header">
         <div class="pt-4">

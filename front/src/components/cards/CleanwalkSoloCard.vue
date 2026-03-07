@@ -255,7 +255,7 @@ const getButtonParticipationText = () => {
         gap:2rem;
     }
     .organizer {
-        background-color: (var(--color-secondary));
+        background-color: #F5F5F5;
         padding: 0.5rem;
         font-size: 1rem;
         border-radius: 8px;

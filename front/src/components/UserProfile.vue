@@ -130,7 +130,7 @@ const changeUserPP = () => {
                 <RefreshCcw color="#fff" :size="20" />
             </div>
         </div>
-        <div class="content">
+        <div class="content pb-8!">
             <h3>{{ currentUser?.email }}</h3>
             <BaseInput v-model="userName" name="name" type="text" label="Nom" placeholder="Votre nom" />
             <BaseTextarea v-model="currentDescription" name="description" label="Description" placeholder="Votre description" />
