@@ -438,7 +438,7 @@ main {
 
   .orga {
     display: flex;
-    background-color: var(--color-secondary);
+    background-color: #F5F5F5;
     justify-content: space-between;
     border-radius: 8px;
     padding: 11px 20px 4px 14px;
