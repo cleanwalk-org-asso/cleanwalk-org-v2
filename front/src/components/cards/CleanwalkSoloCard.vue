@@ -9,6 +9,7 @@ import router from '@/router';
 import { useAccountStore } from '@/stores/AccountStore';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
+import defaultCover from '@/assets/default_cover.webp'
 
 //define props
 const props = defineProps<{
@@ -20,7 +21,6 @@ const cleanwalkStore = useCleanwalkStore();
 const currenUserId = ref(useAccountStore().CurrentUser?.id);
 const showToast = useUtilsStore().showToast;
 
-const defaultCover = '/src/assets/default_cover.webp'
 const showParticipationPopup = ref(false);
 const showLeaveCwPopup = ref(false);
 
