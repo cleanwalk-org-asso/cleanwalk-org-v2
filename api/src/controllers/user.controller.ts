@@ -1,5 +1,6 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { UpdateUserInput, UserParams } from "../schemas/user.schema.js";
+import { sendMail, generateUserDeletionEmail } from "../utils/mailer.js";
 
 // GET /users
 export async function getAllUsers(req: FastifyRequest, reply: FastifyReply) {
@@ -7,6 +8,7 @@ export async function getAllUsers(req: FastifyRequest, reply: FastifyReply) {
     const users = await req.server.prisma.user.findMany({
       where: {
         email: { not: null },
+        deletedAt: null,
       },
       select: {
         id: true,
@@ -40,10 +42,11 @@ export async function getUserById(
         role: true,
         createdAt: true,
         profilePicture: true,
+        deletedAt: true,
       },
     });
 
-    if (!user) {
+    if (!user || user.deletedAt) {
       return reply.code(404).send({ message: "Utilisateur introuvable" });
     }
     
@@ -106,12 +109,26 @@ export async function deleteUser(
       where: { id: Number(id) },
     });
 
-    if (!existingUser) {
+    if (!existingUser || existingUser.deletedAt) {
       return reply.code(404).send({ message: "Utilisateur introuvable" });
     }
 
     if (existingUser.role === "ADMIN") {
       return reply.code(403).send({ message: "Vous ne pouvez pas supprimer un utilisateur avec le rôle ADMIN" });
+    }
+
+    // Send email notification before deletion (if user has email)
+    if (existingUser.email) {
+      try {
+        const emailContent = generateUserDeletionEmail(existingUser.name);
+        await sendMail({
+          to: existingUser.email,
+          ...emailContent,
+        });
+      } catch (emailError) {
+        req.log.error({ err: emailError }, 'Failed to send deletion email');
+        // Continue with deletion even if email fails
+      }
     }
 
     if (existingUser.role === "ASSOCIATION") {
@@ -128,6 +145,7 @@ export async function deleteUser(
         role: 'USER',
         profilePicture: null,
         password: null,
+        deletedAt: new Date(),
       },
     });
 

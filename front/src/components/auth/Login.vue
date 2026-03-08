@@ -31,27 +31,31 @@ const login = async () => {
     return
   }
 
-  const response = await api.post('auth/login', {
-    json: {
-      email: email.value,
-      password: password.value,
-    },
-  })
+  try {
+    const response = await api.post('auth/login', {
+      json: {
+        email: email.value,
+        password: password.value,
+      },
+    })
 
-  if (!response.ok) {
+    if (!response.ok) {
+      showToast('Email ou mot de passe incorrect', false)
+      return
+    }
+
+    const json: LoginResponse = await response.json()
+    accountStore.CurrentUser = json.user
+
+    if (json.access_token) {
+      localStorage.setItem('access_token', json.access_token)
+    }
+
+    const redirectPath = route.query.redirect as string
+    router.push(redirectPath || { name: 'home' })
+  } catch (error) {
     showToast('Email ou mot de passe incorrect', false)
-    return
   }
-
-  const json: LoginResponse = await response.json()
-  accountStore.CurrentUser = json.user
-
-  if (json.access_token) {
-    localStorage.setItem('access_token', json.access_token)
-  }
-
-  const redirectPath = route.query.redirect as string
-  router.push(redirectPath || { name: 'home' })
 }
 </script>
 

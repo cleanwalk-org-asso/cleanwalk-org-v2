@@ -103,6 +103,26 @@ export const useAccountStore = defineStore('account', () => {
         return true
     }
 
+    const deleteAccount = async () => {
+        if (!CurrentUser.value) {
+            return false
+        }
+        try {
+            const response = await api.delete(`users/${CurrentUser.value.id}`);
+            if (response.ok) {
+                await api.post('auth/logout')
+                isLoggedIn.value = false
+                CurrentUser.value = undefined
+                window.location.assign('/')
+                return true
+            }
+            return false
+        } catch (error) {
+            console.error('Error deleting account:', error)
+            return false
+        }
+    }
+
     return {
         logout,
         isLoggedIn,
@@ -113,6 +133,7 @@ export const useAccountStore = defineStore('account', () => {
         modifyAssociation,
         getAssoList,
         googleLoginSignup,
-        checkAuth
+        checkAuth,
+        deleteAccount
     }
 })

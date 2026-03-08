@@ -72,3 +72,42 @@ export function generatePasswordResetEmail(email: string, resetToken: string) {
     text,
   };
 }
+/**
+ * Generate a user deletion confirmation email
+ */
+export function generateUserDeletionEmail(userName: string) {
+  const html = `
+    <h1>Confirmation de suppression de compte</h1>
+    <p>Bonjour ${userName},</p>
+    <p>Votre compte Cleanwalk.org a été supprimé avec succès.</p>
+    <p>Toutes vos données personnelles ont été anonymisées conformément à nos politiques de confidentialité.</p>
+    <p>Si vous souhaitez rejoindre à nouveau notre communauté, vous pouvez créer un nouveau compte à tout moment.</p>
+    <p>Nous vous remercions d'avoir participé à nos actions de nettoyage environnemental.</p>
+    <br>
+    <p>Cordialement,</p>
+    <p>L'équipe Cleanwalk.org</p>
+  `;
+
+  const text = `
+    Confirmation de suppression de compte
+    
+    Bonjour ${userName},
+    
+    Votre compte Cleanwalk.org a été supprimé avec succès.
+    
+    Toutes vos données personnelles ont été anonymisées conformément à nos politiques de confidentialité.
+    
+    Si vous souhaitez rejoindre à nouveau notre communauté, vous pouvez créer un nouveau compte à tout moment.
+    
+    Nous vous remercions d'avoir participé à nos actions de nettoyage environnemental.
+    
+    Cordialement,
+    L'équipe Cleanwalk.org
+  `;
+
+  return {
+    subject: 'Confirmation de suppression de votre compte Cleanwalk.org',
+    html,
+    text,
+  };
+}

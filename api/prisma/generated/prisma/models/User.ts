@@ -42,6 +42,7 @@ export type UserMinAggregateOutputType = {
   createdAt: Date | null
   profilePicture: string | null
   role: $Enums.UserRole | null
+  deletedAt: Date | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -52,6 +53,7 @@ export type UserMaxAggregateOutputType = {
   createdAt: Date | null
   profilePicture: string | null
   role: $Enums.UserRole | null
+  deletedAt: Date | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -62,6 +64,7 @@ export type UserCountAggregateOutputType = {
   createdAt: number
   profilePicture: number
   role: number
+  deletedAt: number
   _all: number
 }
 
@@ -82,6 +85,7 @@ export type UserMinAggregateInputType = {
   createdAt?: true
   profilePicture?: true
   role?: true
+  deletedAt?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -92,6 +96,7 @@ export type UserMaxAggregateInputType = {
   createdAt?: true
   profilePicture?: true
   role?: true
+  deletedAt?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -102,6 +107,7 @@ export type UserCountAggregateInputType = {
   createdAt?: true
   profilePicture?: true
   role?: true
+  deletedAt?: true
   _all?: true
 }
 
@@ -199,6 +205,7 @@ export type UserGroupByOutputType = {
   createdAt: Date
   profilePicture: string | null
   role: $Enums.UserRole
+  deletedAt: Date | null
   _count: UserCountAggregateOutputType | null
   _avg: UserAvgAggregateOutputType | null
   _sum: UserSumAggregateOutputType | null
@@ -232,6 +239,7 @@ export type UserWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   profilePicture?: Prisma.StringNullableFilter<"User"> | string | null
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
+  deletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   articles?: Prisma.ArticleListRelationFilter
   cleanwalks?: Prisma.CleanwalkUserListRelationFilter
   organization?: Prisma.XOR<Prisma.OrganizationNullableScalarRelationFilter, Prisma.OrganizationWhereInput> | null
@@ -246,6 +254,7 @@ export type UserOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   profilePicture?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   articles?: Prisma.ArticleOrderByRelationAggregateInput
   cleanwalks?: Prisma.CleanwalkUserOrderByRelationAggregateInput
   organization?: Prisma.OrganizationOrderByWithRelationInput
@@ -263,6 +272,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   profilePicture?: Prisma.StringNullableFilter<"User"> | string | null
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
+  deletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   articles?: Prisma.ArticleListRelationFilter
   cleanwalks?: Prisma.CleanwalkUserListRelationFilter
   organization?: Prisma.XOR<Prisma.OrganizationNullableScalarRelationFilter, Prisma.OrganizationWhereInput> | null
@@ -277,6 +287,7 @@ export type UserOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   profilePicture?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -295,6 +306,7 @@ export type UserScalarWhereWithAggregatesInput = {
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   profilePicture?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   role?: Prisma.EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
+  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
 }
 
 export type UserCreateInput = {
@@ -304,6 +316,7 @@ export type UserCreateInput = {
   createdAt?: Date | string
   profilePicture?: string | null
   role: $Enums.UserRole
+  deletedAt?: Date | string | null
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
   cleanwalks?: Prisma.CleanwalkUserCreateNestedManyWithoutUserInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutUserInput
@@ -318,6 +331,7 @@ export type UserUncheckedCreateInput = {
   createdAt?: Date | string
   profilePicture?: string | null
   role: $Enums.UserRole
+  deletedAt?: Date | string | null
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
   cleanwalks?: Prisma.CleanwalkUserUncheckedCreateNestedManyWithoutUserInput
   organization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutUserInput
@@ -331,6 +345,7 @@ export type UserUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   profilePicture?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
   cleanwalks?: Prisma.CleanwalkUserUpdateManyWithoutUserNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutUserNestedInput
@@ -345,6 +360,7 @@ export type UserUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   profilePicture?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
   cleanwalks?: Prisma.CleanwalkUserUncheckedUpdateManyWithoutUserNestedInput
   organization?: Prisma.OrganizationUncheckedUpdateOneWithoutUserNestedInput
@@ -359,6 +375,7 @@ export type UserCreateManyInput = {
   createdAt?: Date | string
   profilePicture?: string | null
   role: $Enums.UserRole
+  deletedAt?: Date | string | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -368,6 +385,7 @@ export type UserUpdateManyMutationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   profilePicture?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -378,6 +396,7 @@ export type UserUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   profilePicture?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserScalarRelationFilter = {
@@ -393,6 +412,7 @@ export type UserCountOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   profilePicture?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type UserAvgOrderByAggregateInput = {
@@ -407,6 +427,7 @@ export type UserMaxOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   profilePicture?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -417,6 +438,7 @@ export type UserMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   profilePicture?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type UserSumOrderByAggregateInput = {
@@ -443,6 +465,10 @@ export type NullableStringFieldUpdateOperationsInput = {
 
 export type EnumUserRoleFieldUpdateOperationsInput = {
   set?: $Enums.UserRole
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type UserCreateNestedOneWithoutOrganizationInput = {
@@ -494,6 +520,7 @@ export type UserCreateWithoutRefreshTokensInput = {
   createdAt?: Date | string
   profilePicture?: string | null
   role: $Enums.UserRole
+  deletedAt?: Date | string | null
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
   cleanwalks?: Prisma.CleanwalkUserCreateNestedManyWithoutUserInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutUserInput
@@ -507,6 +534,7 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   createdAt?: Date | string
   profilePicture?: string | null
   role: $Enums.UserRole
+  deletedAt?: Date | string | null
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
   cleanwalks?: Prisma.CleanwalkUserUncheckedCreateNestedManyWithoutUserInput
   organization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutUserInput
@@ -535,6 +563,7 @@ export type UserUpdateWithoutRefreshTokensInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   profilePicture?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
   cleanwalks?: Prisma.CleanwalkUserUpdateManyWithoutUserNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutUserNestedInput
@@ -548,6 +577,7 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   profilePicture?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
   cleanwalks?: Prisma.CleanwalkUserUncheckedUpdateManyWithoutUserNestedInput
   organization?: Prisma.OrganizationUncheckedUpdateOneWithoutUserNestedInput
@@ -560,6 +590,7 @@ export type UserCreateWithoutOrganizationInput = {
   createdAt?: Date | string
   profilePicture?: string | null
   role: $Enums.UserRole
+  deletedAt?: Date | string | null
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
   cleanwalks?: Prisma.CleanwalkUserCreateNestedManyWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
@@ -573,6 +604,7 @@ export type UserUncheckedCreateWithoutOrganizationInput = {
   createdAt?: Date | string
   profilePicture?: string | null
   role: $Enums.UserRole
+  deletedAt?: Date | string | null
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
   cleanwalks?: Prisma.CleanwalkUserUncheckedCreateNestedManyWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
@@ -601,6 +633,7 @@ export type UserUpdateWithoutOrganizationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   profilePicture?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
   cleanwalks?: Prisma.CleanwalkUserUpdateManyWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
@@ -614,6 +647,7 @@ export type UserUncheckedUpdateWithoutOrganizationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   profilePicture?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
   cleanwalks?: Prisma.CleanwalkUserUncheckedUpdateManyWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -626,6 +660,7 @@ export type UserCreateWithoutCleanwalksInput = {
   createdAt?: Date | string
   profilePicture?: string | null
   role: $Enums.UserRole
+  deletedAt?: Date | string | null
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
@@ -639,6 +674,7 @@ export type UserUncheckedCreateWithoutCleanwalksInput = {
   createdAt?: Date | string
   profilePicture?: string | null
   role: $Enums.UserRole
+  deletedAt?: Date | string | null
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
   organization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
@@ -667,6 +703,7 @@ export type UserUpdateWithoutCleanwalksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   profilePicture?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
@@ -680,6 +717,7 @@ export type UserUncheckedUpdateWithoutCleanwalksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   profilePicture?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
   organization?: Prisma.OrganizationUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -692,6 +730,7 @@ export type UserCreateWithoutArticlesInput = {
   createdAt?: Date | string
   profilePicture?: string | null
   role: $Enums.UserRole
+  deletedAt?: Date | string | null
   cleanwalks?: Prisma.CleanwalkUserCreateNestedManyWithoutUserInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
@@ -705,6 +744,7 @@ export type UserUncheckedCreateWithoutArticlesInput = {
   createdAt?: Date | string
   profilePicture?: string | null
   role: $Enums.UserRole
+  deletedAt?: Date | string | null
   cleanwalks?: Prisma.CleanwalkUserUncheckedCreateNestedManyWithoutUserInput
   organization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
@@ -733,6 +773,7 @@ export type UserUpdateWithoutArticlesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   profilePicture?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cleanwalks?: Prisma.CleanwalkUserUpdateManyWithoutUserNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
@@ -746,6 +787,7 @@ export type UserUncheckedUpdateWithoutArticlesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   profilePicture?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cleanwalks?: Prisma.CleanwalkUserUncheckedUpdateManyWithoutUserNestedInput
   organization?: Prisma.OrganizationUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -808,6 +850,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   createdAt?: boolean
   profilePicture?: boolean
   role?: boolean
+  deletedAt?: boolean
   articles?: boolean | Prisma.User$articlesArgs<ExtArgs>
   cleanwalks?: boolean | Prisma.User$cleanwalksArgs<ExtArgs>
   organization?: boolean | Prisma.User$organizationArgs<ExtArgs>
@@ -823,6 +866,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   createdAt?: boolean
   profilePicture?: boolean
   role?: boolean
+  deletedAt?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -833,6 +877,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   createdAt?: boolean
   profilePicture?: boolean
   role?: boolean
+  deletedAt?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -843,9 +888,10 @@ export type UserSelectScalar = {
   createdAt?: boolean
   profilePicture?: boolean
   role?: boolean
+  deletedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "createdAt" | "profilePicture" | "role", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "createdAt" | "profilePicture" | "role" | "deletedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   articles?: boolean | Prisma.User$articlesArgs<ExtArgs>
   cleanwalks?: boolean | Prisma.User$cleanwalksArgs<ExtArgs>
@@ -872,6 +918,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     createdAt: Date
     profilePicture: string | null
     role: $Enums.UserRole
+    deletedAt: Date | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -1306,6 +1353,7 @@ export interface UserFieldRefs {
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly profilePicture: Prisma.FieldRef<"User", 'String'>
   readonly role: Prisma.FieldRef<"User", 'UserRole'>
+  readonly deletedAt: Prisma.FieldRef<"User", 'DateTime'>
 }
     
 

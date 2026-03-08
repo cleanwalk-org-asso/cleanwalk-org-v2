@@ -404,10 +404,6 @@ export type OrganizationUncheckedUpdateOneWithoutUserNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutUserInput, Prisma.OrganizationUpdateWithoutUserInput>, Prisma.OrganizationUncheckedUpdateWithoutUserInput>
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type OrganizationCreateWithoutUserInput = {
   description?: string | null
   webSite?: string | null
