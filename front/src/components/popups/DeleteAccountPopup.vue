@@ -2,10 +2,14 @@
 import { useAccountStore } from '@/stores/AccountStore';
 import { X } from 'lucide-vue-next';
 const accountStore = useAccountStore();
-// Assuming you have a deleteAccount method in your store
 
-const deleteAccount = () => {
-  console.log('Account deleted'); //todo when api route is ready
+const deleteAccount = async () => {
+  const success = await accountStore.deleteAccount();
+  if (success) {
+    console.log('Account deleted successfully');
+  } else {
+    console.error('Failed to delete account');
+  }
 };
 
 defineProps({
