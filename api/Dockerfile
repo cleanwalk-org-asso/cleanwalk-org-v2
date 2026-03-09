@@ -8,7 +8,7 @@ RUN npm ci
 
 COPY . .
 RUN npm run build
-RUN npx prisma generate
+RUN DATABASE_URL=none npx prisma generate
 
 # ---- Prod stage ----
 FROM node:22-alpine AS prod
