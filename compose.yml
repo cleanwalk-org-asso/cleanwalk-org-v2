@@ -1,4 +1,16 @@
 services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    env_file:
+      - ./api/.env
+    depends_on:
+      - database
+      - redis
+    ports:
+      - "8080:8080"
+
   database:
     image: postgres:latest
     environment:
