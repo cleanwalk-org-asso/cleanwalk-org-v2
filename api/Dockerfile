@@ -15,4 +15,4 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
 ENV NODE_ENV=production
 EXPOSE 8080
-CMD ["node", "dist/src/index.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/index.js"]
