@@ -116,16 +116,26 @@ const router = createRouter({
             ogImage: '/default-banner.svg'
           }
         },
-        // {
-        //   path: 'privacy-policy',
-        //   name: 'privacyPolicy',
-        //   component: () => import('@/views/PrivacyPolicyView.vue')
-        // },
-        // {
-        //   path: 'terms-of-use',
-        //   name: 'termsOfUse',
-        //   component: () => import('@/views/TermsOfUseView.vue')
-        // },
+        {
+          path: 'mentions-legales',
+          name: 'mentionsLegales',
+          component: () => import('@/views/MentionsLegalesView.vue'),
+          meta: {
+            title: 'Mentions légales | Cleanwalk.org',
+            description: 'Consultez les mentions légales de Cleanwalk.org.',
+            ogImage: '/default-banner.svg'
+          }
+        },
+        {
+          path: 'conditions-generales-utilisation',
+          name: 'conditionsGeneralesUtilisation',
+          component: () => import('@/views/ConditionsGeneralesUtilisationView.vue'),
+          meta: {
+            title: 'Conditions générales d\'utilisation | Cleanwalk.org',
+            description: 'Consultez les conditions générales d\'utilisation de Cleanwalk.org.',
+            ogImage: '/default-banner.svg'
+          }
+        },
       ]
     },
 
@@ -134,42 +144,82 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: () => import('@/views/LoginView.vue'),
+      meta: {
+        title: 'Connexion | Cleanwalk.org',
+        description: 'Connectez-vous à votre compte Cleanwalk.org.',
+        ogImage: '/default-banner.svg'
+      }
     },
     {
       path: '/signup',
       name: 'signup',
       component: () => import('@/views/SignupChoiceView.vue'),
+      meta: {
+        title: 'Inscription | Cleanwalk.org',
+        description: 'Créez votre compte sur Cleanwalk.org.',
+        ogImage: '/default-banner.svg'
+      }
     },
     {
       path: '/signup/asso',
       name: 'signupAsso',
       component: () => import('@/views/SignupAssoView.vue'),
+      meta: {
+        title: 'Inscription Association | Cleanwalk.org',
+        description: 'Inscrivez votre association sur Cleanwalk.org.',
+        ogImage: '/default-banner.svg'
+      }
     },
     {
       path: '/signup/perso',
       name: 'signupPerso',
       component: () => import('@/views/SignupView.vue'),
+      meta: {
+        title: 'Inscription Citoyen | Cleanwalk.org',
+        description: 'Créez votre compte citoyen sur Cleanwalk.org.',
+        ogImage: '/default-banner.svg'
+      }
     },
     {
       path: '/logout',
       name: 'logout',
       component: () => import('@/views/SignupView.vue'),
+      meta: {
+        title: 'Déconnexion | Cleanwalk.org',
+        description: 'Déconnexion de votre compte Cleanwalk.org.',
+        ogImage: '/default-banner.svg'
+      }
     },
     {
       path: '/cleanwalk/edit/:id',
       name: 'editCleanwalk',
       component: () => import('@/views/EditCleanwalkView.vue'),
-      meta: { requiresAuth: true }
+      meta: {
+        requiresAuth: true,
+        title: 'Modifier un Événement | Cleanwalk.org',
+        description: 'Modifiez les informations de votre cleanwalk.',
+        ogImage: '/default-banner.svg'
+      }
     },
     {
       path: '/reset-password/:token',
       name: 'resetPassword',
       component: () => import('@/views/ResetPasswordView.vue'),
+      meta: {
+        title: 'Réinitialiser le mot de passe | Cleanwalk.org',
+        description: 'Créez un nouveau mot de passe pour votre compte.',
+        ogImage: '/default-banner.svg'
+      }
     },
     {
       path: '/forgot-password',
       name: 'forgotPassword',
       component: () => import('@/views/ForgotPasswordView.vue'),
+      meta: {
+        title: 'Mot de passe oublié | Cleanwalk.org',
+        description: 'Demandez la réinitialisation de votre mot de passe.',
+        ogImage: '/default-banner.svg'
+      }
     },
     {
       path: '/:pathMatch(.*)*',
@@ -196,16 +246,21 @@ router.beforeEach(async (to, from, next) => {
 
   // SEO dynamique
   const meta = to.meta
-  if (meta.title) document.title = meta.title as string
+  const defaultTitle = 'Cleanwalk.org - Événements de Nettoyage Citoyen'
+  const defaultDescription = 'Rejoignez Cleanwalk.org pour organiser et participer à des événements de nettoyage citoyen.'
+  const pageTitle = (meta.title as string) || defaultTitle
+  const pageDescription = (meta.description as string) || defaultDescription
+
+  document.title = pageTitle
 
   const desc = document.querySelector('meta[name="description"]')
-  if (desc && meta.description) desc.setAttribute('content', meta.description as string)
+  if (desc) desc.setAttribute('content', pageDescription)
 
   const ogTitle = document.querySelector('meta[property="og:title"]')
-  if (ogTitle && meta.title) ogTitle.setAttribute('content', meta.title as string)
+  if (ogTitle) ogTitle.setAttribute('content', pageTitle)
 
   const ogDesc = document.querySelector('meta[property="og:description"]')
-  if (ogDesc && meta.description) ogDesc.setAttribute('content', meta.description as string)
+  if (ogDesc) ogDesc.setAttribute('content', pageDescription)
 
   const ogImage = document.querySelector('meta[property="og:image"]')
   if (ogImage && meta.ogImage) {

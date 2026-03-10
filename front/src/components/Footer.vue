@@ -63,8 +63,8 @@ import LinkedIn from './icons/LinkedIn.vue';
         <div class="h-px bg-white/20 my-8"></div>
         <div class="flex items-center justify-between text-xs text-[#E5E7EB]/80 pt-4">
             <div class="flex gap-4">
-                <span class="underline">Mentions légales</span>
-                <span class="underline">Conditions générales d'utilisations</span>
+                <router-link to="/mentions-legales" class="underline">Mentions légales</router-link>
+                <router-link to="/conditions-generales-utilisation" class="underline">Conditions générales d'utilisation</router-link>
             </div>
             <div class="flex gap-6">
                 <span>Cleanwalk.org 2025 - Association de loi 1901</span>

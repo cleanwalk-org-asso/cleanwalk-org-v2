@@ -1,5 +1,5 @@
 User-agent: *
-Disallow /
+Allow: /
 
 # Allow: /
 # Allow: /cleanwalk/
@@ -14,5 +14,4 @@ Disallow /
 # Disallow: /forgot-password
 # Disallow: /logout
 
-# Sitemap location
-# Sitemap: https://cleanwalk.org/sitemap.xml
+Sitemap: https://cleanwalk.org/sitemap.xml
