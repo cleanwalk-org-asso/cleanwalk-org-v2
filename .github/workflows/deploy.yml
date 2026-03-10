@@ -89,7 +89,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT}}
           script: |
-            cd /home/$(whoami)/setup-production
+            cd /home/$(whoami)/cleanwalk-v2/setup-production
             pwd
             echo "${{ secrets.ghrcToken }}" | docker login ghcr.io -u ${{ secrets.ghrcUser }} --password-stdin
             git pull origin main
