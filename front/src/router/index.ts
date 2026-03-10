@@ -19,18 +19,18 @@ const router = createRouter({
           name: 'home',
           component: () => import('@/views/HomeView.vue'),
           meta: {
-            title: 'Cleanwalk.org - Événements de Nettoyage Citoyen',
-            description: 'Rejoignez Cleanwalk.org pour organiser et participer à des événements de nettoyage citoyen.',
+            title: 'Cleanwalk.org - Plateforme des actions citoyennes de ramassage de déchets',
+            description: 'La plateforme qui regroupe les actions citoyennes de ramassage de déchets.Trouvez les ramassages organisés près de chez vous et inscrivez ceux que vous organisez pour mobiliser plus de participants !',
             ogImage: '/default-banner.svg'
           }
         },
         {
-          path: 'carte',
+          path: 'cleanwalks',
           name: 'map',
           component: () => import('@/views/MapView.vue'),
           meta: {
-            title: 'Carte des Cleanwalk | Cleanwalk.org',
-            description: 'Trouvez et rejoignez des événements de nettoyage près de chez vous.',
+            title: 'Cleanwalks à venir',
+            description: 'La plateforme qui regroupe les actions citoyennes de ramassage de déchets. Trouvez les ramassages organisés près de chez vous et inscrivez ceux que vous organisez pour mobiliser plus de participants !',
             ogImage: '/default-banner.svg'
           }
         },

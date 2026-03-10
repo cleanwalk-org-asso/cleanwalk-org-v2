@@ -54,7 +54,7 @@ import LinkedIn from './icons/LinkedIn.vue';
                 <div>
                     <div class="font-bold">Menu</div>
                     <div class="w-38">
-                        <router-link to="/carte">Carte des ramassages</router-link><br>
+                        <router-link to="/cleanwalks">Carte des ramassages</router-link><br>
                         <a href="https://www.helloasso.com/associations/cleanwalk-org">l'association</a>
                     </div>
                 </div>

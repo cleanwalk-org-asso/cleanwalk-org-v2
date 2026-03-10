@@ -22,7 +22,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://cleanwalk.org/carte</loc>
+    <loc>https://cleanwalk.org/cleanwalks</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
