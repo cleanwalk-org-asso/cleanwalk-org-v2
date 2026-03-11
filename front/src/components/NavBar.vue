@@ -1,14 +1,16 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
 import { useAccountStore } from '@/stores/AccountStore';
 import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useDevice } from '@/composables/useDevice';
-import { Plus, MapPin, Compass, Menu, House } from 'lucide-vue-next';
+import { Plus, MapPin, Menu, House } from 'lucide-vue-next';
 
 const currentPage = ref('');
 const route = useRoute();
 const { isMobile } = useDevice(); // Utilisation du composable pour détecter mobile/desktop
-const user = useAccountStore().CurrentUser;
+const accountStore = useAccountStore();
+const { CurrentUser: user } = storeToRefs(accountStore);
 
 // Update currentPage when component is mounted
 onMounted(() => {
