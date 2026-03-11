@@ -69,6 +69,12 @@ import LinkedIn from './icons/LinkedIn.vue';
             <div class="flex gap-6">
                 <span>Cleanwalk.org 2025 - Association de loi 1901</span>
                 <span>Développé par nos bénévoles.</span>
+                <span>
+                    Cartographie :
+                    <a href="https://leafletjs.com" target="_blank" rel="noopener noreferrer" class="underline">Leaflet</a>
+                    &amp;
+                    <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer" class="underline">OpenStreetMap</a>
+                </span>
             </div>
         </div>
     </footer>
