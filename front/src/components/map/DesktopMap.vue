@@ -105,6 +105,8 @@ watch(selectedCleanwalk, (newVal) => {
             </div>
         </div>
 
+        <router-link :to="{ name: 'addCleanwalk' }" class="add-cleanwalk-btn">+</router-link>
+
         <CleanwalkSoloCard 
             :onClose="resetCleanwalkSelection" 
             :cleanwalk="selectedCleanwalk" 
@@ -163,6 +165,24 @@ main {
         text-decoration: none;
         color: inherit;
     }
+}
+
+.add-cleanwalk-btn {
+    position: fixed;
+    right: 1.5rem;
+    bottom: 2rem;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 2rem;
+    line-height: 1;
+    z-index: 1001;
+    background-color: var(--color-primary);
+    color: #fff;
 }
 
 /* Styliser l'ensemble de la scrollbar */

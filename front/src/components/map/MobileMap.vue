@@ -179,6 +179,7 @@ function mapClickEvent() {
             <RouterLink :to="{ name: 'login' }" class="info" v-else>
                 <LogIn color="#94A3B8"/>
             </RouterLink>
+            <RouterLink :to="{ name: 'addCleanwalk' }" class="add-cleanwalk-btn">+</RouterLink>
         </div>
         <div ref="draggableCard" class="draggable-card">
             <div class="card-handle" @click="!selectedCleanwalk && (cardListBool = true);">
@@ -269,6 +270,21 @@ main {
             width: 38px;
             height: 38px;
             margin-left: 8px;
+        }
+
+        .add-cleanwalk-btn {
+            background-color: var(--color-primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            width: 38px;
+            height: 38px;
+            margin-left: 8px;
+            text-decoration: none;
+            font-size: 1.75rem;
+            line-height: 1;
         }
 
         .search-bar {

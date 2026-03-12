@@ -5,7 +5,6 @@ import router from '@/router';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
 import { useAccountStore } from '@/stores/AccountStore';
-import { buildCleanwalkSlug } from '@/services/cleanwalkSlug';
 
 const STORAGE_KEY = 'cleanwalk-form-data';
 
@@ -52,8 +51,6 @@ export function useCleanwalkForm() {
   const showToast = useUtilsStore().showToast;
   const cleanwalkStore = useCleanwalkStore();
   const createCleanwalk = cleanwalkStore.createCleanwalk;
-  const getAllCleanwalks = cleanwalkStore.getAllCleanwalks;
-  const accountStore = useAccountStore();
 
 
   // Function to save form data to sessionStorage
@@ -95,12 +92,17 @@ export function useCleanwalkForm() {
   // Function to set the date and time for start and end
   const setDate = () => {
     if (!dateCleanwalk.value.dateDay || !dateCleanwalk.value.hourBegin || !dateCleanwalk.value.hourEnd) {
-      return;
+      return { ok: false as const, reason: 'missing' as const };
     }
     const startDate = set(parse(dateCleanwalk.value.dateDay, 'yyyy-MM-dd', new Date()), {
       hours: parseInt(dateCleanwalk.value.hourBegin.split(':')[0]),
       minutes: parseInt(dateCleanwalk.value.hourBegin.split(':')[1]),
     });
+
+    if (startDate.getTime() < Date.now()) {
+      showToast('La date de début ne peut pas être dans le passé', false);
+      return { ok: false as const, reason: 'past' as const };
+    }
 
     // Conversion en string ISO pour Prisma/Backend
     newCleanwalk.value.date_begin = startDate.toISOString();
@@ -114,6 +116,7 @@ export function useCleanwalkForm() {
 
     newCleanwalk.value.duration = duration;
     // Data will be saved automatically via the watcher
+    return { ok: true as const };
   };
 
   // Function to upload the image and create the cleanwalk
@@ -144,27 +147,7 @@ export function useCleanwalkForm() {
         // Clear form data from storage after successful creation
         clearStorage();
         showToast('Your cleanwalk has been successfully published', true);
-        const cleanwalks = await getAllCleanwalks();
-        const createdCleanwalk = [...cleanwalks]
-          .filter((cw) => {
-            const sameName = cw.name === newCleanwalk.value.name;
-            const sameAddress = cw.address === newCleanwalk.value.address;
-            const sameHost = cw.host?.name === accountStore.CurrentUser?.name;
-            const sameCoordinates = cw.pos_lat === newCleanwalk.value.pos_lat && cw.pos_long === newCleanwalk.value.pos_long;
-            return sameName && sameAddress && sameHost && sameCoordinates;
-          })
-          .sort((a, b) => new Date(b.date_begin).getTime() - new Date(a.date_begin).getTime())[0];
-
-        const slug = buildCleanwalkSlug(
-          createdCleanwalk?.name ?? newCleanwalk.value.name,
-          createdCleanwalk?.host?.name ?? accountStore.CurrentUser?.name,
-        );
-
         setTimeout(() => {
-          if (createdCleanwalk?.id) {
-            router.push({ name: 'cleanwalk', params: { id: String(createdCleanwalk.id), slug } });
-            return;
-          }
           router.push({ name: 'map' }).then(() => router.go(0));
         }, 1000);
       } else {
