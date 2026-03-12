@@ -11,6 +11,7 @@ import { useAccountStore } from "@/stores/AccountStore";
 import { useCleanwalkMap } from "@/composables/useCleanwalkMap";
 import blueMapIcon from "@/assets/blue-map.svg";
 import greenMapIcon from "@/assets/green-map.svg";
+import { getCleanwalkRouteParams } from '@/services/cleanwalkSlug';
 
 const {
     mapInstance,
@@ -178,6 +179,7 @@ function mapClickEvent() {
             <RouterLink :to="{ name: 'login' }" class="info" v-else>
                 <LogIn color="#94A3B8"/>
             </RouterLink>
+            <RouterLink :to="{ name: 'addCleanwalk' }" class="add-cleanwalk-btn">+</RouterLink>
         </div>
         <div ref="draggableCard" class="draggable-card">
             <div class="card-handle" @click="!selectedCleanwalk && (cardListBool = true);">
@@ -187,7 +189,7 @@ function mapClickEvent() {
             </div>
             <div class="card-content" v-if="selectedCleanwalk">
                 <h3>{{ selectedCleanwalk.name }}</h3>
-                <router-link :to="{name: 'cleanwalk', params:{id: selectedCleanwalk.id}}" class="flex-container">
+                <router-link :to="{name: 'cleanwalk', params: getCleanwalkRouteParams(selectedCleanwalk)}" class="flex-container">
                     <div class="left">
                         <div class="top">
                             <Clock :size="16"/>
@@ -210,7 +212,7 @@ function mapClickEvent() {
         </div>
         <div class="cleanwalk-list" :class="{ 'active': cardListBool === false }">
             <div class="container" ref="cleanwalkListContainer">
-                <router-link v-for="cleanwalk in filteredCleanwalks" :to="{name: 'cleanwalk', params:{id: cleanwalk.id}}"  :key="cleanwalk.id" class="listContainer">
+                <router-link v-for="cleanwalk in filteredCleanwalks" :to="{name: 'cleanwalk', params: getCleanwalkRouteParams(cleanwalk)}"  :key="cleanwalk.id" class="listContainer">
                     <cleanwalk-card :cleanwalk="cleanwalk" />
                 </router-link>
             </div>
@@ -268,6 +270,21 @@ main {
             width: 38px;
             height: 38px;
             margin-left: 8px;
+        }
+
+        .add-cleanwalk-btn {
+            background-color: var(--color-primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            width: 38px;
+            height: 38px;
+            margin-left: 8px;
+            text-decoration: none;
+            font-size: 1.75rem;
+            line-height: 1;
         }
 
         .search-bar {

@@ -10,6 +10,7 @@ import BaseSearchInput from '@/components/base/BaseSearchInput.vue';
 import CleanwalkListCard from '@/components/cards/CleanwalkListCard.vue';
 import CleanwalkSoloCard from '@/components/cards/CleanwalkSoloCard.vue';
 import type { Cleanwalk } from '@/interfaces/cleanwalkInterface';
+import { getCleanwalkRouteParams } from '@/services/cleanwalkSlug';
 
 const cleanwalkStore = useCleanwalkStore();
 
@@ -95,7 +96,7 @@ watch(selectedCleanwalk, (newVal) => {
             </div>
             <div class="container" ref="cleanwalkListContainer">
                 <router-link v-for="cleanwalk in filteredCleanwalks"
-                    :to="{ name: 'cleanwalk', params: { id: cleanwalk.id } }" 
+                    :to="{ name: 'cleanwalk', params: getCleanwalkRouteParams(cleanwalk) }" 
                     :key="cleanwalk.id" 
                     class="listContainer"
                     @click.prevent="showSoloCW(cleanwalk.id!)">
@@ -103,6 +104,8 @@ watch(selectedCleanwalk, (newVal) => {
                 </router-link>
             </div>
         </div>
+
+        <router-link :to="{ name: 'addCleanwalk' }" class="add-cleanwalk-btn">+</router-link>
 
         <CleanwalkSoloCard 
             :onClose="resetCleanwalkSelection" 
@@ -162,6 +165,24 @@ main {
         text-decoration: none;
         color: inherit;
     }
+}
+
+.add-cleanwalk-btn {
+    position: fixed;
+    right: 1.5rem;
+    bottom: 2rem;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 2rem;
+    line-height: 1;
+    z-index: 1001;
+    background-color: var(--color-primary);
+    color: #fff;
 }
 
 /* Styliser l'ensemble de la scrollbar */

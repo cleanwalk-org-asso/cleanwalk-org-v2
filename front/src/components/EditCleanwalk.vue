@@ -8,12 +8,12 @@ import { useCleanwalkStore } from '@/stores/CleanwalkStore';
 import dateService from '@/services/dateService'; // Assurez-vous d'importer correctement
 import dragDrop from './dragDrop.vue';
 import AutocompleteAddress from './base/AutocompleteAddress.vue';
-import { format, parse } from 'date-fns';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import api from '@/services/apiService';
 import BaseInput from './base/BaseInput.vue';
 import BaseTextarea from './base/BaseTextarea.vue';
 import NavBar from './NavBar.vue';
+import { getCleanwalkRouteParams } from '@/services/cleanwalkSlug';
 
 const showToast = useUtilsStore().showToast;
 
@@ -39,15 +39,20 @@ onMounted(async () => {
   }
   const cleanwalkId = route.params.id;
   if (!cleanwalkId) {
-    router.push({ name: 'carte' });
+    router.push('/cleanwalks');
   }
   // fetch cleanwalk
   currentCleanwalk.value = await getCleanwalkById(+cleanwalkId);
   if (!currentCleanwalk.value) {
-    router.push({ name: 'carte' });
+    router.push('/cleanwalks');
   } else {
+    const expectedSlug = getCleanwalkRouteParams(currentCleanwalk.value).slug;
+    const currentSlug = typeof route.params.slug === 'string' ? route.params.slug : '';
+    if (currentSlug !== expectedSlug) {
+      router.replace({ name: 'editCleanwalk', params: getCleanwalkRouteParams(currentCleanwalk.value) });
+    }
     const { dateDay, hourBegin, hourEnd } = dateService.getDayAndHourBegginEndByDate(currentCleanwalk.value.date_begin, currentCleanwalk.value.duration);
-    dateCleanwalk.value.dateDay = format(parse(dateDay, 'dd-MM-yyyy', new Date()), 'yyyy-MM-dd');
+    dateCleanwalk.value.dateDay = dateDay;
     dateCleanwalk.value.hourBegin = hourBegin;
     dateCleanwalk.value.hourEnd = hourEnd;
   }
@@ -65,19 +70,24 @@ const validate = async () => {
     currentCleanwalk.value!.date_begin = date!.date_begin;
     currentCleanwalk.value!.duration = date!.duration;
   }
+
+  if (new Date(currentCleanwalk.value!.date_begin).getTime() < Date.now()) {
+    showToast('La date de début ne peut pas être dans le passé', false);
+    return;
+  }
+
   await Upload();
-  const res = await api.put(`/cleanwalks/${currentCleanwalk.value!.id}`,
+  const res = await api.put(`cleanwalks/${currentCleanwalk.value!.id}`,
     {
       json: {
         name: currentCleanwalk.value!.name,
-        pos_lat: currentCleanwalk.value!.pos_lat,
-        pos_long: currentCleanwalk.value!.pos_long,
-        date_begin: currentCleanwalk.value!.date_begin,
+        posLat: currentCleanwalk.value!.pos_lat,
+        posLong: currentCleanwalk.value!.pos_long,
+        dateBegin: currentCleanwalk.value!.date_begin,
         duration: currentCleanwalk.value!.duration,
         description: currentCleanwalk.value!.description,
-        img_url: currentCleanwalk.value!.img_url,
+        imgUrl: currentCleanwalk.value!.img_url,
         address: currentCleanwalk.value!.address,
-        city: currentCleanwalk.value!.city,
       },
     }
   );
@@ -87,6 +97,7 @@ const validate = async () => {
   }
   else {
     showToast('La cleanwalk a été modifiée avec succès', true);
+    router.push({ name: 'cleanwalk', params: getCleanwalkRouteParams(currentCleanwalk.value!) });
   }
 }
 

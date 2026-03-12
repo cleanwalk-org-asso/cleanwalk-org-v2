@@ -10,6 +10,7 @@ import { useAccountStore } from '@/stores/AccountStore';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
 import defaultCover from '@/assets/default_cover.webp'
+import { getCleanwalkRouteParams } from '@/services/cleanwalkSlug';
 
 //define props
 const props = defineProps<{
@@ -101,7 +102,7 @@ const ShowParticipationPopup = () => {
     // Check if user is the host
     if (currenCleanwalkParticipation.value?.is_host) {
         // Redirect to edit cleanwalk
-        router.push({ name: 'editCleanwalk', params: { id: props.cleanwalk.id!.toString() } });
+        router.push({ name: 'editCleanwalk', params: getCleanwalkRouteParams(props.cleanwalk) });
         return;
     }
     
@@ -131,7 +132,7 @@ const getButtonParticipationText = () => {
     <div class="solo-cw">
         <img :src="props.cleanwalk.img_url ?? defaultCover" alt="cleanwalk image">
         <div class="btn-container">
-            <router-link class="btn" :to="{ name: 'cleanwalk', params: { id: props.cleanwalk.id } }">
+            <router-link class="btn" :to="{ name: 'cleanwalk', params: getCleanwalkRouteParams(props.cleanwalk) }">
                 <ExternalLink color="#65707F" />
             </router-link>
             <button class="btn" @click="props.onClose()">

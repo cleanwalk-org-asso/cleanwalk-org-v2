@@ -49,7 +49,8 @@ export function useCleanwalkForm() {
 
   // Stores used
   const showToast = useUtilsStore().showToast;
-  const createCleanwalk = useCleanwalkStore().createCleanwalk;
+  const cleanwalkStore = useCleanwalkStore();
+  const createCleanwalk = cleanwalkStore.createCleanwalk;
 
 
   // Function to save form data to sessionStorage
@@ -91,12 +92,17 @@ export function useCleanwalkForm() {
   // Function to set the date and time for start and end
   const setDate = () => {
     if (!dateCleanwalk.value.dateDay || !dateCleanwalk.value.hourBegin || !dateCleanwalk.value.hourEnd) {
-      return;
+      return { ok: false as const, reason: 'missing' as const };
     }
     const startDate = set(parse(dateCleanwalk.value.dateDay, 'yyyy-MM-dd', new Date()), {
       hours: parseInt(dateCleanwalk.value.hourBegin.split(':')[0]),
       minutes: parseInt(dateCleanwalk.value.hourBegin.split(':')[1]),
     });
+
+    if (startDate.getTime() < Date.now()) {
+      showToast('La date de début ne peut pas être dans le passé', false);
+      return { ok: false as const, reason: 'past' as const };
+    }
 
     // Conversion en string ISO pour Prisma/Backend
     newCleanwalk.value.date_begin = startDate.toISOString();
@@ -110,6 +116,7 @@ export function useCleanwalkForm() {
 
     newCleanwalk.value.duration = duration;
     // Data will be saved automatically via the watcher
+    return { ok: true as const };
   };
 
   // Function to upload the image and create the cleanwalk
@@ -141,7 +148,7 @@ export function useCleanwalkForm() {
         clearStorage();
         showToast('Your cleanwalk has been successfully published', true);
         setTimeout(() => {
-          router.push({name: 'map'}).then(() => router.go(0));
+          router.push({ name: 'map' }).then(() => router.go(0));
         }, 1000);
       } else {
         showToast('Error while creating the event', false);

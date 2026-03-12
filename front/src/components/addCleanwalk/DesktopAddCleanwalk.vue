@@ -54,7 +54,13 @@ const next = () => {
     return;
   }
   if (progress.value === 2) {
-    setDate();
+    const dateResult = setDate();
+    if (!dateResult?.ok) {
+      if (dateResult?.reason !== 'past') {
+        showToast('Please enter a valid start and end time', false);
+      }
+      return;
+    }
     if (!newCleanwalk.value.date_begin || !newCleanwalk.value.duration || newCleanwalk.value.duration < 0) {
       showToast('Please enter a valid start and end time', false);
       return;

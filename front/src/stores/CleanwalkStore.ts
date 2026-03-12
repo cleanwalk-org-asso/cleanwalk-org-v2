@@ -40,7 +40,7 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
         return undefined;
     }
 
-    async function createCleanwalk(cleanwalk: CleanwalkCreation): Promise<CleanwalkCreation | undefined> {
+    async function createCleanwalk(cleanwalk: CleanwalkCreation): Promise<boolean> {
         const response = await api.post(route, {
             json: cleanwalk
         });
@@ -48,10 +48,10 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
         console.log('Create cleanwalk request:', cleanwalk);
         console.log('Create cleanwalk response:', response);
         if (response.ok) {
-            return await response.json() as unknown as CleanwalkCreation;
+            return true;
         }
-        router.push({ name: 'cleanwalks' });
-        return undefined;
+        router.push({ name: 'map' });
+        return false;
     }
 
     async function updateCleanwalk(cleanwalk: Cleanwalk): Promise<Cleanwalk | undefined> {
