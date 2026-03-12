@@ -70,6 +70,12 @@ const validate = async () => {
     currentCleanwalk.value!.date_begin = date!.date_begin;
     currentCleanwalk.value!.duration = date!.duration;
   }
+
+  if (new Date(currentCleanwalk.value!.date_begin).getTime() < Date.now()) {
+    showToast('La date de début ne peut pas être dans le passé', false);
+    return;
+  }
+
   await Upload();
   const res = await api.put(`cleanwalks/${currentCleanwalk.value!.id}`,
     {
