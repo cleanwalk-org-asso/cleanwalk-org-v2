@@ -14,7 +14,7 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
     const cleanwalksTab: Ref<Cleanwalk[]> = ref([]);
 
     async function getAllCleanwalks() {
-        const route = 'cleanwalks'; // Assure-toi que cette route est correcte et complète
+        const route = 'cleanwalks/current';
         try {
             const response = await api.get(route);
             if (response.ok) {

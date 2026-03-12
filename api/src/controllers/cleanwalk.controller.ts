@@ -120,6 +120,112 @@ export async function getAllCleanwalks(req: FastifyRequest, reply: FastifyReply)
     return reply.send(cleanwalkData);
 }
 
+export async function getCurrentCleanwalks(req: FastifyRequest, reply: FastifyReply) {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const prisma = req.server.prisma;
+    const cleanwalks = await prisma.cleanwalk.findMany({
+        where: {
+            dateBegin: {
+                gte: startOfToday,
+            },
+            participants: {
+                some: { isHost: true },
+            },
+        },
+        include: {
+            participants: {
+                where: { isHost: true },
+                include: {
+                    user: true,
+                },
+            },
+        },
+        orderBy: {
+            dateBegin: "asc",
+        },
+    });
+
+    const cleanwalkData = cleanwalks.map((cw) => {
+        const host = cw.participants[0]?.user;
+
+        return {
+            id: cw.id,
+            name: cw.name,
+            pos_lat: cw.posLat,
+            pos_long: cw.posLong,
+            date_begin: cw.dateBegin,
+            duration: cw.duration,
+            description: cw.description,
+            address: cw.address,
+            img_url: cw.imgUrl,
+            host: host
+                ? {
+                    name: host.name,
+                    role: host.role,
+                    profilePicture: host.profilePicture,
+                }
+                : null,
+        };
+    });
+
+    return reply.send(cleanwalkData);
+}
+
+export async function getPastCleanwalks(req: FastifyRequest, reply: FastifyReply) {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const prisma = req.server.prisma;
+    const cleanwalks = await prisma.cleanwalk.findMany({
+        where: {
+            dateBegin: {
+                lt: startOfToday,
+            },
+            participants: {
+                some: { isHost: true },
+            },
+        },
+        include: {
+            participants: {
+                where: { isHost: true },
+                include: {
+                    user: true,
+                },
+            },
+        },
+        orderBy: {
+            dateBegin: "desc",
+        },
+    });
+
+    const cleanwalkData = cleanwalks.map((cw) => {
+        const host = cw.participants[0]?.user;
+
+        return {
+            id: cw.id,
+            name: cw.name,
+            pos_lat: cw.posLat,
+            pos_long: cw.posLong,
+            date_begin: cw.dateBegin,
+            duration: cw.duration,
+            description: cw.description,
+            address: cw.address,
+            img_url: cw.imgUrl,
+            host: host
+                ? {
+                    name: host.name,
+                    role: host.role,
+                    profilePicture: host.profilePicture,
+                }
+                : null,
+        };
+    });
+
+    return reply.send(cleanwalkData);
+}
+
 export async function checkUserParticipation(req: FastifyRequest<{ Querystring: { user_id?: number; cleanwalk_id?: number } }>, reply: FastifyReply) {
     const { user_id: userId, cleanwalk_id: cleanwalkId } = req.query;
 

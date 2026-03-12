@@ -3,6 +3,8 @@ import { Type } from "@sinclair/typebox";
 import {
   getCleanwalkById,
   getAllCleanwalks,
+  getCurrentCleanwalks,
+  getPastCleanwalks,
   checkUserParticipation,
   createCleanwalk,
   joinCleanwalk,
@@ -18,6 +20,20 @@ import {
 } from "../schemas/cleanwalk.schema.js";
 
 export default async function cleanwalkRoutes(fastify: FastifyInstance) {
+  fastify.get("/current", {
+    schema: {
+      response: { 200: Type.Array(CleanwalkSchema) },
+    },
+    handler: getCurrentCleanwalks,
+  });
+
+  fastify.get("/past", {
+    schema: {
+      response: { 200: Type.Array(CleanwalkSchema) },
+    },
+    handler: getPastCleanwalks,
+  });
+
   fastify.get("/:cleanwalkId", {
     preHandler: [fastify.getUserId],
     schema: {
