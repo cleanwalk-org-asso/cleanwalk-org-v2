@@ -5,6 +5,7 @@ import router from '@/router';
 import { useUtilsStore } from '@/stores/UtilsStore';
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
 import { useAccountStore } from '@/stores/AccountStore';
+import { buildCleanwalkSlug } from '@/services/cleanwalkSlug';
 
 const STORAGE_KEY = 'cleanwalk-form-data';
 
@@ -49,7 +50,10 @@ export function useCleanwalkForm() {
 
   // Stores used
   const showToast = useUtilsStore().showToast;
-  const createCleanwalk = useCleanwalkStore().createCleanwalk;
+  const cleanwalkStore = useCleanwalkStore();
+  const createCleanwalk = cleanwalkStore.createCleanwalk;
+  const getAllCleanwalks = cleanwalkStore.getAllCleanwalks;
+  const accountStore = useAccountStore();
 
 
   // Function to save form data to sessionStorage
@@ -140,8 +144,28 @@ export function useCleanwalkForm() {
         // Clear form data from storage after successful creation
         clearStorage();
         showToast('Your cleanwalk has been successfully published', true);
+        const cleanwalks = await getAllCleanwalks();
+        const createdCleanwalk = [...cleanwalks]
+          .filter((cw) => {
+            const sameName = cw.name === newCleanwalk.value.name;
+            const sameAddress = cw.address === newCleanwalk.value.address;
+            const sameHost = cw.host?.name === accountStore.CurrentUser?.name;
+            const sameCoordinates = cw.pos_lat === newCleanwalk.value.pos_lat && cw.pos_long === newCleanwalk.value.pos_long;
+            return sameName && sameAddress && sameHost && sameCoordinates;
+          })
+          .sort((a, b) => new Date(b.date_begin).getTime() - new Date(a.date_begin).getTime())[0];
+
+        const slug = buildCleanwalkSlug(
+          createdCleanwalk?.name ?? newCleanwalk.value.name,
+          createdCleanwalk?.host?.name ?? accountStore.CurrentUser?.name,
+        );
+
         setTimeout(() => {
-          router.push({name: 'map'}).then(() => router.go(0));
+          if (createdCleanwalk?.id) {
+            router.push({ name: 'cleanwalk', params: { id: String(createdCleanwalk.id), slug } });
+            return;
+          }
+          router.push({ name: 'map' }).then(() => router.go(0));
         }, 1000);
       } else {
         showToast('Error while creating the event', false);

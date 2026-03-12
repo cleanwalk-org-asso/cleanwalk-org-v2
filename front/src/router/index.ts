@@ -25,7 +25,7 @@ const router = createRouter({
           }
         },
         {
-          path: 'carte',
+          path: 'cleanwalks',
           name: 'map',
           component: () => import('@/views/MapView.vue'),
           meta: {
@@ -35,7 +35,7 @@ const router = createRouter({
           }
         },
         {
-          path: 'cleanwalk/:id',
+          path: 'cleanwalk/:id/:slug?',
           name: 'cleanwalk',
           component: () => import('@/views/SingleCleanwalkView.vue'),
           meta: {
@@ -191,7 +191,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/cleanwalk/edit/:id',
+      path: '/cleanwalk/edit/:id/:slug?',
       name: 'editCleanwalk',
       component: () => import('@/views/EditCleanwalkView.vue'),
       meta: {

@@ -7,6 +7,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
 import { useAccountStore } from '@/stores/AccountStore';
 import type { SingleCleanwalk as CleanwalkType } from '@/interfaces/cleanwalkInterface';
+import { buildCleanwalkSlug } from '@/services/cleanwalkSlug';
 
 const route = useRoute();
 const router = useRouter();
@@ -58,7 +59,21 @@ const updateMetaTags = (cleanwalk: CleanwalkType) => {
     canonicalUrl.setAttribute('rel', 'canonical');
     document.head.appendChild(canonicalUrl);
   }
-  canonicalUrl.setAttribute('href', `${window.location.origin}/cleanwalk/${cleanwalk.id}`);
+  const slug = buildCleanwalkSlug(cleanwalk.name, cleanwalk.host.name);
+  canonicalUrl.setAttribute('href', `${window.location.origin}/cleanwalk/${cleanwalk.id}/${slug}`);
+}
+
+const ensureCanonicalPath = (cleanwalk: CleanwalkType) => {
+  const expectedSlug = buildCleanwalkSlug(cleanwalk.name, cleanwalk.host.name);
+  const currentSlug = typeof route.params.slug === 'string' ? route.params.slug : '';
+
+  if (currentSlug !== expectedSlug) {
+    router.replace({
+      name: 'cleanwalk',
+      params: { id: String(cleanwalk.id), slug: expectedSlug },
+      query: route.query,
+    });
+  }
 }
 
 const fetchCleanwalkData = async (id: number) => {
@@ -71,6 +86,7 @@ const fetchCleanwalkData = async (id: number) => {
     currentCleanwalk.value = await cleanwalkStore.getCleanwalkById(id, currenUserId.value);
     
     if (currentCleanwalk.value) {
+      ensureCanonicalPath(currentCleanwalk.value);
       updateMetaTags(currentCleanwalk.value);
     } else {
       router.push({ name: 'NotFound' });

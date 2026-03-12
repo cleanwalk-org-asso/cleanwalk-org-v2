@@ -26,7 +26,7 @@
                     rel="noopener noreferrer"
                     class="flex-1 rounded-lg border-2! text-text border-border! p-4! text-center"
                 >
-                    Devenir Adhérant
+                    Devenir Adhérent
                 </a>
             </div>
         </div>

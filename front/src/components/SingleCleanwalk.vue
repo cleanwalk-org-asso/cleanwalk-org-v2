@@ -12,6 +12,7 @@ import { useUtilsStore } from '@/stores/UtilsStore';
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
 import { Clock, MapPin } from 'lucide-vue-next';
 import CleanwalkChat from './CleanwalkChat.vue';
+import { getCleanwalkRouteParams } from '@/services/cleanwalkSlug';
 
 const cleanwalkStore = useCleanwalkStore();
 const accountStore = useAccountStore();
@@ -90,7 +91,7 @@ const actionButton = () => {
   }
   if (cleanwalk.value.host.id === currenUserId.value) {
     // edit cleanwalk
-    router.push({ name: 'editCleanwalk', params: { id: cleanwalk.value.id.toString() } });
+    router.push({ name: 'editCleanwalk', params: getCleanwalkRouteParams(cleanwalk.value) });
     return;
   }
   if (cleanwalk.value.is_user_participant === true) {
@@ -142,7 +143,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <TopBar backUrl="/carte" pageName="Cleanwalk" />
+  <TopBar backUrl="/cleanwalks" pageName="Cleanwalk" />
   <LeaveCwPopup :isVisible="showLeaveCwPopup" :tooglePopup="toogleLeaveCwPopup" :leaveCw="leaveCleanwalk" />
   <ParticipationPopup :isVisible="showParticipationPopup" @close="toggleParticipationPopup" @confirm="handleJoinCleanwalk" format="screen" />
   

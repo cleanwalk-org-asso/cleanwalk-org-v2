@@ -11,6 +11,7 @@ import { useAccountStore } from "@/stores/AccountStore";
 import { useCleanwalkMap } from "@/composables/useCleanwalkMap";
 import blueMapIcon from "@/assets/blue-map.svg";
 import greenMapIcon from "@/assets/green-map.svg";
+import { getCleanwalkRouteParams } from '@/services/cleanwalkSlug';
 
 const {
     mapInstance,
@@ -187,7 +188,7 @@ function mapClickEvent() {
             </div>
             <div class="card-content" v-if="selectedCleanwalk">
                 <h3>{{ selectedCleanwalk.name }}</h3>
-                <router-link :to="{name: 'cleanwalk', params:{id: selectedCleanwalk.id}}" class="flex-container">
+                <router-link :to="{name: 'cleanwalk', params: getCleanwalkRouteParams(selectedCleanwalk)}" class="flex-container">
                     <div class="left">
                         <div class="top">
                             <Clock :size="16"/>
@@ -210,7 +211,7 @@ function mapClickEvent() {
         </div>
         <div class="cleanwalk-list" :class="{ 'active': cardListBool === false }">
             <div class="container" ref="cleanwalkListContainer">
-                <router-link v-for="cleanwalk in filteredCleanwalks" :to="{name: 'cleanwalk', params:{id: cleanwalk.id}}"  :key="cleanwalk.id" class="listContainer">
+                <router-link v-for="cleanwalk in filteredCleanwalks" :to="{name: 'cleanwalk', params: getCleanwalkRouteParams(cleanwalk)}"  :key="cleanwalk.id" class="listContainer">
                     <cleanwalk-card :cleanwalk="cleanwalk" />
                 </router-link>
             </div>

@@ -88,6 +88,10 @@ interface Suggestion {
 
 // Props definition
 const props = defineProps({
+  query: {
+    type: String,
+    default: ''
+  },
   value: {
     type: Object as () => Suggestion | null,
     default: null
@@ -129,7 +133,7 @@ const props = defineProps({
 // Generate a unique ID for the input
 const uniqueId = computed(() => `${props.name}-${Math.random().toString(36).substr(2, 9)}`);
 
-const emit = defineEmits(['update:value', 'select-suggestion']);
+const emit = defineEmits(['update:value', 'update:query', 'select-suggestion']);
 
 // Component state
 const inputValue = ref('');
@@ -203,6 +207,7 @@ const handleOnSelectOption = (option: Suggestion) => {
   selectedOption.value = option;
   inputValue.value = formatSuggestion(option);
   emit('update:value', option);
+  emit('update:query', inputValue.value);
   emit('select-suggestion', {
     address: formatSuggestion(option),
     lat: option.lat,
@@ -269,6 +274,16 @@ watch(() => props.value, (newValue) => {
     inputValue.value = formatSuggestion(newValue);
   }
 }, { immediate: true });
+
+watch(() => props.query, (newQuery) => {
+  if (typeof newQuery === 'string' && newQuery !== inputValue.value) {
+    inputValue.value = newQuery;
+  }
+}, { immediate: true });
+
+watch(inputValue, (newValue) => {
+  emit('update:query', newValue);
+});
 
 // Setup and cleanup
 onMounted(() => {

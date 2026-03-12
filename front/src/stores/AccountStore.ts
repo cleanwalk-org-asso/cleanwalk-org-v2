@@ -10,7 +10,7 @@ export const useAccountStore = defineStore('account', () => {
     const isLoggedIn = ref(false)
 
     const getOrganizationById = async (organizationId: number) => {
-        const response = await api.get('/users/association/' + organizationId);
+        const response = await api.get('users/association/' + organizationId);
 
         if (!response.ok) {
             return undefined
@@ -57,7 +57,7 @@ export const useAccountStore = defineStore('account', () => {
         newPassword: string
     ) => {
         const response = await api.put(
-            '/users/password/' + userId,
+            'users/password/' + userId,
             {
                 json: {
                     old_password: oldPassword,
@@ -80,18 +80,18 @@ export const useAccountStore = defineStore('account', () => {
 
     const modifyAssociation = (asso: modifyAssociation) => {
         api.put(
-            '/users/association/' + CurrentUser.value!.id,
+            'users/association/' + CurrentUser.value!.id,
             asso as Record<string, unknown>,
         );
     }
 
     const getAssoList = async () => {
-        const response = await api.get('/users/associations');
+        const response = await api.get('users/associations');
         return await response.json() as unknown as Association[]
     }
 
     const googleLoginSignup = async (credential: string, redirectPath?: string) => {
-        const response = await api.post('/users/google-login', {
+        const response = await api.post('users/google-login', {
             json: {
                 token: credential
             }

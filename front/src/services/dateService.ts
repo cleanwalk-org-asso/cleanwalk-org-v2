@@ -1,4 +1,4 @@
-import { format, add, set, parse, differenceInMinutes, isValid} from 'date-fns';
+import { format, add, set, parse, parseISO, differenceInMinutes, isValid} from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 const getCleanwalkWrittenDate = (startDate: Date, duration: number): string => {
@@ -24,8 +24,6 @@ const getDateBegginAndDuration = (date: string, hourBegin: string, hourEnd: stri
     minutes: parseInt(hourBegin.split(':')[1]),
   });
 
-  let formattedStartDate = format(startDate, 'yyyy-MM-dd HH:mm:ss');
-
   let endDate = set(parse(date, 'yyyy-MM-dd', new Date()), {
     hours: parseInt(hourEnd.split(':')[0]),
     minutes: parseInt(hourEnd.split(':')[1]),
@@ -34,15 +32,15 @@ const getDateBegginAndDuration = (date: string, hourBegin: string, hourEnd: stri
   let duration = differenceInMinutes(endDate, startDate);
 
   return {
-    date_begin: formattedStartDate,
+    date_begin: startDate.toISOString(),
     duration: duration,
   };
 };
 
 const getDayAndHourBegginEndByDate = (date: string, duration: number) => {
   try {
-    // Parse the date string with time
-    const startDate = parse(date, "yyyy-MM-dd'T'HH:mm:ss", new Date());
+    // Parse ISO date string robustly (with or without timezone)
+    const startDate = parseISO(date);
 
     // Check if the parsed date is valid
     if (!isValid(startDate)) {
@@ -53,7 +51,7 @@ const getDayAndHourBegginEndByDate = (date: string, duration: number) => {
     const endDate = add(startDate, { minutes: duration });
 
     // Format the day, start time, and end time
-    const dateDay = format(startDate, 'dd-MM-yyyy');
+    const dateDay = format(startDate, 'yyyy-MM-dd');
     const hourBegin = format(startDate, 'HH:mm');
     const hourEnd = format(endDate, 'HH:mm');
 

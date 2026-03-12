@@ -10,6 +10,7 @@ import BaseSearchInput from '@/components/base/BaseSearchInput.vue';
 import CleanwalkListCard from '@/components/cards/CleanwalkListCard.vue';
 import CleanwalkSoloCard from '@/components/cards/CleanwalkSoloCard.vue';
 import type { Cleanwalk } from '@/interfaces/cleanwalkInterface';
+import { getCleanwalkRouteParams } from '@/services/cleanwalkSlug';
 
 const cleanwalkStore = useCleanwalkStore();
 
@@ -95,7 +96,7 @@ watch(selectedCleanwalk, (newVal) => {
             </div>
             <div class="container" ref="cleanwalkListContainer">
                 <router-link v-for="cleanwalk in filteredCleanwalks"
-                    :to="{ name: 'cleanwalk', params: { id: cleanwalk.id } }" 
+                    :to="{ name: 'cleanwalk', params: getCleanwalkRouteParams(cleanwalk) }" 
                     :key="cleanwalk.id" 
                     class="listContainer"
                     @click.prevent="showSoloCW(cleanwalk.id!)">
