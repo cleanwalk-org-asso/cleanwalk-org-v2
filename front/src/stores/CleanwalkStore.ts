@@ -95,6 +95,18 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
         return null;
     }
 
-    return { getAllCleanwalks, cleanwalksTab, getCleanwalkById, createCleanwalk, joinCleanwalk, leaveCleanwalk, checkUserParticipation }
+    async function getMyCleanwalks(): Promise<Cleanwalk[]> {
+        try {
+            const response = await api.get(route + '/me');
+            if (response.ok) {
+                return await response.json() as unknown as Cleanwalk[];
+            }
+        } catch (error) {
+            console.error('Failed to fetch my cleanwalks:', error);
+        }
+        return [];
+    }
+
+    return { getAllCleanwalks, cleanwalksTab, getCleanwalkById, createCleanwalk, joinCleanwalk, leaveCleanwalk, checkUserParticipation, getMyCleanwalks }
 
 });

@@ -173,6 +173,49 @@ export async function getCurrentCleanwalks(req: FastifyRequest, reply: FastifyRe
     return reply.send(cleanwalkData);
 }
 
+export async function getMyCleanwalks(req: FastifyRequest, reply: FastifyReply) {
+    const userId = (req as any).user?.id;
+    if (!userId) {
+        return reply.status(401).send({ message: "Unauthorized" });
+    }
+
+    const prisma = req.server.prisma;
+    const cleanwalks = await prisma.cleanwalk.findMany({
+        where: {
+            participants: {
+                some: { userId, isHost: true },
+            },
+        },
+        include: {
+            participants: {
+                where: { isHost: true },
+                include: { user: true },
+            },
+        },
+        orderBy: { dateBegin: "desc" },
+    });
+
+    const cleanwalkData = cleanwalks.map((cw) => {
+        const host = cw.participants[0]?.user;
+        return {
+            id: cw.id,
+            name: cw.name,
+            pos_lat: cw.posLat,
+            pos_long: cw.posLong,
+            date_begin: cw.dateBegin,
+            duration: cw.duration,
+            description: cw.description,
+            address: cw.address,
+            img_url: cw.imgUrl,
+            host: host
+                ? { name: host.name, role: host.role, profilePicture: host.profilePicture }
+                : null,
+        };
+    });
+
+    return reply.send(cleanwalkData);
+}
+
 export async function getPastCleanwalks(req: FastifyRequest, reply: FastifyReply) {
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);

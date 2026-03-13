@@ -5,6 +5,7 @@ import {
   getAllCleanwalks,
   getCurrentCleanwalks,
   getPastCleanwalks,
+  getMyCleanwalks,
   checkUserParticipation,
   createCleanwalk,
   joinCleanwalk,
@@ -20,6 +21,14 @@ import {
 } from "../schemas/cleanwalk.schema.js";
 
 export default async function cleanwalkRoutes(fastify: FastifyInstance) {
+  fastify.get("/me", {
+    preHandler: [fastify.authenticate],
+    schema: {
+      response: { 200: Type.Array(CleanwalkSchema) },
+    },
+    handler: getMyCleanwalks,
+  });
+
   fastify.get("/current", {
     schema: {
       response: { 200: Type.Array(CleanwalkSchema) },

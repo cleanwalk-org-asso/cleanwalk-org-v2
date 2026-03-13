@@ -97,6 +97,17 @@ const router = createRouter({
           }
         },
         {
+          path: 'menu/mes-cleanwalks',
+          name: 'myCleanwalks',
+          component: () => import('@/views/MyCleanwalksView.vue'),
+          meta: {
+            requiresAuth: true,
+            title: 'Mes Cleanwalks | Cleanwalk.org',
+            description: 'Liste de vos cleanwalks créées.',
+            ogImage: '/default-banner.svg'
+          }
+        },
+        {
           path: 'cleanwalk-guide',
           name: 'cleanwalkGuide',
           component: () => import('@/views/CleanwalkGuideView.vue'),
