@@ -24,6 +24,7 @@ const route = useRoute();
 const router = useRouter();
 
 const dragDropRef = ref(null as any);
+const isDeleting = ref(false);
 
 const dateCleanwalk = ref({
   dateDay: '',
@@ -101,6 +102,44 @@ const validate = async () => {
   }
 }
 
+const deleteCleanwalk = async () => {
+  if (!currentCleanwalk.value || isDeleting.value) {
+    return;
+  }
+
+  const confirmed = window.confirm('Voulez-vous vraiment supprimer cette cleanwalk ?');
+  if (!confirmed) {
+    return;
+  }
+
+  isDeleting.value = true;
+
+  try {
+    const response = await api.delete(`cleanwalks/${currentCleanwalk.value.id}`);
+    let message = 'La cleanwalk a été supprimée avec succès';
+
+    try {
+      const data = await response.json() as { message?: string };
+      if (data?.message) {
+        message = data.message;
+      }
+    } catch {
+    }
+
+    if (!response.ok) {
+      showToast(message, false);
+      return;
+    }
+
+    showToast(message, true);
+    router.push({ name: 'myCleanwalks' });
+  } catch (error) {
+    showToast('Erreur lors de la suppression de la cleanwalk', false);
+  } finally {
+    isDeleting.value = false;
+  }
+}
+
 const Upload = async () => {
   if (!dragDropRef.value) {
     return;
@@ -145,10 +184,15 @@ const handleSelectAddress = (addressData: { address: string, lat: string, lon: s
       <BaseInput v-model="dateCleanwalk.dateDay" name="date" type="date" label="Date de l'évènement" />
       <BaseInput v-model="dateCleanwalk.hourBegin" name="hourBegin" type="time" label="Heure de début" />
       <BaseInput v-model="dateCleanwalk.hourEnd" name="hourEnd" type="time" label="Heure de fin" />
+      <div class="flex">
+        <button @click="validate()" class="validate button-primary">
+          Valider
+        </button>
   
-      <button @click="validate()" class="validate button-primary">
-        Valider
-      </button>
+        <button @click="deleteCleanwalk()" :disabled="isDeleting" class="delete bg-white border-2! border-[#FF5757] rounded-lg text-[#FF5757] px-4!">
+          {{ isDeleting ? 'Suppression...' : 'Supprimer la cleanwalk' }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -164,6 +208,12 @@ const handleSelectAddress = (addressData: { address: string, lat: string, lon: s
   width: 8rem;
   margin: 0 auto;
   padding: 0.5rem 1rem;
+  margin-top: 2rem;
+}
+
+.delete {
+  width: max-content;
+  margin: 0 auto;
   margin-top: 2rem;
 }
 </style>
