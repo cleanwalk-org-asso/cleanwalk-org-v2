@@ -2,15 +2,23 @@
 import "leaflet/dist/leaflet.css";
 import { LMap, LTileLayer, LMarker, LIcon } from "@vue-leaflet/vue-leaflet";
 import L, { type PointExpression } from "leaflet";
-import { onMounted, ref, type Ref } from 'vue';
+import { onMounted, ref, watch, type Ref } from 'vue';
 import greenMapIcon from "@/assets/green-map.svg";
 import blueMapIcon from "@/assets/blue-map.svg";
 import { useCleanwalkStore } from '@/stores/CleanwalkStore';
+import { useDevice } from '@/composables/useDevice';
 
 let zoom = ref(6);
 let center: Ref<PointExpression> = ref([47.5, 2.333333]);
+const { isMobile } = useDevice();
 
 const cleanwalkStore = useCleanwalkStore();
+
+const updateZoomForViewport = () => {
+    zoom.value = isMobile.value ? 5 : 6;
+}
+
+watch(isMobile, updateZoomForViewport, { immediate: true });
 
 onMounted(async () => {
     await cleanwalkStore.getAllCleanwalks();
@@ -33,7 +41,7 @@ onMounted(async () => {
         </svg>
         <div class="m-5 relative w-full max-w-4xl aspect-video rounded-2xl overflow-hidden group shadow-lg">
 
-            <l-map ref="map" v-model:zoom="zoom" v-model:center="center" :min-zoom="6" :max-zoom="6"
+            <l-map ref="map" v-model:zoom="zoom" v-model:center="center" :min-zoom="isMobile ? 5 : 6" :max-zoom="isMobile ? 5 : 6"
                 :useGlobalLeaflet="false">
                 <l-tile-layer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="base"></l-tile-layer>
                 <div v-for="cleanwalk in cleanwalkStore.cleanwalksTab" :key="cleanwalk.id">
