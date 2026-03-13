@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Minus, Plus, X } from 'lucide-vue-next';
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue';
 
 const props = defineProps<{
   isVisible: boolean,
@@ -12,6 +12,61 @@ const emit = defineEmits(['close', 'confirm']);
 const counterParticipate = ref(1);
 const isAnonyme = ref(false);
 const popupRef = ref<HTMLElement | null>(null);
+const previousFocusedElement = ref<HTMLElement | null>(null);
+
+const getFocusableElements = () => {
+  if (!popupRef.value) {
+    return [] as HTMLElement[];
+  }
+
+  return Array.from(
+    popupRef.value.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )
+  ).filter((element) => !element.hasAttribute('disabled'));
+}
+
+const focusPopup = async () => {
+  await nextTick();
+
+  const focusableElements = getFocusableElements();
+
+  if (focusableElements.length > 0) {
+    focusableElements[0].focus();
+    return;
+  }
+
+  popupRef.value?.focus();
+}
+
+const handleTabTrap = (event: KeyboardEvent) => {
+  if (!props.isVisible || event.key !== 'Tab') {
+    return;
+  }
+
+  const focusableElements = getFocusableElements();
+
+  if (focusableElements.length === 0) {
+    event.preventDefault();
+    popupRef.value?.focus();
+    return;
+  }
+
+  const firstElement = focusableElements[0];
+  const lastElement = focusableElements[focusableElements.length - 1];
+  const activeElement = document.activeElement as HTMLElement | null;
+
+  if (event.shiftKey && activeElement === firstElement) {
+    event.preventDefault();
+    lastElement.focus();
+    return;
+  }
+
+  if (!event.shiftKey && activeElement === lastElement) {
+    event.preventDefault();
+    firstElement.focus();
+  }
+}
 
 const counterAdd = () => {
   if (counterParticipate.value < 5) {
@@ -52,13 +107,28 @@ const handleOutsideClick = (event: MouseEvent) => {
   }
 }
 
+watch(
+  () => props.isVisible,
+  async (isVisible) => {
+    if (isVisible) {
+      previousFocusedElement.value = document.activeElement as HTMLElement | null;
+      await focusPopup();
+      return;
+    }
+
+    previousFocusedElement.value?.focus();
+  }
+);
+
 // Set up and clean up click event listeners
 onMounted(() => {
   document.addEventListener('mousedown', handleOutsideClick);
+  document.addEventListener('keydown', handleTabTrap);
 });
 
 onUnmounted(() => {
   document.removeEventListener('mousedown', handleOutsideClick);
+  document.removeEventListener('keydown', handleTabTrap);
 });
 </script>
 
@@ -67,6 +137,9 @@ onUnmounted(() => {
     <div
       class="popup-validation"
       ref="popupRef"
+      role="dialog"
+      aria-modal="true"
+      tabindex="-1"
     >
       <div class="cross-container">
         <button class="cross" @click="cancel()">
@@ -157,16 +230,9 @@ onUnmounted(() => {
         width: 50px;
         height: 50px;
         stroke: #fff;
-        padding-top: 4px;
-
-        &.add {
-          padding-top: 4px;
-
-          svg {
-            width: 32px;
-            height: 32px;
-          }
-        }
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
 
       div {
@@ -174,7 +240,7 @@ onUnmounted(() => {
         font-style: normal;
         font-weight: 700;
         line-height: 47px;
-        background-color: var(--color-secondary);
+        background-color: #F5F5F5;
         margin: 0 20px;
         border-radius: 8px;
         flex-grow: 1;
