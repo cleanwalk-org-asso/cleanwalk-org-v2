@@ -20,10 +20,12 @@ export async function getAllUsers(req: FastifyRequest, reply: FastifyReply) {
       },
     });
 
-    reply.send(users);
+    return reply.send(users);
   } catch (error) {
     req.log.error(error);
-    reply.code(500).send({ message: "Erreur serveur" });
+    if (!reply.sent) {
+      return reply.code(500).send({ message: "Erreur serveur" });
+    }
   }
 }
 
@@ -50,10 +52,12 @@ export async function getUserById(
       return reply.code(404).send({ message: "Utilisateur introuvable" });
     }
     
-    reply.send(user);
+    return reply.send(user);
   } catch (error) {
     req.log.error(error);
-    reply.code(500).send({ message: "Erreur serveur" });
+    if (!reply.sent) {
+      return reply.code(500).send({ message: "Erreur serveur" });
+    }
   }
 }
 
@@ -90,10 +94,12 @@ export async function updateUser(
       },
     });
 
-    reply.send(user);
+    return reply.send(user);
   } catch (error) {
     req.log.error(error);
-    reply.code(500).send({ message: "Erreur serveur" });
+    if (!reply.sent) {
+      return reply.code(500).send({ message: "Erreur serveur" });
+    }
   }
 }
 
@@ -149,9 +155,11 @@ export async function deleteUser(
       },
     });
 
-    reply.code(204).send();
+    return reply.code(204).send();
   } catch (error) {
     req.log.error(error);
-    reply.code(500).send({ message: "Erreur serveur" });
+    if (!reply.sent) {
+      return reply.code(500).send({ message: "Erreur serveur" });
+    }
   }
 }
