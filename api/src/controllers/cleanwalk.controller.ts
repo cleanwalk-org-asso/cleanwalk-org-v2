@@ -358,7 +358,19 @@ export async function updateCleanwalk(req: FastifyRequest, reply: FastifyReply) 
 export async function deleteCleanwalk(req: FastifyRequest<{ Params: { cleanwalkId: number } }>, reply: FastifyReply) {
     const prisma = req.server.prisma;
     const cleanwalkId = req.params.cleanwalkId;
-    await prisma.cleanwalk.delete({ where: { id: cleanwalkId } });
+
+    const deletedCount = await prisma.$transaction(async (tx) => {
+        await tx.cleanwalkUser.deleteMany({ where: { cleanwalkId } });
+        await tx.cleanwalkChatMessage.deleteMany({ where: { cleanwalkId } });
+
+        const result = await tx.cleanwalk.deleteMany({ where: { id: cleanwalkId } });
+        return result.count;
+    });
+
+    if (deletedCount === 0) {
+        return reply.send({ message: "Cleanwalk already deleted" });
+    }
+
     reply.send({ message: "Cleanwalk deleted successfully" });
 }
 
