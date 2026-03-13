@@ -1,5 +1,18 @@
 import { Type } from "@sinclair/typebox";
 
+const CleanwalkHostSchema = Type.Object({
+  name: Type.String(),
+  role: Type.String(),
+  profilePicture: Type.Union([Type.String(), Type.Null()]),
+});
+
+const SoloCleanwalkHostSchema = Type.Object({
+  id: Type.Integer(),
+  name: Type.String(),
+  role: Type.String(),
+  profilePicture: Type.Union([Type.String(), Type.Null()]),
+});
+
 export const CleanwalkSchema = Type.Object({
   id: Type.Integer(),
   name: Type.String({ minLength: 1 }),
@@ -10,14 +23,7 @@ export const CleanwalkSchema = Type.Object({
   description: Type.Optional(Type.String()),
   address: Type.Optional(Type.String()),
   img_url: Type.Optional(Type.String()),
-  host: Type.Union([
-    Type.Object({
-      name: Type.String(),
-      role: Type.String(), // ou Type.Enum si tu as un enum de rôles
-      profilePicture: Type.String({ format: 'uri' }),
-    }),
-    Type.Null(),
-  ]),
+  host: Type.Union([CleanwalkHostSchema, Type.Null()]),
 });
 
 export const SoloCleanwalkSchema = Type.Object({
@@ -30,15 +36,7 @@ export const SoloCleanwalkSchema = Type.Object({
   description: Type.Optional(Type.String()),
   address: Type.Optional(Type.String()),
   img_url: Type.Optional(Type.String()),
-  host: Type.Union([
-    Type.Object({
-      id: Type.Integer(),
-      name: Type.String(),
-      role: Type.String(), // ou Type.Enum si tu as un enum de rôles
-      profilePicture: Type.String({ format: 'uri' }),
-    }),
-    Type.Null(),
-  ]),
+  host: Type.Union([SoloCleanwalkHostSchema, Type.Null()]),
   participant_count: Type.Integer(),
   is_user_participant: Type.Boolean(),
 });

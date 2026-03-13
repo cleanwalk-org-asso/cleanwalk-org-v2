@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CalendarDays, Settings, History, File, Send, ChevronRight } from 'lucide-vue-next';
+import { CalendarDays, History, File, Send, ChevronRight } from 'lucide-vue-next';
 import { useAccountStore } from '@/stores/AccountStore';
 import DeleteAccountButton from './buttons/DeleteAccountButton.vue';
 import LogoutButton from './buttons/LogoutButton.vue';
@@ -26,16 +26,13 @@ const currentUser = accountStore.CurrentUser!;
             </router-link>
         </div>
         <ul class="list">
-            <!-- <li v-if="currentUser">
-                <CalendarDays />
-                <h3>Mes évènements</h3>
-                <ChevronRight :size="22"/>
+            <li v-if="currentUser">
+                <router-link :to="{ name: 'myCleanwalks' }" class="item-link">
+                    <CalendarDays />
+                    <h3>Mes cleanwalks</h3>
+                    <ChevronRight :size="22"/>
+                </router-link>
             </li>
-            <li>
-                <Settings />
-                <h3>Paramètres</h3>
-                <ChevronRight :size="22"/>
-            </li> -->
             <li>
                 <router-link :to="{ name: 'cleanwalkHistory' }" class="item-link">
                     <History />
