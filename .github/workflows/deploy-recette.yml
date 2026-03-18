@@ -90,10 +90,10 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY_DEV }}
           port: ${{ secrets.SERVER_PORT_DEV}}
           script: |
-            cd /home/$(whoami)/cleanwalk-v2/setup-production
+            cd /home/$(whoami)/setup-production
             pwd
             echo "${{ secrets.ghrcToken }}" | docker login ghcr.io -u ${{ secrets.ghrcUser }} --password-stdin
-            git pull origin develop
+            git pull origin recette
             docker compose -f compose.yml pull
             docker compose -f compose.yml up -d --remove-orphans
             docker image prune -f
