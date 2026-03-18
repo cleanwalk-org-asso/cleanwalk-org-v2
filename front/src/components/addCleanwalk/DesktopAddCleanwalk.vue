@@ -105,6 +105,7 @@ const clearFormCache = () => {
     pos_long: 0,
     address: "",
     city: "",
+    participant_count_public: false,
   });
   Object.assign(dateCleanwalk.value, {
     dateDay: undefined,
@@ -143,6 +144,10 @@ const clearFormCache = () => {
         </div>
         <BaseTextarea v-if="progress === 3" v-model="newCleanwalk.description" name="description" id="description"
           label="Description" :rows="4" />
+        <label v-if="progress === 3" class="participant-visibility">
+          <input v-model="newCleanwalk.participant_count_public" type="checkbox" />
+          Rendre public le nombre d'inscrits
+        </label>
         <dragDrop ref="dragDropRef" v-if="progress >= 4" :auto-upload="false" format="card" />
         <div v-if="progress === 5" class="preview pt-4 flex flex-col gap-4">
           <h3 class="text-md">{{ newCleanwalk.name }}</h3>
@@ -339,6 +344,15 @@ const clearFormCache = () => {
       gap: 0.5rem;
     }
   }
+
+.participant-visibility {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: #334155;
+}
 
 @media screen and (min-width: 1500px) {
   .progress {

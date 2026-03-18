@@ -50,6 +50,7 @@ model Cleanwalk {
   duration     Int
   description  String
   address      String
+  participantCountPublic Boolean @default(false)
   cityId       Int
   city         City            @relation(fields: [cityId], references: [id])
   participants CleanwalkUser[]

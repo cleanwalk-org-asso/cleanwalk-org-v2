@@ -50,8 +50,67 @@ export async function getCleanwalkById(req: FastifyRequest<{ Params: { cleanwalk
             profilePicture: host.profilePicture
         } : null,
         participant_count: participantCount,
+        participant_count_public: cleanwalk.participantCountPublic,
         is_user_participant: isUserParticipant
     });
+}
+
+export async function getCleanwalkUsersForHost(req: FastifyRequest<{ Params: { cleanwalkId: number } }>, reply: FastifyReply) {
+    const cleanwalkId = req.params.cleanwalkId;
+    const userId = (req as any).user?.id;
+
+    if (!userId) {
+        return reply.status(401).send({ message: "Unauthorized" });
+    }
+
+    const prisma = req.server.prisma;
+
+    const cleanwalk = await prisma.cleanwalk.findUnique({
+        where: { id: cleanwalkId },
+        select: { id: true }
+    });
+
+    if (!cleanwalk) {
+        return reply.status(404).send({ message: "Cleanwalk not found" });
+    }
+
+    const hostParticipation = await prisma.cleanwalkUser.findUnique({
+        where: {
+            userId_cleanwalkId: {
+                userId,
+                cleanwalkId
+            }
+        },
+        select: { isHost: true }
+    });
+
+    if (!hostParticipation?.isHost) {
+        return reply.status(403).send({ message: "Forbidden" });
+    }
+
+    const participants = await prisma.cleanwalkUser.findMany({
+        where: { cleanwalkId },
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    name: true,
+                    profilePicture: true
+                }
+            }
+        },
+        orderBy: {
+            user: {
+                name: "asc"
+            }
+        }
+    });
+
+    return reply.send(participants.map(({ user }) => ({
+        id: user.id,
+        name: user.name,
+        profilePicture: user.profilePicture
+    })));
 }
 
 
@@ -307,6 +366,7 @@ export async function createCleanwalk(req: FastifyRequest, reply: FastifyReply) 
             description: data.description ?? "",
             imgUrl: data.img_url,
             address: data.address ?? "",
+            participantCountPublic: data.participant_count_public ?? false,
             cityId: city.id
         }
     });
@@ -349,8 +409,12 @@ export async function updateCleanwalk(req: FastifyRequest, reply: FastifyReply) 
         cityId = city.id;
     }
     const updateData: any = { ...data };
+    if (updateData.participant_count_public !== undefined) {
+        updateData.participantCountPublic = updateData.participant_count_public;
+    }
     if (cityId) updateData.city_id = cityId;
     delete updateData.city;
+    delete updateData.participant_count_public;
     await prisma.cleanwalk.update({ where: { id: cleanwalkId }, data: updateData });
     reply.send({ message: "Cleanwalk updated successfully" });
 }

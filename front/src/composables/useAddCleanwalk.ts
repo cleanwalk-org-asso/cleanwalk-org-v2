@@ -37,6 +37,7 @@ export function useCleanwalkForm() {
     pos_long: storedData?.newCleanwalk?.pos_long || 0,
     address: storedData?.newCleanwalk?.address || "",
     city: storedData?.newCleanwalk?.city || "",
+    participant_count_public: storedData?.newCleanwalk?.participant_count_public || false,
     user_id: useAccountStore().CurrentUser?.id || 0,
   });
 

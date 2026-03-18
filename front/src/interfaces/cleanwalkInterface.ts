@@ -14,7 +14,8 @@ export interface Cleanwalk {
         name: string,
         profilePicture: string,
         role: string,
-    }
+    },
+    participant_count_public?: boolean,
 }
 
 export interface CleanwalkCreation {
@@ -28,6 +29,7 @@ export interface CleanwalkCreation {
     img_url?: string,
     user_id: number,
     city: string,
+    participant_count_public: boolean,
 }
 
 export interface SingleCleanwalk {
@@ -48,6 +50,7 @@ export interface SingleCleanwalk {
         profilePicture: string;
     };
     participant_count: number;
+    participant_count_public: boolean;
     is_user_participant: boolean;
 }
 
@@ -55,4 +58,10 @@ export interface SubscibeToCleanwalk {
     cleanwalk_id: number;
     user_id: number;
     nb_participants: number;
+}
+
+export interface CleanwalkUserSummary {
+    id: number;
+    name: string;
+    profilePicture: string | null;
 }

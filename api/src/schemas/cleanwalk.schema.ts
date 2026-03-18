@@ -13,6 +13,12 @@ const SoloCleanwalkHostSchema = Type.Object({
   profilePicture: Type.Union([Type.String(), Type.Null()]),
 });
 
+export const CleanwalkParticipantUserSchema = Type.Object({
+  id: Type.Integer(),
+  name: Type.String(),
+  profilePicture: Type.Union([Type.String(), Type.Null()]),
+});
+
 export const CleanwalkSchema = Type.Object({
   id: Type.Integer(),
   name: Type.String({ minLength: 1 }),
@@ -38,6 +44,7 @@ export const SoloCleanwalkSchema = Type.Object({
   img_url: Type.Optional(Type.String()),
   host: Type.Union([SoloCleanwalkHostSchema, Type.Null()]),
   participant_count: Type.Integer(),
+  participant_count_public: Type.Boolean(),
   is_user_participant: Type.Boolean(),
 });
 
@@ -52,6 +59,7 @@ export const CreateCleanwalkSchema = Type.Object({
   description: Type.Optional(Type.String()),
   address: Type.Optional(Type.String()),
   img_url: Type.Optional(Type.String()),
+  participant_count_public: Type.Optional(Type.Boolean()),
   city: Type.String({ minLength: 1 }),
   user_id: Type.Integer(),
 });
@@ -65,6 +73,7 @@ export const UpdateCleanwalkSchema = Type.Object({
   description: Type.Optional(Type.String()),
   address: Type.Optional(Type.String()),
   img_url: Type.Optional(Type.String()),
+  participant_count_public: Type.Optional(Type.Boolean()),
   city: Type.Optional(Type.String({ minLength: 1 })),
 });
 
