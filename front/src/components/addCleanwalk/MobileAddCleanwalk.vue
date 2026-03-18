@@ -82,6 +82,7 @@ const clearFormCache = () => {
     pos_long: 0,
     address: "",
     city: "",
+    participant_count_public: false,
   });
   Object.assign(dateCleanwalk.value, {
     dateDay: undefined,
@@ -141,6 +142,10 @@ const getConseil = () => {
           label="Heure de fin" />
         <BaseTextarea v-if="progress === 4" v-model="newCleanwalk.description" name="description" id="description"
           :rows="4" />
+        <label v-if="progress === 4" class="participant-visibility">
+          <input v-model="newCleanwalk.participant_count_public" type="checkbox" />
+          Rendre public le nombre d'inscrits
+        </label>
         <dragDrop ref="dragDropRef" v-if="progress >= 5" :auto-upload="false" format="card" />
 
         <div v-if="progress === 6" class="preview">
@@ -346,6 +351,15 @@ const getConseil = () => {
         flex-grow: 0.5;
       }
     }
+  }
+
+  .participant-visibility {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    color: #334155;
   }
 }
 

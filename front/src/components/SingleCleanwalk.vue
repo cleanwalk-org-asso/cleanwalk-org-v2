@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { SingleCleanwalk } from '@/interfaces/cleanwalkInterface'
-import { onMounted, ref, onUnmounted, computed } from 'vue';
+import type { CleanwalkUserSummary, SingleCleanwalk } from '@/interfaces/cleanwalkInterface'
+import { onMounted, ref, onUnmounted, computed, watch } from 'vue';
 import router from '@/router';
 import dateService from '@/services/dateService';
 import { useAccountStore } from '@/stores/AccountStore';
@@ -16,7 +16,7 @@ import { getCleanwalkRouteParams } from '@/services/cleanwalkSlug';
 
 const cleanwalkStore = useCleanwalkStore();
 const accountStore = useAccountStore();
-const currenUserId = ref(accountStore.CurrentUser?.id);
+const currenUserId = computed(() => accountStore.CurrentUser?.id);
 const currentUsername = computed(() => accountStore.CurrentUser?.name ?? 'Anonyme');
 const showToast = useUtilsStore().showToast;
 
@@ -40,6 +40,34 @@ const showLeaveCwPopup = ref(false);
 const toogleLeaveCwPopup = () => {
   showLeaveCwPopup.value = !showLeaveCwPopup.value;
 }
+
+const cleanwalkUsers = ref<CleanwalkUserSummary[]>([]);
+const isUsersAccordionOpen = ref(false);
+const isLoadingCleanwalkUsers = ref(false);
+
+const isCurrentUserHost = computed(() => {
+  return !!cleanwalk.value?.host?.id && cleanwalk.value.host.id === currenUserId.value;
+});
+
+const canShowParticipantCount = computed(() => {
+  return isCurrentUserHost.value || !!cleanwalk.value?.participant_count_public;
+});
+
+const toggleUsersAccordion = () => {
+  isUsersAccordionOpen.value = !isUsersAccordionOpen.value;
+};
+
+const fetchCleanwalkUsers = async () => {
+  if (!cleanwalk.value?.id || !isCurrentUserHost.value) {
+    cleanwalkUsers.value = [];
+    isUsersAccordionOpen.value = false;
+    return;
+  }
+
+  isLoadingCleanwalkUsers.value = true;
+  cleanwalkUsers.value = await cleanwalkStore.getCleanwalkUsers(cleanwalk.value.id);
+  isLoadingCleanwalkUsers.value = false;
+};
 
 let showParticipationPopup = ref(false);
 const toggleParticipationPopup = () => {
@@ -107,7 +135,7 @@ const actionButton = () => {
 }
 
 const getActionButtonText = (): string => {
-  if (cleanwalk.value?.host.id === currenUserId.value) {
+  if (isCurrentUserHost.value) {
     return "Editer la cleanwalk";
   }
   if (cleanwalk.value?.is_user_participant === true) {
@@ -135,6 +163,14 @@ onMounted(() => {
   checkScreenSize();
   window.addEventListener('resize', checkScreenSize);
 });
+
+watch(
+  () => [cleanwalk.value?.id, cleanwalk.value?.host?.id],
+  async () => {
+    await fetchCleanwalkUsers();
+  },
+  { immediate: true }
+);
 
 // Clean up event listener
 onUnmounted(() => {
@@ -188,8 +224,31 @@ onUnmounted(() => {
           </a>
         </div>
         
-        <div v-if="cleanwalk?.host.id === currenUserId" class="participant-count">
+        <div v-if="canShowParticipantCount" class="participant-count">
           {{ cleanwalk?.participant_count }} participant(s)
+        </div>
+
+        <div v-if="isCurrentUserHost" class="participants-accordion">
+          <button class="participants-accordion-header" @click="toggleUsersAccordion">
+            <span>Participants inscrits</span>
+            <span class="participants-accordion-icon" :class="{ open: isUsersAccordionOpen }">⌄</span>
+          </button>
+
+          <div v-show="isUsersAccordionOpen" class="participants-accordion-content">
+            <div v-if="isLoadingCleanwalkUsers" class="participants-empty">Chargement...</div>
+            <div v-else-if="cleanwalkUsers.length === 0" class="participants-empty">Aucun participant pour le moment.</div>
+
+            <div v-else class="participants-list">
+              <div v-for="user in cleanwalkUsers" :key="user.id" class="participant-item">
+                <div class="participant-left">
+                  <img v-if="user.profilePicture" :src="user.profilePicture" alt="photo de profil" class="participant-avatar" />
+                  <div v-else class="participant-avatar participant-avatar-fallback">{{ user.name.charAt(0).toUpperCase() }}</div>
+
+                  <div class="participant-name">{{ user.name }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         
         <div class="orga">
@@ -206,7 +265,7 @@ onUnmounted(() => {
           {{ getActionButtonText() }}
         </button>
         
-        <p class="description">
+        <p class="description text-sm">
           {{ cleanwalk?.description }}
         </p>
       </div>
@@ -266,8 +325,31 @@ onUnmounted(() => {
           </a>
         </div>
         
-        <div v-if="cleanwalk?.host.id === currenUserId">
+        <div v-if="canShowParticipantCount" class="participant-count">
           {{ cleanwalk?.participant_count }} participant(s)
+        </div>
+
+        <div v-if="isCurrentUserHost" class="participants-accordion">
+          <button class="participants-accordion-header" @click="toggleUsersAccordion">
+            <span>Participants inscrits</span>
+            <span class="participants-accordion-icon" :class="{ open: isUsersAccordionOpen }">⌄</span>
+          </button>
+
+          <div v-show="isUsersAccordionOpen" class="participants-accordion-content">
+            <div v-if="isLoadingCleanwalkUsers" class="participants-empty">Chargement...</div>
+            <div v-else-if="cleanwalkUsers.length === 0" class="participants-empty">Aucun participant pour le moment.</div>
+
+            <div v-else class="participants-list">
+              <div v-for="user in cleanwalkUsers" :key="user.id" class="participant-item">
+                <div class="participant-left">
+                  <img v-if="user.profilePicture" :src="user.profilePicture" alt="photo de profil" class="participant-avatar" />
+                  <div v-else class="participant-avatar participant-avatar-fallback">{{ user.name.charAt(0).toUpperCase() }}</div>
+
+                  <div class="participant-name">{{ user.name }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         
         <div class="orga">
@@ -435,6 +517,94 @@ main {
   .participant-count {
     margin-bottom: 1rem;
     font-weight: 500;
+  }
+
+  .participants-accordion {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    background-color: #ffffff;
+  }
+
+  .participants-accordion-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border: none;
+    background: #f8f9fa;
+    font-size: 14px;
+    font-weight: 600;
+    color: #2f2f2f;
+    cursor: pointer;
+  }
+
+  .participants-accordion-icon {
+    transition: transform 0.2s ease;
+    display: inline-flex;
+  }
+
+  .participants-accordion-icon.open {
+    transform: rotate(180deg);
+  }
+
+  .participants-accordion-content {
+    border-top: 1px solid #e9ecef;
+    padding: 0.5rem;
+  }
+
+  .participants-empty {
+    font-size: 13px;
+    color: #6b7280;
+    padding: 0.5rem;
+  }
+
+  .participants-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .participant-item {
+    display: block;
+    padding: 0.5rem;
+    border-radius: 8px;
+    background: #f7f7f7;
+  }
+
+  .participant-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
+  .participant-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 9999px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .participant-avatar-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #1f2937;
+    background: #dbe4ff;
+  }
+
+  .participant-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1f2937;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .orga {
