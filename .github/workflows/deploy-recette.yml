@@ -2,9 +2,9 @@ name: Deploy recette
 
 # WORKFLOW SETUP : 
 # 1 : Generate token (write:packages, delete:packages)
-# 2 : Add secret ['secrets.SERVER_HOST','secrets.SERVER_USER','secrets.SERVER_SSH_KEY','secrets.SERVER_PORT',"ghrcToken","ghrcUser"]
-# 3 : Replace 'git pull origin main' with 'git pull origin release' during the rebuild phase
-# 4 : Change the push branch name to 'main"
+# 2 : Add secret ['SERVER_HOST_DEV','SERVER_USER_DEV','SERVER_SSH_KEY_DEV','SERVER_PORT_DEV','ghrcToken','ghrcUser','ENVFRONT_DEV']
+# 3 : Sur le serveur de recette, le compose.yml doit pointer sur frontend-recette:latest et api-recette:latest
+# 4 : La branche 'recette' doit exister sur le serveur de recette
 
 on:
   push:
@@ -63,6 +63,7 @@ jobs:
       - name: Build Front
         if: env.FRONTEND_CHANGED == 'true'
         run: |
+          echo -e "User-agent: *\nDisallow: /" > ./front/public/robots.txt
           touch ./front/.env
           echo "${{ secrets.ENVFRONT_DEV }}" | tee -a ./front/.env > /dev/null
           docker build -f ./front/Dockerfile -t ghcr.io/${{ env.REPO_LOWER }}/frontend-recette:latest ./front
