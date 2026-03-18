@@ -93,7 +93,7 @@ jobs:
             cd /home/$(whoami)/cleanwalk-v2/setup-production
             pwd
             echo "${{ secrets.ghrcToken }}" | docker login ghcr.io -u ${{ secrets.ghrcUser }} --password-stdin
-            git pull origin recette
+            git pull origin develop
             docker compose -f compose.yml pull
             docker compose -f compose.yml up -d --remove-orphans
             docker image prune -f
