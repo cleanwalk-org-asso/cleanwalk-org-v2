@@ -65,14 +65,14 @@ jobs:
         run: |
           touch ./front/.env
           echo "${{ secrets.ENVFRONT_DEV }}" | tee -a ./front/.env > /dev/null
-          docker build -f ./front/Dockerfile -t ghcr.io/${{ env.REPO_LOWER }}/frontend:latest ./front
-          docker push ghcr.io/${{ env.REPO_LOWER }}/frontend:latest
+          docker build -f ./front/Dockerfile -t ghcr.io/${{ env.REPO_LOWER }}/frontend-recette:latest ./front
+          docker push ghcr.io/${{ env.REPO_LOWER }}/frontend-recette:latest
 
       - name: Build API
         if: env.API_CHANGED == 'true'
         run: |
-          docker build -f ./api/Dockerfile -t ghcr.io/${{ env.REPO_LOWER }}/api:latest ./api
-          docker push ghcr.io/${{ env.REPO_LOWER }}/api:latest
+          docker build -f ./api/Dockerfile -t ghcr.io/${{ env.REPO_LOWER }}/api-recette:latest ./api
+          docker push ghcr.io/${{ env.REPO_LOWER }}/api-recette:latest
 
   deploy:
     needs: build
@@ -92,7 +92,7 @@ jobs:
             cd /home/$(whoami)/cleanwalk-v2/setup-production
             pwd
             echo "${{ secrets.ghrcToken }}" | docker login ghcr.io -u ${{ secrets.ghrcUser }} --password-stdin
-            git pull origin main
+            git pull origin recette
             docker compose -f compose.yml pull
             docker compose -f compose.yml up -d --remove-orphans
             docker image prune -f
