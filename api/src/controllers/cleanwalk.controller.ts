@@ -24,7 +24,11 @@ export async function getCleanwalkById(req: FastifyRequest<{ Params: { cleanwalk
         return;
     }
 
-    const participantCount = await prisma.cleanwalkUser.count({ where: { cleanwalkId } });
+    const participantCountAggregate = await prisma.cleanwalkUser.aggregate({
+        where: { cleanwalkId },
+        _sum: { nbPerson: true }
+    });
+    const participantCount = participantCountAggregate._sum.nbPerson ?? 0;
     let isUserParticipant = false;
     if (userId) {
         const userParticipation = await prisma.cleanwalkUser.findFirst({ where: { cleanwalkId, userId } });
@@ -106,10 +110,11 @@ export async function getCleanwalkUsersForHost(req: FastifyRequest<{ Params: { c
         }
     });
 
-    return reply.send(participants.map(({ user }) => ({
+    return reply.send(participants.map(({ user, nbPerson }) => ({
         id: user.id,
         name: user.name,
-        profilePicture: user.profilePicture
+        profilePicture: user.profilePicture,
+        nb_person: nbPerson
     })));
 }
 

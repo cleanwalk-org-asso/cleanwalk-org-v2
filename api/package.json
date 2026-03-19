@@ -29,7 +29,7 @@
     "@fastify/type-provider-typebox": "^5.2.0",
     "@fastify/websocket": "github:fastify/fastify-websocket",
     "@prisma/adapter-pg": "^7.2.0",
-    "@prisma/client": "^7.2.0",
+    "@prisma/client": "^7.5.0",
     "@sinclair/typebox": "^0.34.38",
     "aws4": "^1.13.2",
     "bcrypt": "^6.0.0",
