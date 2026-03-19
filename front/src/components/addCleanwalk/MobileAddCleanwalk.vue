@@ -142,10 +142,6 @@ const getConseil = () => {
           label="Heure de fin" />
         <BaseTextarea v-if="progress === 4" v-model="newCleanwalk.description" name="description" id="description"
           :rows="4" />
-        <label v-if="progress === 4" class="participant-visibility">
-          <input v-model="newCleanwalk.participant_count_public" type="checkbox" />
-          Rendre public le nombre d'inscrits
-        </label>
         <dragDrop ref="dragDropRef" v-if="progress >= 5" :auto-upload="false" format="card" />
 
         <div v-if="progress === 6" class="preview">
@@ -162,6 +158,10 @@ const getConseil = () => {
             </div>
           </div>
           <p>{{ newCleanwalk.description }}</p>
+          <label class="participant-visibility">
+            <input v-model="newCleanwalk.participant_count_public" type="checkbox" />
+            Rendre public le nombre d'inscrits
+          </label>
         </div>
       </div>
       <div class="bottom">

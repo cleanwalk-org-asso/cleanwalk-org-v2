@@ -53,6 +53,22 @@ const canShowParticipantCount = computed(() => {
   return isCurrentUserHost.value || !!cleanwalk.value?.participant_count_public;
 });
 
+const displayedParticipantCount = computed(() => {
+  if (!cleanwalk.value) {
+    return 0;
+  }
+
+  if (!isCurrentUserHost.value) {
+    return cleanwalk.value.participant_count;
+  }
+
+  if (isLoadingCleanwalkUsers.value) {
+    return cleanwalk.value.participant_count;
+  }
+
+  return cleanwalkUsers.value.reduce((total, user) => total + (user.nb_person || 0), 0);
+});
+
 const toggleUsersAccordion = () => {
   isUsersAccordionOpen.value = !isUsersAccordionOpen.value;
 };
@@ -225,13 +241,17 @@ onUnmounted(() => {
         </div>
         
         <div v-if="canShowParticipantCount" class="participant-count">
-          {{ cleanwalk?.participant_count }} participant(s)
+          {{ displayedParticipantCount }} participant(s)
         </div>
 
         <div v-if="isCurrentUserHost" class="participants-accordion">
           <button class="participants-accordion-header" @click="toggleUsersAccordion">
             <span>Participants inscrits</span>
-            <span class="participants-accordion-icon" :class="{ open: isUsersAccordionOpen }">⌄</span>
+            <span class="participants-accordion-icon" :class="{ open: isUsersAccordionOpen }" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7 8L10 11L13 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
           </button>
 
           <div v-show="isUsersAccordionOpen" class="participants-accordion-content">
@@ -246,6 +266,7 @@ onUnmounted(() => {
 
                   <div class="participant-name">{{ user.name }}</div>
                 </div>
+                <div class="participant-nb">x{{ user.nb_person }}</div>
               </div>
             </div>
           </div>
@@ -326,13 +347,17 @@ onUnmounted(() => {
         </div>
         
         <div v-if="canShowParticipantCount" class="participant-count">
-          {{ cleanwalk?.participant_count }} participant(s)
+          {{ displayedParticipantCount }} participant(s)
         </div>
 
         <div v-if="isCurrentUserHost" class="participants-accordion">
           <button class="participants-accordion-header" @click="toggleUsersAccordion">
             <span>Participants inscrits</span>
-            <span class="participants-accordion-icon" :class="{ open: isUsersAccordionOpen }">⌄</span>
+            <span class="participants-accordion-icon" :class="{ open: isUsersAccordionOpen }" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7 8L10 11L13 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
           </button>
 
           <div v-show="isUsersAccordionOpen" class="participants-accordion-content">
@@ -347,6 +372,7 @@ onUnmounted(() => {
 
                   <div class="participant-name">{{ user.name }}</div>
                 </div>
+                <div class="participant-nb">x{{ user.nb_person }}</div>
               </div>
             </div>
           </div>
@@ -539,11 +565,21 @@ main {
     font-weight: 600;
     color: #2f2f2f;
     cursor: pointer;
+    transition: background-color 0.3s ease;
+    user-select: none;
+  }
+
+  .participants-accordion-header:hover {
+    background: #f0f1f3;
   }
 
   .participants-accordion-icon {
-    transition: transform 0.2s ease;
     display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
   }
 
   .participants-accordion-icon.open {
@@ -568,7 +604,10 @@ main {
   }
 
   .participant-item {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
     padding: 0.5rem;
     border-radius: 8px;
     background: #f7f7f7;
@@ -605,6 +644,17 @@ main {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .participant-nb {
+    font-size: 12px;
+    font-weight: 700;
+    color: #0f5132;
+    background: #d1e7dd;
+    border-radius: 9999px;
+    padding: 0.2rem 0.55rem;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
   .orga {

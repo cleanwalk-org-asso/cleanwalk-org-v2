@@ -64,4 +64,5 @@ export interface CleanwalkUserSummary {
     id: number;
     name: string;
     profilePicture: string | null;
+    nb_person: number;
 }

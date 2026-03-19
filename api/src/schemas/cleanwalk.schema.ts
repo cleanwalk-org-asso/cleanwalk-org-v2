@@ -17,6 +17,7 @@ export const CleanwalkParticipantUserSchema = Type.Object({
   id: Type.Integer(),
   name: Type.String(),
   profilePicture: Type.Union([Type.String(), Type.Null()]),
+  nb_person: Type.Integer({ minimum: 1 }),
 });
 
 export const CleanwalkSchema = Type.Object({
