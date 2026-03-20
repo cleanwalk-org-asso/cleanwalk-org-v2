@@ -231,6 +231,9 @@ const getButtonParticipationText = () => {
 
     
     .content {
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
         
         .title {
             padding-bottom: 1.5rem;
@@ -245,6 +248,9 @@ const getButtonParticipationText = () => {
         }
         p {
             padding-top: 2.2rem;
+            overflow-y: auto;
+            max-height: 100%;
+            padding-right: 0.35rem;
         }
     }
     
