@@ -91,6 +91,7 @@ jobs:
           port: ${{ secrets.SERVER_PORT_DEV}}
           script: |
             cd /home/$(whoami)/setup-production
+            docker compose run --rm -e BACKUP_PREFIX=backups/pre-deploy db_backup
             pwd
             echo "${{ secrets.ghrcToken }}" | docker login ghcr.io -u ${{ secrets.ghrcUser }} --password-stdin
             git pull origin recette
