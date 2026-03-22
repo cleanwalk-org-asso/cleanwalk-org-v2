@@ -89,6 +89,7 @@ const validate = async () => {
         description: currentCleanwalk.value!.description,
         imgUrl: currentCleanwalk.value!.img_url,
         address: currentCleanwalk.value!.address,
+        participantCountPublic: currentCleanwalk.value!.participant_count_public,
       },
     }
   );
@@ -181,6 +182,10 @@ const handleSelectAddress = (addressData: { address: string, lat: string, lon: s
       <AutocompleteAddress v-model:query="currentCleanwalk.address" @select-suggestion="handleSelectAddress" />
       <label for="description">Description</label>
       <BaseTextarea name="descrition" v-model="currentCleanwalk.description" id="description" :rows="4"></BaseTextarea>
+      <label class="participant-visibility">
+        <input v-model="currentCleanwalk.participant_count_public" type="checkbox" />
+        Rendre public le nombre d'inscrits
+      </label>
       <BaseInput v-model="dateCleanwalk.dateDay" name="date" type="date" label="Date de l'évènement" />
       <BaseInput v-model="dateCleanwalk.hourBegin" name="hourBegin" type="time" label="Heure de début" />
       <BaseInput v-model="dateCleanwalk.hourEnd" name="hourEnd" type="time" label="Heure de fin" />
@@ -215,5 +220,13 @@ const handleSelectAddress = (addressData: { address: string, lat: string, lon: s
   width: max-content;
   margin: 0 auto;
   margin-top: 2rem;
+}
+
+.participant-visibility {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  color: #334155;
 }
 </style>

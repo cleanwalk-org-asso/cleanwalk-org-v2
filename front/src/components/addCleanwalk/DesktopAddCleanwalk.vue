@@ -105,6 +105,7 @@ const clearFormCache = () => {
     pos_long: 0,
     address: "",
     city: "",
+    participant_count_public: false,
   });
   Object.assign(dateCleanwalk.value, {
     dateDay: undefined,
@@ -159,6 +160,10 @@ const clearFormCache = () => {
             </div>
           </div>
           <p>{{ newCleanwalk.description }}</p>
+          <label class="participant-visibility">
+            <input v-model="newCleanwalk.participant_count_public" type="checkbox" />
+            Rendre public le nombre d'inscrits
+          </label>
         </div>
 
 
@@ -339,6 +344,15 @@ const clearFormCache = () => {
       gap: 0.5rem;
     }
   }
+
+.participant-visibility {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: #334155;
+}
 
 @media screen and (min-width: 1500px) {
   .progress {

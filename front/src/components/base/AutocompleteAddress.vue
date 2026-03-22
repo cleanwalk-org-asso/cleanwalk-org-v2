@@ -9,6 +9,7 @@
           type="text"
           :id="uniqueId"
           :placeholder="placeholder"
+          @focus="handleInputFocus"
           @click="displayOptionsList"
           @keyup="handleKeyNavigation"
         />
@@ -189,6 +190,13 @@ const hideOptionsList = () => {
 const handleOnSearchClick = () => {
   displayOptionsList();
   if (inputValue.value) {
+    debouncedFetchSuggestions();
+  }
+};
+
+const handleInputFocus = () => {
+  displayOptionsList();
+  if (inputValue.value.length >= 3) {
     debouncedFetchSuggestions();
   }
 };

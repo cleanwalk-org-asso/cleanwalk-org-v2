@@ -8,7 +8,7 @@
         </p>
 
         <button class="block w-fit">
-            <router-link :to="{name: 'map'}" class="px-8 py-4 bg-primary text-white! rounded-md font-catamaran font-medium">
+            <router-link to="/notre-histoire" class="px-8 py-4 bg-primary text-white! rounded-md font-catamaran font-medium">
                 Notre Histoire
             </router-link>
         </button>

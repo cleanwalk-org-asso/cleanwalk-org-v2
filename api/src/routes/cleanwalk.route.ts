@@ -6,6 +6,7 @@ import {
   getCurrentCleanwalks,
   getPastCleanwalks,
   getMyCleanwalks,
+  getCleanwalkUsersForHost,
   checkUserParticipation,
   createCleanwalk,
   joinCleanwalk,
@@ -15,6 +16,7 @@ import {
 } from "../controllers/cleanwalk.controller.js";
 import {
   CleanwalkSchema,
+  CleanwalkParticipantUserSchema,
   CreateCleanwalkSchema,
   SoloCleanwalkSchema,
   UpdateCleanwalkSchema
@@ -51,6 +53,20 @@ export default async function cleanwalkRoutes(fastify: FastifyInstance) {
       response: { 200: SoloCleanwalkSchema, 404: Type.Object({ message: Type.String() }) },
     },
     handler: getCleanwalkById,
+  });
+
+  fastify.get("/:cleanwalkId/users", {
+    preHandler: [fastify.authenticate],
+    schema: {
+      params: Type.Object({ cleanwalkId: Type.Integer() }),
+      response: {
+        200: Type.Array(CleanwalkParticipantUserSchema),
+        401: Type.Object({ message: Type.String() }),
+        403: Type.Object({ message: Type.String() }),
+        404: Type.Object({ message: Type.String() })
+      },
+    },
+    handler: getCleanwalkUsersForHost,
   });
 
   fastify.get("", {
