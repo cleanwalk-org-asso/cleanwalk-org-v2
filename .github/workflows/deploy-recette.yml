@@ -1,15 +1,15 @@
-name: Deploy Prod
+name: Deploy recette
 
 # WORKFLOW SETUP : 
 # 1 : Generate token (write:packages, delete:packages)
-# 2 : Add secret ['secrets.SERVER_HOST','secrets.SERVER_USER','secrets.SERVER_SSH_KEY','secrets.SERVER_PORT',"ghrcToken","ghrcUser"]
-# 3 : Replace 'git pull origin main' with 'git pull origin release' during the rebuild phase
-# 4 : Change the push branch name to 'main"
+# 2 : Add secret ['SERVER_HOST_DEV','SERVER_USER_DEV','SERVER_SSH_KEY_DEV','SERVER_PORT_DEV','ghrcToken','ghrcUser','ENVFRONT_DEV']
+# 3 : Sur le serveur de recette, le compose.yml doit pointer sur frontend-recette:latest et api-recette:latest
+# 4 : La branche 'recette' doit exister sur le serveur de recette
 
 on:
   push:
     branches:
-      - main
+      - develop
 
 jobs:
   build:
@@ -63,16 +63,17 @@ jobs:
       - name: Build Front
         if: env.FRONTEND_CHANGED == 'true'
         run: |
+          echo -e "User-agent: *\nDisallow: /" > ./front/public/robots.txt
           touch ./front/.env
-          echo "${{ secrets.ENVFRONT }}" | tee -a ./front/.env > /dev/null
-          docker build -f ./front/Dockerfile -t ghcr.io/${{ env.REPO_LOWER }}/frontend:latest ./front
-          docker push ghcr.io/${{ env.REPO_LOWER }}/frontend:latest
+          echo "${{ secrets.ENVFRONT_DEV }}" | tee -a ./front/.env > /dev/null
+          docker build -f ./front/Dockerfile -t ghcr.io/${{ env.REPO_LOWER }}/frontend-recette:latest ./front
+          docker push ghcr.io/${{ env.REPO_LOWER }}/frontend-recette:latest
 
       - name: Build API
         if: env.API_CHANGED == 'true'
         run: |
-          docker build -f ./api/Dockerfile -t ghcr.io/${{ env.REPO_LOWER }}/api:latest ./api
-          docker push ghcr.io/${{ env.REPO_LOWER }}/api:latest
+          docker build -f ./api/Dockerfile -t ghcr.io/${{ env.REPO_LOWER }}/api-recette:latest ./api
+          docker push ghcr.io/${{ env.REPO_LOWER }}/api-recette:latest
 
   deploy:
     needs: build
@@ -84,16 +85,16 @@ jobs:
       - name: Deploy on Server
         uses: appleboy/ssh-action@v0.1.10
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          port: ${{ secrets.SERVER_PORT}}
+          host: ${{ secrets.SERVER_HOST_DEV }}
+          username: ${{ secrets.SERVER_USER_DEV }}
+          key: ${{ secrets.SERVER_SSH_KEY_DEV }}
+          port: ${{ secrets.SERVER_PORT_DEV}}
           script: |
-            cd /home/$(whoami)/cleanwalk-v2/setup-production
+            cd /home/$(whoami)/setup-production
             docker compose run --rm -e BACKUP_PREFIX=backups/pre-deploy db_backup
             pwd
             echo "${{ secrets.ghrcToken }}" | docker login ghcr.io -u ${{ secrets.ghrcUser }} --password-stdin
-            git pull origin main
+            git pull origin recette
             docker compose -f compose.yml pull
             docker compose -f compose.yml up -d --remove-orphans
             docker image prune -f

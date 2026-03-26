@@ -1,11 +1,24 @@
 <script setup lang="ts">
 import { useCleanwalkChat } from '@/composables/useCleanwalkChat';
+import { computed } from 'vue';
+import router from '@/router';
+import { useAccountStore } from '@/stores/AccountStore';
 
 
 const props = defineProps<{
     cleanwalkId: string;
     username: string;
 }>();
+
+const accountStore = useAccountStore();
+const isAuthenticated = computed(() => !!accountStore.CurrentUser?.id);
+
+const goToLogin = () => {
+    router.push({
+        name: 'login',
+        query: { redirect: router.currentRoute.value.fullPath }
+    });
+};
 
 const { messages, newMessage, sendMessage } = useCleanwalkChat(
     props.cleanwalkId,
@@ -35,7 +48,7 @@ const { messages, newMessage, sendMessage } = useCleanwalkChat(
             </div>
         </div>
 
-        <div class="px-4 py-3 border-t border-slate-200 flex gap-3">
+        <div v-if="isAuthenticated" class="px-4 py-3 border-t border-slate-200 flex gap-3">
             <input
                 v-model="newMessage"
                 @keyup.enter="sendMessage"
@@ -47,6 +60,15 @@ const { messages, newMessage, sendMessage } = useCleanwalkChat(
                 class="rounded-lg bg-primary text-white px-4! py-2! text-sm font-semibold hover:opacity-90 transition"
             >
                 Envoyer
+            </button>
+        </div>
+
+        <div v-else class="px-4 py-3 border-t border-slate-200">
+            <button
+                @click="goToLogin"
+                class="w-full rounded-lg bg-primary text-white px-4! py-2! text-sm font-semibold hover:opacity-90 transition"
+            >
+                Connectez-vous pour envoyer un message
             </button>
         </div>
     </div>

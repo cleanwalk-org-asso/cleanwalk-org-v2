@@ -1,4 +1,4 @@
-# Cleanwalk V2 website and webapp
+# Cleanwalk V2 website and web-app
 
 Cleanwalk.org is a website to find clean walks all over France.
 

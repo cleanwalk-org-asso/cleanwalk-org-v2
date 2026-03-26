@@ -1,6 +1,6 @@
 import nominatimService from '@/services/nominatimService';
 import api from '@/services/apiService';
-import type { Cleanwalk, CleanwalkCreation, SingleCleanwalk } from '@/interfaces/cleanwalkInterface';
+import type { Cleanwalk, CleanwalkCreation, CleanwalkUserSummary, SingleCleanwalk } from '@/interfaces/cleanwalkInterface';
 import router from '@/router';
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue';
@@ -38,6 +38,14 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
             return await response.json() as unknown as SingleCleanwalk;
         }
         return undefined;
+    }
+
+    async function getCleanwalkUsers(cleanwalkId: number): Promise<CleanwalkUserSummary[]> {
+        const response = await api.get(route + '/' + cleanwalkId + '/users');
+        if (response.ok) {
+            return await response.json() as unknown as CleanwalkUserSummary[];
+        }
+        return [];
     }
 
     async function createCleanwalk(cleanwalk: CleanwalkCreation): Promise<boolean> {
@@ -107,6 +115,6 @@ export const useCleanwalkStore = defineStore('cleanwalk', () => {
         return [];
     }
 
-    return { getAllCleanwalks, cleanwalksTab, getCleanwalkById, createCleanwalk, joinCleanwalk, leaveCleanwalk, checkUserParticipation, getMyCleanwalks }
+    return { getAllCleanwalks, cleanwalksTab, getCleanwalkById, getCleanwalkUsers, createCleanwalk, joinCleanwalk, leaveCleanwalk, checkUserParticipation, getMyCleanwalks }
 
 });
