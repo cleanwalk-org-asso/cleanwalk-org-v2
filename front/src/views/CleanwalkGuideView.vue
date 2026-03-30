@@ -118,7 +118,7 @@ const dernierEffort = [
         </p>
         <div class="flex flex-wrap gap-4 justify-center">
           <a
-            href="https://drive.google.com/file/d/1Iv56ES7hGadMDWfro09GwiJnTYelkO8S/view?usp=sharing"
+            href="https://pub-dee3eb9e5cc5449daec1613dab81a643.r2.dev/assets/GUIDE_Organisation_evenement_Cleanwalk_org.pdf?usp=sharing"
             target="_blank"
             class="inline-flex items-center gap-2 bg-[#72BDA3] hover:bg-[#5aa98e] text-white font-semibold px-7 py-3.5 rounded-full transition-colors duration-200 text-sm"
           >
@@ -397,7 +397,7 @@ const dernierEffort = [
           </div>
           <div class="flex flex-wrap gap-4 justify-center">
             <a
-              href="https://drive.google.com/file/d/1Iv56ES7hGadMDWfro09GwiJnTYelkO8S/view?usp=sharing"
+              href="https://pub-dee3eb9e5cc5449daec1613dab81a643.r2.dev/assets/GUIDE_Organisation_evenement_Cleanwalk_org.pdf?usp=sharing"
               target="_blank"
               class="inline-flex items-center gap-2 bg-[#72BDA3] hover:bg-[#5aa98e] text-white font-semibold px-7 py-3.5 rounded-full transition-colors duration-200 text-sm"
             >
