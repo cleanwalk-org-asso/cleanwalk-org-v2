@@ -1,5 +1,6 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { UpdateUserInput, UserParams } from "../schemas/user.schema.js";
+import bcrypt from "bcrypt";
+import { DeleteUserInput, UpdateUserInput, UserParams } from "../schemas/user.schema.js";
 import { sendMail, generateUserDeletionEmail } from "../utils/mailer.js";
 
 // GET /users
@@ -104,11 +105,13 @@ export async function updateUser(
 }
 
 export async function deleteUser(
-  req: FastifyRequest<{ Params: UserParams }>,
+  req: FastifyRequest<{ Params: UserParams; Body: DeleteUserInput }>,
   reply: FastifyReply,
 ) {
   try {
     const { id } = req.params;
+    const { password } = req.body;
+    console.log(password)
 
     // Vérifier si l'utilisateur existe avant de le supprimer
     const existingUser = await req.server.prisma.user.findUnique({
@@ -121,6 +124,10 @@ export async function deleteUser(
 
     if (existingUser.role === "ADMIN") {
       return reply.code(403).send({ message: "Vous ne pouvez pas supprimer un utilisateur avec le rôle ADMIN" });
+    }
+
+    if (!existingUser.password || !(await bcrypt.compare(password, existingUser.password))) {
+      return reply.code(400).send({ message: "Mot de passe incorrect" });
     }
 
     // Send email notification before deletion (if user has email)
