@@ -103,12 +103,16 @@ export const useAccountStore = defineStore('account', () => {
         return true
     }
 
-    const deleteAccount = async () => {
+    const deleteAccount = async (password: string) => {
         if (!CurrentUser.value) {
             return false
         }
         try {
-            const response = await api.delete(`users/${CurrentUser.value.id}`);
+            const response = await api.delete(`users/${CurrentUser.value.id}`, {
+                json: {
+                    password,
+                },
+            });
             if (response.ok) {
                 await api.post('auth/logout')
                 isLoggedIn.value = false

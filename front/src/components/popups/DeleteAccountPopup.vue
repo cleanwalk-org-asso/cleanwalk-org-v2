@@ -1,31 +1,54 @@
 <script setup lang="ts">
+import BaseInput from '@/components/base/BaseInput.vue';
 import { useAccountStore } from '@/stores/AccountStore';
+import { useUtilsStore } from '@/stores/UtilsStore';
 import { X } from 'lucide-vue-next';
+import { ref } from 'vue';
+
 const accountStore = useAccountStore();
+const showToast = useUtilsStore().showToast;
+const confirmPassword = ref('');
 
 const deleteAccount = async () => {
-  const success = await accountStore.deleteAccount();
+  if (!confirmPassword.value) {
+    showToast('Veuillez confirmer votre mot de passe', false);
+    return;
+  }
+
+  const success = await accountStore.deleteAccount(confirmPassword.value);
   if (success) {
-    console.log('Account deleted successfully');
+    confirmPassword.value = '';
   } else {
-    console.error('Failed to delete account');
+    showToast('Mot de passe incorrect', false);
   }
 };
 
-defineProps({
+const onClose = () => {
+  confirmPassword.value = '';
+  props.togglePopup?.();
+};
+
+const props = defineProps({
   isVisible: Boolean,
   togglePopup: Function,
 });
 </script>
 
 <template>
-  <div v-if="isVisible" class="popup" @click="togglePopup!">
+  <div v-if="isVisible" class="popup" @click="onClose()">
     <div class="popup-content" @click.stop>
-      <div class="cross"><X @click="togglePopup!" /></div>
+      <div class="cross"><X @click="onClose()" /></div>
       <h2>Clôturer son compte</h2>
       <p>Êtes-vous certain de vouloir clôturer votre compte ? Cette action est irréversible et toutes vos données seront définitivement supprimées.</p>
-      <div class="btn-container">
-        <button @click="togglePopup!" class="cancel-button">Annuler</button>
+      <BaseInput
+        v-model="confirmPassword"
+        name="confirm-delete-password"
+        type="password"
+        label="Confirmez votre mot de passe"
+        placeholder="Votre mot de passe actuel"
+      />
+      <div class="btn-container mt-8!">
+        <button @click="onClose()" class="cancel-button">Annuler</button>
         <button @click="deleteAccount()" class="danger-button">Confirmer</button>
       </div>
     </div>
@@ -75,7 +98,7 @@ defineProps({
       font-style: normal;
       font-weight: 400;
       padding: 0 1rem;
-      margin-bottom: 3rem;
+      margin-bottom: 1rem;
     }
   }
   
