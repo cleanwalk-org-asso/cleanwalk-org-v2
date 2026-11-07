@@ -1,8 +1,8 @@
 -- Données de test pour une base de développement VIDE.
 --
--- À lancer après les migrations :
---   npx prisma migrate deploy
---   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f prisma/mock.sql
+-- Pour lancer (applique les migrations puis importe ce fichier) :
+--   npm run db:mock
+-- (ou : npx prisma migrate deploy && psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f prisma/mock.sql)
 --
 -- Ne pas utiliser en production : ce fichier crée un compte administrateur
 -- dont le mot de passe est partagé avec tous les comptes de test.

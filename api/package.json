@@ -9,7 +9,8 @@
     "start": "node dist/src/index.js",
     "dev": "tsx watch src/index.ts",
     "prisma:generate": "prisma generate",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "db:mock": "prisma migrate deploy && prisma db execute --file prisma/mock.sql"
   },
   "keywords": [],
   "author": "",
