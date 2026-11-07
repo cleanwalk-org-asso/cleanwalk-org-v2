@@ -1,3 +1,4 @@
+import { HTTPError } from 'ky'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { Ref } from 'vue'
@@ -76,21 +77,26 @@ export const useAccountStore = defineStore('account', () => {
     return response.ok
   }
 
-  const deleteAccount = async () => {
+  // L'API demande le mot de passe actuel et répond 400 s'il est faux.
+  const deleteAccount = async (password: string): Promise<'deleted' | 'wrong-password' | 'error'> => {
     if (!CurrentUser.value) {
-      return false
+      return 'error'
     }
     try {
-      await api.delete(`users/${CurrentUser.value.id}`)
-      await api.post('auth/logout')
+      await api.delete(`users/${CurrentUser.value.id}`, { json: { password } })
     } catch (error) {
+      if (error instanceof HTTPError && error.response.status === 400) {
+        return 'wrong-password'
+      }
       console.error('Error deleting account:', error)
-      return false
+      return 'error'
     }
+    // Le compte est supprimé : la déconnexion ne doit pas empêcher de quitter la session.
+    await api.post('auth/logout').catch(() => undefined)
     clearSession()
     sessionCheck = Promise.resolve(false)
     window.location.assign('/')
-    return true
+    return 'deleted'
   }
 
   return {
