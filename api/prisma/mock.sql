@@ -58,10 +58,10 @@ INSERT INTO "CleanwalkUser" ("userId", "cleanwalkId", "nbPerson", "isHost") VALU
   (4, 3, 1, FALSE),
   (5, 5, 1, FALSE);
 
-INSERT INTO "CleanwalkChatMessage" ("id", "cleanwalkId", "user", "text") VALUES
-  (1, 1, 'Les Mains Vertes', 'Bienvenue ! Rendez-vous à 10 h devant le pont.'),
-  (2, 1, 'Camille Test',     'Merci, nous serons deux.'),
-  (3, 3, 'Rivages Propres',  'Pensez à apporter de l''eau et une casquette.');
+INSERT INTO "CleanwalkChatMessage" ("id", "cleanwalkId", "userId", "user", "text") VALUES
+  (1, 1, 2, 'Les Mains Vertes', 'Bienvenue ! Rendez-vous à 10 h devant le pont.'),
+  (2, 1, 4, 'Camille Test',     'Merci, nous serons deux.'),
+  (3, 3, 3, 'Rivages Propres',  'Pensez à apporter de l''eau et une casquette.');
 
 INSERT INTO "Category" ("id", "category") VALUES
   (1, 'Conseils'),

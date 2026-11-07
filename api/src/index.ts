@@ -15,6 +15,7 @@ import cleanwalkRoutes from "./routes/cleanwalk.route.js";
 import { articleRoutes } from "./routes/article.route.js";
 import uploadRoutes from "./routes/upload.route.js";
 import s3Plugin from "./plugins/s3.js";
+import profanityPlugin from "./plugins/profanity.js";
 import dotenv from "dotenv";
 import oauthPlugin from '@fastify/oauth2';
 import adminRoutes from "./routes/admin.route.js";
@@ -47,6 +48,7 @@ server.register(cors, {
 
 server.register(multipart);
 server.register(prismaPlugin);
+server.register(profanityPlugin);
 server.register(swagger, {
   openapi: {
     info: {

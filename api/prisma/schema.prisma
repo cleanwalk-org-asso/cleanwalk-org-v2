@@ -28,6 +28,7 @@ model User {
   cleanwalks     CleanwalkUser[]
   organization   Organization?
   refreshTokens  RefreshToken[]
+  chatMessages   CleanwalkChatMessage[]
 }
 
 model Organization {
@@ -60,11 +61,15 @@ model Cleanwalk {
 model CleanwalkChatMessage {
   id           Int       @id @default(autoincrement())
   cleanwalkId  Int
+  // Nom et photo au moment de l'envoi, affichés si l'auteur n'existe plus.
   user         String
   text         String
   avatar       String?
+  // Vide pour les messages envoyés avant l'authentification du chat.
+  userId       Int?
   createdAt    DateTime  @default(now())
   cleanwalk    Cleanwalk @relation(fields: [cleanwalkId], references: [id], onDelete: Cascade)
+  author       User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
 model CleanwalkUser {
@@ -110,6 +115,21 @@ model CategoryArticle {
   category   Category @relation(fields: [categoryId], references: [id])
 
   @@id([categoryId, articleId])
+}
+
+// Mots et expressions du filtre du chat, en plus des dictionnaires de leo-profanity.
+// Gardés en base plutôt que dans le code pour ne pas publier la liste dans le dépôt.
+model ProfanityWord {
+  id        Int               @id @default(autoincrement())
+  // En minuscules. Avec une espace, c'est une expression de plusieurs mots.
+  value     String            @unique
+  kind      ProfanityWordKind
+  createdAt DateTime          @default(now())
+}
+
+enum ProfanityWordKind {
+  BLOCK // censuré
+  ALLOW // laissé tel quel même s'il est dans un dictionnaire
 }
 
 enum UserRole {
