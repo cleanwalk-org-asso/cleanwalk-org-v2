@@ -5,6 +5,9 @@ services:
       dockerfile: Dockerfile
     env_file:
       - ./api/.env
+    environment:
+      DATABASE_URL: postgresql://user:password@database:5432/mydb
+      REDIS_URL: redis://redis:6379
     depends_on:
       - database
       - redis
