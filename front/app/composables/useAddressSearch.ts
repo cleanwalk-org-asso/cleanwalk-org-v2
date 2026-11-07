@@ -1,3 +1,5 @@
+import { MAP_BOUNDS } from '@/services/mapBounds'
+
 export interface AddressSuggestion {
   place_id: number
   osm_id: number
@@ -53,6 +55,9 @@ export function useAddressSearch() {
         addressdetails: '1',
         limit: '5',
         countrycodes: 'fr,be',
+        // Écarte les DOM-TOM, que la carte ne montre pas.
+        viewbox: `${MAP_BOUNDS.west},${MAP_BOUNDS.north},${MAP_BOUNDS.east},${MAP_BOUNDS.south}`,
+        bounded: '1',
         q: text,
       })
       const response = await fetch(`${NOMINATIM_URL}/search?${params}`)

@@ -73,7 +73,11 @@ export default defineNuxtConfig({
         { property: 'og:type', content: 'website' },
         { property: 'og:url', content: 'https://cleanwalk.org' },
       ],
-      link: [{ rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }],
+      link: [
+        { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },
+        // Serveur des tuiles de la carte : la connexion est prête avant que MapLibre en ait besoin.
+        { rel: 'preconnect', href: 'https://tiles.openfreemap.org', crossorigin: '' },
+      ],
     },
   },
 

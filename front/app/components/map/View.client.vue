@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { Map as MapLibreMap, setWorkerUrl, type ExpressionSpecification } from 'maplibre-gl'
+import { LngLat, Map as MapLibreMap, setWorkerUrl, type ExpressionSpecification } from 'maplibre-gl'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
 import 'maplibre-gl/dist/maplibre-gl.css'
+import { MAP_BOUNDS } from '@/services/mapBounds'
 
 // MapLibre cherche son worker à côté de son propre fichier, qui n'y est plus une fois le code bundlé.
 setWorkerUrl(workerUrl)
 
-// Les zooms sont en unités MapLibre : un cran de moins que Leaflet pour la même vue.
-// maxZoom 17 correspond au zoom 18 de Leaflet.
+// Zoom maximal 17 : assez près pour lire le nom des rues.
 const props = withDefaults(defineProps<{ minZoom?: number; maxZoom?: number }>(), { minZoom: 4, maxZoom: 17 })
 const emit = defineEmits<{ ready: [map: MapLibreMap]; click: [] }>()
 
@@ -20,10 +20,27 @@ const MAP_STYLE = 'https://tiles.openfreemap.org/styles/liberty'
 const FRENCH_LABEL: ExpressionSpecification = ['coalesce', ['get', 'name:fr'], ['get', 'name:latin'], ['get', 'name']]
 
 const EPSILON = 1e-6
+// Si le premier rendu complet n'arrive pas (tuiles en erreur...), la carte s'affiche quand même.
+const REVEAL_TIMEOUT_MS = 6000
+
+const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
+
+// Le centre de la carte reste dans MAP_BOUNDS. maxBounds interdirait d'afficher quoi que ce soit hors de la zone,
+// ce qui forcerait un zoom plus fort sur grand écran. Remplacer la contrainte de MapLibre
+// remplace aussi son respect du zoom min/max, d'où le clamp du zoom.
+const constrainToBounds = (lngLat: LngLat, nextZoom: number) => ({
+  center: new LngLat(clamp(lngLat.lng, MAP_BOUNDS.west, MAP_BOUNDS.east), clamp(lngLat.lat, MAP_BOUNDS.south, MAP_BOUNDS.north)),
+  zoom: clamp(nextZoom, props.minZoom, props.maxZoom),
+})
 
 const container = ref<HTMLElement | null>(null)
 const map = shallowRef<MapLibreMap | null>(null)
 const unavailable = ref(false)
+// La carte reste masquée tant que MapLibre dessine les tuiles une à une.
+const loaded = ref(false)
+// Le fond de chargement est retiré une fois le fondu de la carte terminé, pour ne plus animer sous la carte.
+const faded = ref(false)
+let revealTimer: ReturnType<typeof setTimeout> | undefined
 
 provide(mapInjectionKey, map)
 
@@ -54,7 +71,8 @@ onMounted(async () => {
       zoom: zoom.value,
       minZoom: props.minZoom,
       maxZoom: props.maxZoom,
-      // Carte à plat et au nord, sans contrôle affiché, comme avec Leaflet.
+      transformConstrain: constrainToBounds,
+      // Carte à plat et orientée au nord, sans contrôle affiché.
       attributionControl: false,
       dragRotate: false,
       pitchWithRotate: false,
@@ -69,13 +87,23 @@ onMounted(async () => {
   }
 
   // Le style affiche les noms en anglais. Les numéros de route ne sont pas concernés.
+  // Les bâtiments en 3D sont retirés : ceux dessinés à plat (calque « building ») restent.
   instance.on('style.load', () => {
     for (const layer of instance.getStyle().layers) {
-      if (layer.type === 'symbol' && JSON.stringify(layer.layout?.['text-field'])?.includes('name')) {
+      if (layer.type === 'fill-extrusion') {
+        instance.removeLayer(layer.id)
+      } else if (layer.type === 'symbol' && JSON.stringify(layer.layout?.['text-field'])?.includes('name')) {
         instance.setLayoutProperty(layer.id, 'text-field', FRENCH_LABEL)
       }
     }
   })
+
+  const reveal = () => {
+    clearTimeout(revealTimer)
+    loaded.value = true
+  }
+  instance.once('load', reveal)
+  revealTimer = setTimeout(reveal, REVEAL_TIMEOUT_MS)
 
   instance.touchZoomRotate.disableRotation()
   instance.keyboard.disableRotation()
@@ -113,12 +141,28 @@ watch([() => props.minZoom, () => props.maxZoom], ([minZoom, maxZoom]) => {
 })
 
 // onUnmounted : les marqueurs enfants sont retirés avant la carte.
-onUnmounted(() => map.value?.remove())
+onUnmounted(() => {
+  clearTimeout(revealTimer)
+  map.value?.remove()
+})
 </script>
 
 <template>
   <div class="relative size-full">
-    <div ref="container" class="size-full" />
+    <div v-if="!faded" class="absolute inset-0 flex items-center justify-center bg-base-200">
+      <div v-if="!unavailable" role="status" class="flex flex-col items-center text-primary">
+        <IconMapPin :size="36" class="animate-bounce motion-reduce:animate-none" aria-hidden="true" />
+        <span class="h-1.5 w-6 animate-pulse rounded-full bg-primary/20 motion-reduce:animate-none" aria-hidden="true" />
+        <span class="mt-3 text-sm font-medium text-muted">Chargement de la carte…</span>
+      </div>
+    </div>
+    <!-- La carte passe au-dessus du fond de chargement (relative, après lui) et le recouvre en fondu. -->
+    <div
+      ref="container"
+      class="relative size-full transition-opacity duration-500 motion-reduce:transition-none"
+      :class="loaded ? 'opacity-100' : 'opacity-0'"
+      @transitionend.self="faded = loaded"
+    />
     <p v-if="unavailable" class="absolute inset-0 flex items-center justify-center p-4 text-center text-muted">
       La carte ne peut pas s'afficher sur cet appareil.
     </p>

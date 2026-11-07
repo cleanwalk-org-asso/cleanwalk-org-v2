@@ -16,6 +16,8 @@ icon.width = 25
 icon.height = 41
 icon.alt = ''
 icon.draggable = false
+// drop-shadow suit la forme du pin, là où box-shadow dessinerait un rectangle.
+icon.className = 'drop-shadow-[0_2px_2px_rgb(0_0_0/0.35)]'
 
 const button = document.createElement('button')
 button.type = 'button'
