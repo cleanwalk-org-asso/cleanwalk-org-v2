@@ -4,7 +4,7 @@
 .output
 .data
 node_modules
-.env
+# .env reste dans le contexte : le build y lit l'adresse de l'API. L'image finale ne garde que .output.
 .env.*
 !.env.example
 *.log

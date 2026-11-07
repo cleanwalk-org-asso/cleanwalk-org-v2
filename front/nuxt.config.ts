@@ -51,7 +51,10 @@ export default defineNuxtConfig({
     // Adresse utilisée par le serveur Nuxt pour joindre l'API. Vide : même adresse que le navigateur.
     apiInternalUrl: '',
     public: {
-      apiUrl: 'http://127.0.0.1:8080',
+      // Valeur intégrée au build, lue dans front/.env (écrit par les workflows de déploiement).
+      // NUXT_PUBLIC_API_URL la remplace aussi au lancement du serveur.
+      // VITE_API_URL : nom utilisé par l'ancien front, gardé tant que les secrets ENVFRONT n'ont pas été renommés.
+      apiUrl: process.env.NUXT_PUBLIC_API_URL || process.env.VITE_API_URL || 'http://127.0.0.1:8080',
     },
   },
 
