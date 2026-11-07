@@ -42,3 +42,7 @@ lerna-debug.log*
 /letsencrypt
 
 pyrightconfig.json
+
+# Claude Code
+.claude
+CLAUDE.md
