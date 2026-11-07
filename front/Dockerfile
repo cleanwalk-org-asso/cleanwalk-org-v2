@@ -1,11 +1,13 @@
-FROM node:24 as build-stage
+FROM node:24-slim AS build
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY ./ .
+COPY . .
+RUN npm ci
 RUN npm run build
 
-FROM nginx as production-stage
-RUN mkdir /app
-COPY --from=build-stage /app/dist /app
-COPY nginx.conf /etc/nginx/nginx.conf
+FROM node:24-slim
+WORKDIR /app
+ENV NODE_ENV=production HOST=0.0.0.0 PORT=80
+COPY --from=build /app/.output ./.output
+USER node
+EXPOSE 80
+CMD ["node", ".output/server/index.mjs"]
