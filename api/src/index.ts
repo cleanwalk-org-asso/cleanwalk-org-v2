@@ -78,7 +78,7 @@ server.register(oauthPlugin, {
 
 server.decorate('config', {
   isProduction: process.env.NODE_ENV === 'production',
-  FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:5173',
+  FRONTEND_URL: process.env.FRONTEND_URL || 'http://127.0.0.1:3000',
   SMTP_SECURE: process.env.SMTP_SECURE === 'true',
 });
 

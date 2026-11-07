@@ -6,6 +6,12 @@ const clientOnly = { ssr: false }
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+
+  // Même hôte que l'API (127.0.0.1:8080) : sinon les cookies de session en sameSite strict ne sont pas envoyés.
+  devServer: {
+    host: '127.0.0.1',
+    port: 3000,
+  },
   css: ['~/assets/css/main.css'],
 
   vite: {
