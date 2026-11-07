@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { v4 as uuidv4 } from 'uuid'
 import type { Association } from '@/interfaces/userInterface'
 import { getApiErrorMessage } from '@/services/apiError'
 
@@ -12,7 +11,7 @@ const { showToast } = useUtilsStore()
 const association = ref<Association>()
 const name = ref(user.value?.name ?? '')
 const description = ref('')
-const picture = ref(user.value?.profilePicture)
+const avatarEditorOpen = ref(false)
 
 const timers = new Map<string, ReturnType<typeof setTimeout>>()
 
@@ -75,21 +74,6 @@ watch(description, (value) => {
     'Erreur lors de la modification de la description',
   )
 })
-
-const changePicture = () => {
-  const url = `https://api.dicebear.com/8.x/fun-emoji/svg?seed=${uuidv4()}`
-  picture.value = url
-
-  saveLater(
-    'picture',
-    async () => {
-      await accountStore.modifyUser(user.value!.id!, undefined, url)
-      user.value!.profilePicture = url
-      showToast('Votre photo de profil a été modifiée', true)
-    },
-    'Erreur lors de la modification de la photo',
-  )
-}
 </script>
 
 <template>
@@ -97,16 +81,14 @@ const changePicture = () => {
     <AccountAssoImages v-if="association" :association="association" />
 
     <div v-if="user?.role !== 'ASSOCIATION'" class="relative mt-10 flex flex-col items-center justify-center">
-      <BaseAvatar :src="picture" alt="cover-img" class="size-24" />
-      <button
-        type="button"
-        class="absolute right-0 bottom-0 flex size-6.5 items-center justify-center rounded-full bg-brand text-on-brand transition-transform duration-200 active:-rotate-180"
-        aria-label="Changer de photo de profil"
-        @click="changePicture"
-      >
-        <IconRefreshCcw :size="20" />
+      <button type="button" class="relative rounded-full" aria-label="Personnaliser mon avatar" @click="avatarEditorOpen = true">
+        <BaseAvatar :src="user?.profilePicture" alt="Photo de profil" class="size-24" />
+        <span class="absolute right-0 bottom-0 flex size-7 items-center justify-center rounded-full bg-brand text-on-brand ring-2 ring-base-100">
+          <IconPencil :size="15" />
+        </span>
       </button>
     </div>
+    <LazyAccountAvatarEditor v-if="user?.role !== 'ASSOCIATION'" v-model:open="avatarEditorOpen" />
 
     <div class="w-full px-[2.45rem] pt-4 pb-8">
       <h3 class="mb-4">{{ user?.email }}</h3>

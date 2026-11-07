@@ -12,6 +12,8 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@dicebear/core": "^9.4.3",
+    "@dicebear/fun-emoji": "^9.4.2",
     "@nuxt/eslint": "^1.15.1",
     "@nuxt/fonts": "^0.14.0",
     "@nuxtjs/color-mode": "^3.5.2",
