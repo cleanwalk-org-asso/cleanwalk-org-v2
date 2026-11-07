@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Map as MapLibreMap, setWorkerUrl } from 'maplibre-gl'
+import { Map as MapLibreMap, setWorkerUrl, type ExpressionSpecification } from 'maplibre-gl'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
 import 'maplibre-gl/dist/maplibre-gl.css'
 
@@ -17,7 +17,7 @@ const zoom = defineModel<number>('zoom', { required: true })
 
 // Tuiles vectorielles OpenFreeMap (données OpenStreetMap), sans clé d'API.
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/liberty'
-const FRENCH_LABEL = ['coalesce', ['get', 'name:fr'], ['get', 'name:latin'], ['get', 'name']]
+const FRENCH_LABEL: ExpressionSpecification = ['coalesce', ['get', 'name:fr'], ['get', 'name:latin'], ['get', 'name']]
 
 const EPSILON = 1e-6
 
