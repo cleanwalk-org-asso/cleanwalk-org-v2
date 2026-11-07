@@ -46,13 +46,13 @@ docker compose down
 
 <div style="color:#f1c232">⚠️ Tips : with docker Adminer is launched on port :8080 </div>
 
-**Frontend ->**
-- go in **api** Directory -> `cd api`
+**Frontend (Nuxt) ->**
+- go in **front** Directory -> `cd front`
 - install
 ```bash
 npm install
 ```
-- run on port 5173
+- run on port 3000
 ```bash
 npm run dev
 ```
