@@ -15,8 +15,14 @@ export const CreateProfanityWordSchema = Type.Object({
   kind: ProfanityWordKindSchema,
 });
 
+// Aperçu du filtre : le texte tel que le chat l'afficherait
+export const TestProfanitySchema = Type.Object({
+  text: Type.String({ minLength: 1, maxLength: 1000 }),
+});
+
 export const ProfanityWordParamsSchema = Type.Object({
   id: Type.Integer(),
 });
 
 export type CreateProfanityWordInput = Static<typeof CreateProfanityWordSchema>;
+export type TestProfanityInput = Static<typeof TestProfanitySchema>;

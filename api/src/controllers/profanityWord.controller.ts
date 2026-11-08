@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { Prisma } from "@prisma/client";
 import { normalizeProfanityValue } from "../plugins/profanity.js";
-import { CreateProfanityWordInput } from "../schemas/profanityWord.schema.js";
+import { CreateProfanityWordInput, TestProfanityInput } from "../schemas/profanityWord.schema.js";
 
 const isPrismaError = (err: unknown, code: string) =>
   err instanceof Prisma.PrismaClientKnownRequestError && err.code === code;
@@ -48,4 +48,8 @@ export async function deleteProfanityWord(
     }
     throw err;
   }
+}
+
+export async function testProfanity(req: FastifyRequest<{ Body: TestProfanityInput }>, reply: FastifyReply) {
+  reply.send({ censored: req.server.profanity.censor(req.body.text) });
 }
