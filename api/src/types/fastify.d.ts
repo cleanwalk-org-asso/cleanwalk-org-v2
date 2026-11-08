@@ -13,8 +13,10 @@ declare module "fastify" {
   
   interface FastifyInstance {
     authenticate: any;
+    authenticateUserOrAdmin: any;
     authorizeUser: any;
     requireAdmin: any;
+    verifyAdmin: (req: FastifyRequest) => Promise<boolean>;
     getUserId: (req: FastifyRequest, reply: FastifyReply) => Promise<string>;
   }
 }

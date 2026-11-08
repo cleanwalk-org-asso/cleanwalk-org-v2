@@ -11,5 +11,5 @@ export default async function userRoutes(app: FastifyInstance) {
 
   app.get("/:id", getAssociationById);
 
-  app.put("/:id", updateAssociation);
+  app.put("/:id", { preHandler: [app.authorizeUser] }, updateAssociation);
 }

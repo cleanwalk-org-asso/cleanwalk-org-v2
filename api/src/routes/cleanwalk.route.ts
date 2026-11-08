@@ -12,7 +12,8 @@ import {
   joinCleanwalk,
   updateCleanwalk,
   deleteCleanwalk,
-  leaveCleanwalk
+  leaveCleanwalk,
+  requireHostOrAdmin
 } from "../controllers/cleanwalk.controller.js";
 import {
   CleanwalkSchema,
@@ -85,6 +86,7 @@ export default async function cleanwalkRoutes(fastify: FastifyInstance) {
   });
 
   fastify.post("", {
+    preHandler: [fastify.authenticate],
     schema: {
       body: CreateCleanwalkSchema,
       response: { 201: Type.Object({ message: Type.String() }) },
@@ -93,6 +95,7 @@ export default async function cleanwalkRoutes(fastify: FastifyInstance) {
   });
 
   fastify.post("/join", {
+    preHandler: [fastify.authenticate],
     schema: {
       body: Type.Object({ cleanwalk_id: Type.Integer(), user_id: Type.Integer(), nb_person: Type.Integer() }),
       response: { 201: Type.Object({ message: Type.String() }) },
@@ -101,6 +104,7 @@ export default async function cleanwalkRoutes(fastify: FastifyInstance) {
   });
 
   fastify.put("/:cleanwalkId", {
+    preHandler: [requireHostOrAdmin],
     schema: {
       params: Type.Object({ cleanwalkId: Type.Integer() }),
       body: UpdateCleanwalkSchema,
@@ -110,6 +114,7 @@ export default async function cleanwalkRoutes(fastify: FastifyInstance) {
   });
 
   fastify.delete("/:cleanwalkId", {
+    preHandler: [requireHostOrAdmin],
     schema: {
       params: Type.Object({ cleanwalkId: Type.Integer() }),
       response: { 200: Type.Object({ message: Type.String() }), 404: Type.Object({ message: Type.String() }) },
@@ -118,6 +123,7 @@ export default async function cleanwalkRoutes(fastify: FastifyInstance) {
   });
 
   fastify.delete("/leave", {
+    preHandler: [fastify.authenticate],
     schema: {
       body: Type.Object({ cleanwalk_id: Type.Integer(), user_id: Type.Integer() }),
       response: { 200: Type.Object({ message: Type.String() }), 404: Type.Object({ message: Type.String() }) },

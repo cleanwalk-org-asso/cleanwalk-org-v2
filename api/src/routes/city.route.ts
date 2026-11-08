@@ -20,6 +20,7 @@ export default async function cityRoutes(fastify: FastifyInstance) {
   });
 
   fastify.post("", {
+    preHandler: [fastify.requireAdmin],
     schema: {
       body: CreateCitySchema,
       response: { 201: Type.Object({ message: Type.String(), city: CitySchema }) },
@@ -28,6 +29,7 @@ export default async function cityRoutes(fastify: FastifyInstance) {
   });
 
   fastify.put("/:cityId", {
+    preHandler: [fastify.requireAdmin],
     schema: {
       params: Type.Object({ cityId: Type.Integer() }),
       body: UpdateCitySchema,
@@ -37,6 +39,7 @@ export default async function cityRoutes(fastify: FastifyInstance) {
   });
 
   fastify.delete("/:cityId", {
+    preHandler: [fastify.requireAdmin],
     schema: {
       params: Type.Object({ cityId: Type.Integer() }),
       response: { 200: Type.Object({ message: Type.String() }), 404: Type.Object({ message: Type.String() }) },

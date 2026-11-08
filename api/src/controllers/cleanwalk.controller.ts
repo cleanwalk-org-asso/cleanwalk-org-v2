@@ -1,5 +1,6 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { Static } from "@sinclair/typebox";
+import type { Prisma } from "@prisma/client";
 import { CreateCleanwalkSchema, UpdateCleanwalkSchema } from "../schemas/cleanwalk.schema.js";
 
 export async function getCleanwalkById(req: FastifyRequest<{ Params: { cleanwalkId: number } }>, reply: FastifyReply) {
@@ -378,7 +379,7 @@ export async function createCleanwalk(req: FastifyRequest, reply: FastifyReply) 
     await prisma.cleanwalkUser.create({
         data: {
             cleanwalkId: newCleanwalk.id,
-            userId: data.user_id,
+            userId: req.user!.id,
             nbPerson: 1,
             isHost: true
         }
@@ -392,7 +393,7 @@ export async function joinCleanwalk(req: FastifyRequest, reply: FastifyReply) {
     await prisma.cleanwalkUser.create({
         data: {
             cleanwalkId: data.cleanwalk_id,
-            userId: data.user_id,
+            userId: req.user!.id,
             nbPerson: data.nb_person,
             isHost: false
         }
@@ -413,15 +414,44 @@ export async function updateCleanwalk(req: FastifyRequest, reply: FastifyReply) 
         }
         cityId = city.id;
     }
-    const updateData: any = { ...data };
-    if (updateData.participant_count_public !== undefined) {
-        updateData.participantCountPublic = updateData.participant_count_public;
-    }
-    if (cityId) updateData.city_id = cityId;
-    delete updateData.city;
-    delete updateData.participant_count_public;
+    // Liste blanche : le schéma n'interdit pas les champs en plus, qui partaient tels quels
+    // vers Prisma (relations imbriquées comprises). Le front et l'admin envoient du camelCase.
+    const body = req.body as Record<string, any>;
+    const updateData: Prisma.CleanwalkUncheckedUpdateInput = {
+        name: data.name,
+        posLat: body.posLat ?? data.pos_lat,
+        posLong: body.posLong ?? data.pos_long,
+        dateBegin: body.dateBegin ?? data.date_begin,
+        duration: data.duration,
+        description: data.description,
+        address: data.address,
+        imgUrl: body.imgUrl ?? data.img_url,
+        participantCountPublic: body.participantCountPublic ?? data.participant_count_public,
+        cityId,
+    };
     await prisma.cleanwalk.update({ where: { id: cleanwalkId }, data: updateData });
     reply.send({ message: "Cleanwalk updated successfully" });
+}
+
+// preHandler : seul l'organisateur de la cleanwalk ou un admin peut la modifier / supprimer
+export async function requireHostOrAdmin(req: FastifyRequest, reply: FastifyReply) {
+    if (await req.server.verifyAdmin(req)) return;
+
+    try {
+        await req.userJwtVerify();
+    } catch (_) {
+        return reply.code(401).send({ message: "Unauthorized" });
+    }
+
+    const cleanwalkId = Number((req.params as { cleanwalkId: number }).cleanwalkId);
+    const participation = await req.server.prisma.cleanwalkUser.findUnique({
+        where: { userId_cleanwalkId: { userId: req.user!.id, cleanwalkId } },
+        select: { isHost: true },
+    });
+
+    if (!participation?.isHost) {
+        return reply.code(403).send({ message: "Forbidden" });
+    }
 }
 
 export async function deleteCleanwalk(req: FastifyRequest<{ Params: { cleanwalkId: number } }>, reply: FastifyReply) {
@@ -444,8 +474,8 @@ export async function deleteCleanwalk(req: FastifyRequest<{ Params: { cleanwalkI
 }
 
 export async function leaveCleanwalk(req: FastifyRequest, reply: FastifyReply) {
-    const data = req.body as { cleanwalk_id: number; user_id: number };
+    const data = req.body as { cleanwalk_id: number };
     const prisma = req.server.prisma;
-    await prisma.cleanwalkUser.deleteMany({ where: { cleanwalkId: data.cleanwalk_id, userId: data.user_id } });
+    await prisma.cleanwalkUser.deleteMany({ where: { cleanwalkId: data.cleanwalk_id, userId: req.user!.id } });
     reply.send({ message: "User removed from the cleanwalk successfully" });
 }

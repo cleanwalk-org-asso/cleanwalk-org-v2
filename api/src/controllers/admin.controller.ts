@@ -83,6 +83,11 @@ export async function getAdmin(req: FastifyRequest, reply: FastifyReply) {
       return reply.code(404).send({ message: "Utilisateur non trouvé" });
     }
 
+    // Le rôle en base fait foi : un compte rétrogradé perd l'accès même avec un token valide
+    if (user.role !== "ADMIN") {
+      return reply.code(401).send({ message: "Unauthorized" });
+    }
+
     return reply.send(user);
   } catch {
     return reply.code(401).send({ message: "Unauthorized" });
