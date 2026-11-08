@@ -2,11 +2,12 @@ import { FastifyInstance } from "fastify";
 import { getAdmin, loginAdmin, logoutUser } from "../controllers/admin.controller.js";
 import { LoginSchema } from "../schemas/auth.schema.js";
 import { Type } from "@sinclair/typebox";
-import { createProfanityWord, deleteProfanityWord, getProfanityWords } from "../controllers/profanityWord.controller.js";
+import { createProfanityWord, deleteProfanityWord, getProfanityWords, testProfanity } from "../controllers/profanityWord.controller.js";
 import {
   CreateProfanityWordSchema,
   ProfanityWordParamsSchema,
   ProfanityWordSchema,
+  TestProfanitySchema,
 } from "../schemas/profanityWord.schema.js";
 
 const MessageSchema = Type.Object({ message: Type.String() });
@@ -52,6 +53,12 @@ export default async function authRoutes(app: FastifyInstance) {
       },
     },
     handler: createProfanityWord,
+  });
+
+  app.post("/profanity-words/test", {
+    preHandler: [app.requireAdmin],
+    schema: { body: TestProfanitySchema, response: { 200: Type.Object({ censored: Type.String() }) } },
+    handler: testProfanity,
   });
 
   app.delete("/profanity-words/:id", {
