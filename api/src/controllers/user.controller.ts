@@ -71,7 +71,9 @@ export async function updateUser(
 ) {
   try {
     const { id } = req.params;
-    const updateData = req.body;
+    // Liste blanche : le schéma n'interdit pas les champs en plus (ex. role, password)
+    const { name, email, profilePicture } = req.body;
+    const updateData = { name, email, profilePicture };
 
     // Vérifier si l'utilisateur existe avant de le mettre à jour
     const existingUser = await req.server.prisma.user.findUnique({

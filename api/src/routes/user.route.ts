@@ -11,6 +11,7 @@ import {
 
 export default async function userRoutes(app: FastifyInstance) {
   app.get("", {
+    preHandler: [app.requireAdmin],
     schema: {
       response: {
         200: UsersResponseSchema,
@@ -32,6 +33,7 @@ export default async function userRoutes(app: FastifyInstance) {
   }, getUserById);
 
   app.put("/:id", {
+    preHandler: [app.authorizeUser],
     schema: {
       params: UserParamsSchema,
       body: UpdateUserSchema,
