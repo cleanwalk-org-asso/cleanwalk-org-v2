@@ -63,6 +63,14 @@ server.register(swaggerUi, {
 server.register(jwtPlugin);
 server.register(loggingPlugin);
 
+// Masque de la doc Swagger les routes /admin et celles réservées aux admins
+server.addHook("onRoute", (route) => {
+  const preHandlers = [route.preHandler].flat() as unknown[];
+  if (route.url.startsWith("/admin") || preHandlers.includes(server.requireAdmin)) {
+    route.schema = { ...route.schema, hide: true };
+  }
+});
+
 server.register(oauthPlugin, {
   name: 'googleOAuth2',
   scope: ['email', 'profile'],
