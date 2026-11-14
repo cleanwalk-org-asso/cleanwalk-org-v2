@@ -1,0 +1,63 @@
+name: Rollback production
+
+# Rollback manuel de la prod (Actions > Rollback production > Run workflow) :
+# repointe `latest` sur les images d'une version déjà publiée (aucun rebuild),
+# puis redéploie la prod.
+#
+# Seules les versions taguées depuis la mise en place de ci-cd.yml ont des
+# images frontend:vX.Y.Z / api:vX.Y.Z dans le registre.
+#
+# Attention : les migrations Prisma ne sont pas annulées. Si la version
+# fautive a modifié le schéma, l'ancienne API tourne sur le nouveau schéma ;
+# restaurer au besoin le backup pre-deploy pris juste avant.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version vers laquelle revenir (ex. v1.2.3)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  REGISTRY: ghcr.io/cleanwalk-org-asso/cleanwalk-org-v2
+
+jobs:
+  retag-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Vérifier le format de la version
+        run: |
+          if [[ ! "${{ inputs.version }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Version invalide : attendu au format vX.Y.Z"
+            exit 1
+          fi
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.ghrcUser }}
+          password: ${{ secrets.ghrcToken }}
+
+      # Vérifie les deux images avant de toucher à `latest`, pour ne pas
+      # laisser le front et l'API sur deux versions différentes.
+      - name: Vérifier que la version existe dans le registre
+        run: |
+          for image in frontend api; do
+            docker buildx imagetools inspect "$REGISTRY/$image:${{ inputs.version }}" > /dev/null
+          done
+
+      - name: Repointer latest sur ${{ inputs.version }}
+        run: |
+          for image in frontend api; do
+            docker buildx imagetools create -t "$REGISTRY/$image:latest" "$REGISTRY/$image:${{ inputs.version }}"
+          done
+
+  deploy-production:
+    needs: retag-images
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: production
+    secrets: inherit

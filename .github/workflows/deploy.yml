@@ -1,99 +1,71 @@
-name: Deploy Prod
+name: Deploy (réutilisable)
 
-# WORKFLOW SETUP : 
-# 1 : Generate token (write:packages, delete:packages)
-# 2 : Add secret ['secrets.SERVER_HOST','secrets.SERVER_USER','secrets.SERVER_SSH_KEY','secrets.SERVER_PORT',"ghrcToken","ghrcUser"]
-# 3 : Replace 'git pull origin main' with 'git pull origin release' during the rebuild phase
-# 4 : Change the push branch name to 'main"
+# Appelé par ci-cd.yml (recette sur main, prod sur tag) et rollback.yml.
+# Sur le serveur, le dossier de setup (compose.yml + .env) est un clone git :
+# on le met à jour, on sauvegarde la base, puis on tire les images `latest`
+# (`frontend-recette`/`api-recette` en recette, `frontend`/`api` en prod)
+# et on relance les conteneurs.
+#
+# Secrets requis :
+#   SERVER_HOST / SERVER_USER / SERVER_SSH_KEY / SERVER_PORT                 --> prod
+#   SERVER_HOST_DEV / SERVER_USER_DEV / SERVER_SSH_KEY_DEV / SERVER_PORT_DEV --> recette
+#   ghrcToken / ghrcUser --> PAT pour tirer les images de ghcr.io
 
 on:
-  push:
-    branches:
-      - main
+  workflow_call:
+    inputs:
+      environment:
+        description: "recette ou production"
+        required: true
+        type: string
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      # Fix uppercase issues with URLs
-      - name: UPPER to lower
-        run: |
-          echo "ACTOR_LOWER=$(echo '${{ github.actor }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-          echo "REPO_LOWER=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-
-      # Track updates on API & front
-      - name: Set up Git for checking changes
-        run: git fetch --prune --unshallow
-
-      - name: Check if front has changed
-        id: check_frontend
-        run: |
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^front/'; then
-            echo "FRONTEND_CHANGED=true" >> $GITHUB_ENV
-          else
-            echo "FRONTEND_CHANGED=false" >> $GITHUB_ENV
-          fi
-
-      - name: Check if api has changed
-        id: check_api
-        run: |
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^api/'; then
-            echo "API_CHANGED=true" >> $GITHUB_ENV
-          else
-            echo "API_CHANGED=false" >> $GITHUB_ENV
-          fi
-
-      # Stop if no changes were made
-      - name: Stop if no changes were made to front or api
-        run: |
-          if [[ "$FRONTEND_CHANGED" == "false" && "$API_CHANGED" == "false" ]]; then
-            echo "Aucun changement dans frontend ou API, arrêt du workflow."
-            exit 0
-          fi
-
-      - name: Login
-        run: echo "${{ secrets.ghrcToken }}" | docker login ghcr.io -u ${{ secrets.ghrcUser }} --password-stdin
-
-
-      # SECRET FRONT (mv .env.exemple .env + add .ENVFRONT to .env)
-      - name: Build Front
-        if: env.FRONTEND_CHANGED == 'true'
-        run: |
-          touch ./front/.env
-          echo "${{ secrets.ENVFRONT }}" | tee -a ./front/.env > /dev/null
-          docker build -f ./front/Dockerfile -t ghcr.io/${{ env.REPO_LOWER }}/frontend:latest ./front
-          docker push ghcr.io/${{ env.REPO_LOWER }}/frontend:latest
-
-      - name: Build API
-        if: env.API_CHANGED == 'true'
-        run: |
-          docker build -f ./api/Dockerfile -t ghcr.io/${{ env.REPO_LOWER }}/api:latest ./api
-          docker push ghcr.io/${{ env.REPO_LOWER }}/api:latest
-
   deploy:
-    needs: build
     runs-on: ubuntu-latest
-
-
-    # Rebuild without downtime, only if changes were made + remove unused images
+    environment: ${{ inputs.environment }}
+    # Un seul déploiement à la fois par environnement (tag + rollback simultanés par ex.).
+    concurrency:
+      group: deploy-${{ inputs.environment }}
+      cancel-in-progress: false
     steps:
-      - name: Deploy on Server
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          port: ${{ secrets.SERVER_PORT}}
-          script: |
-            cd /home/$(whoami)/cleanwalk-v2/setup-production
-            docker compose run --rm -e BACKUP_PREFIX=backups/pre-deploy db_backup
-            pwd
-            echo "${{ secrets.ghrcToken }}" | docker login ghcr.io -u ${{ secrets.ghrcUser }} --password-stdin
-            git pull origin main
-            docker compose -f compose.yml pull
-            docker compose -f compose.yml up -d --remove-orphans
-            docker image prune -f
+      - name: Vérifier l'environnement
+        run: |
+          case "${{ inputs.environment }}" in
+            recette|production) ;;
+            *) echo "Environnement inconnu : ${{ inputs.environment }}"; exit 1 ;;
+          esac
+
+      - name: Préparer la connexion SSH
+        env:
+          SSH_KEY: ${{ inputs.environment == 'production' && secrets.SERVER_SSH_KEY || secrets.SERVER_SSH_KEY_DEV }}
+          HOST: ${{ inputs.environment == 'production' && secrets.SERVER_HOST || secrets.SERVER_HOST_DEV }}
+          PORT: ${{ inputs.environment == 'production' && secrets.SERVER_PORT || secrets.SERVER_PORT_DEV }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -p "${PORT:-22}" -H "$HOST" >> ~/.ssh/known_hosts
+
+      - name: Déployer
+        env:
+          HOST: ${{ inputs.environment == 'production' && secrets.SERVER_HOST || secrets.SERVER_HOST_DEV }}
+          USER: ${{ inputs.environment == 'production' && secrets.SERVER_USER || secrets.SERVER_USER_DEV }}
+          PORT: ${{ inputs.environment == 'production' && secrets.SERVER_PORT || secrets.SERVER_PORT_DEV }}
+          SETUP_DIR: ${{ inputs.environment == 'production' && 'cleanwalk-v2/setup-production' || 'setup-production' }}
+          SETUP_BRANCH: ${{ inputs.environment == 'production' && 'main' || 'recette' }}
+          GHCR_USER: ${{ secrets.ghrcUser }}
+          GHCR_TOKEN: ${{ secrets.ghrcToken }}
+        # Le script passe par stdin (bash -s) : le token n'apparaît pas dans
+        # la ligne de commande du serveur.
+        run: |
+          ssh -i ~/.ssh/id_deploy -p "${PORT:-22}" "$USER@$HOST" bash -s <<EOF
+          set -euo pipefail
+          cd "\$HOME/$SETUP_DIR"
+          docker compose run --rm -e BACKUP_PREFIX=backups/pre-deploy db_backup
+          git pull origin "$SETUP_BRANCH"
+          echo '$GHCR_TOKEN' | docker login ghcr.io -u '$GHCR_USER' --password-stdin
+          trap 'docker logout ghcr.io' EXIT
+          docker compose -f compose.yml pull
+          docker compose -f compose.yml up -d --remove-orphans
+          docker image prune -f
+          EOF

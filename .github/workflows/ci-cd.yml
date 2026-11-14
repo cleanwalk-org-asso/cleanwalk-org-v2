@@ -1,0 +1,190 @@
+name: CI/CD
+
+# - pull_request      -> checks (lint, build, scan Trivy)
+# - push sur main     -> build des images + déploiement en recette
+# - tag vX.Y.Z        -> promotion des images du commit tagué + déploiement en prod
+#
+# Secrets requis :
+#   ghrcToken / ghrcUser   --> PAT (write:packages, delete:packages) pour ghcr.io
+#   ENVFRONT / ENVFRONT_DEV --> contenu du front/.env (prod / recette), intégré au build
+#   + ceux de deploy.yml (SSH prod et recette)
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-cd-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  REGISTRY: ghcr.io/cleanwalk-org-asso/cleanwalk-org-v2
+
+jobs:
+  # ---------------------------------------------------------------------
+  # CHECKS — uniquement sur les pull requests.
+  # front/ et api/ sont deux projets Node indépendants : une matrice,
+  # chaque appli dans son dossier, avec la version de Node de son Dockerfile.
+  # L'API n'a pas encore de tests (`npm test` échoue volontairement) :
+  # on vérifie seulement qu'elle compile.
+  # ---------------------------------------------------------------------
+  checks:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app: front
+            node: "24"
+            run: npm run lint && npm run build
+          - app: api
+            node: "22"
+            run: DATABASE_URL=none npx prisma generate && npm run build
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: ${{ matrix.app }}/package-lock.json
+      - working-directory: ${{ matrix.app }}
+        run: npm ci
+      - working-directory: ${{ matrix.app }}
+        run: ${{ matrix.run }}
+
+  # Dépendances npm vulnérables, secrets, mauvaises configs.
+  # Échoue uniquement sur les failles CRITICAL avec un correctif disponible.
+  trivy-scan-repo:
+    needs: checks
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Scan du dépôt (Trivy)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: 1
+
+  # ---------------------------------------------------------------------
+  # PACKAGE — à chaque push sur main, toujours (pas de détection de
+  # changements) : chaque commit de main doit avoir ses images taguées
+  # avec son SHA pour pouvoir être promu en prod par un tag.
+  #
+  # L'API est la même image partout (sa config est lue au lancement,
+  # dans le .env du serveur). Le front, lui, intègre l'URL de l'API au
+  # build (front/.env) et le robots.txt : il faut une image par environnement.
+  # ---------------------------------------------------------------------
+  build-api:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.ghrcUser }}
+          password: ${{ secrets.ghrcToken }}
+      - uses: docker/build-push-action@v7
+        with:
+          context: ./api
+          file: api/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/api:${{ github.sha }}
+            ${{ env.REGISTRY }}/api-recette:latest
+
+  build-front:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - target: recette
+            image: frontend-recette
+          - target: production
+            image: frontend
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Écrire front/.env
+        env:
+          ENVFRONT: ${{ matrix.target == 'production' && secrets.ENVFRONT || secrets.ENVFRONT_DEV }}
+        run: printf '%s\n' "$ENVFRONT" > front/.env
+
+      - name: Bloquer l'indexation de la recette
+        if: matrix.target == 'recette'
+        run: |
+          printf 'User-agent: *\nDisallow: /\n' > front/public/robots.txt
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.ghrcUser }}
+          password: ${{ secrets.ghrcToken }}
+
+      # Recette : déployée tout de suite, donc taguée latest.
+      # Prod : seulement le SHA, `latest` n'est posé qu'au tag de version.
+      - uses: docker/build-push-action@v7
+        with:
+          context: ./front
+          file: front/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ matrix.image }}:${{ github.sha }}
+            ${{ matrix.target == 'recette' && format('{0}/{1}:latest', env.REGISTRY, matrix.image) || '' }}
+
+  # ---------------------------------------------------------------------
+  # PROMOTE — sur un tag vX.Y.Z, pas de rebuild : les images prod du
+  # commit tagué existent déjà (frontend:<sha>, api:<sha>). On leur ajoute
+  # le tag de version et `latest`, que tire le compose de prod.
+  # Si le commit n'est pas passé par main, les images n'existent pas et
+  # le job échoue : seul un commit de main peut partir en prod.
+  # ---------------------------------------------------------------------
+  promote-images:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: [frontend, api]
+    steps:
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.ghrcUser }}
+          password: ${{ secrets.ghrcToken }}
+      - name: Taguer ${{ matrix.image }}:${{ github.sha }} en ${{ github.ref_name }} et latest
+        run: |
+          docker buildx imagetools create \
+            -t ${{ env.REGISTRY }}/${{ matrix.image }}:${{ github.ref_name }} \
+            -t ${{ env.REGISTRY }}/${{ matrix.image }}:latest \
+            ${{ env.REGISTRY }}/${{ matrix.image }}:${{ github.sha }}
+
+  # ---------------------------------------------------------------------
+  # DEPLOY — workflow réutilisable deploy.yml
+  # ---------------------------------------------------------------------
+  deploy-recette:
+    needs: [build-api, build-front]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: recette
+    secrets: inherit
+
+  deploy-production:
+    needs: promote-images
+    if: startsWith(github.ref, 'refs/tags/v')
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: production
+    secrets: inherit
