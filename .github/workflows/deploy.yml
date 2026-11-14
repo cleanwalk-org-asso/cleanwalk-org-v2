@@ -1,21 +1,27 @@
 name: Deploy (réutilisable)
 
-# Appelé par ci-cd.yml (recette sur main, prod sur tag) et rollback.yml.
+# Appelé par ci-cd.yml (staging sur main, prod sur tag) et rollback.yml.
 # Sur le serveur, le dossier de setup (compose.yml + .env) est un clone git :
 # on le met à jour, on sauvegarde la base, puis on tire les images `latest`
-# (`frontend-recette`/`api-recette` en recette, `frontend`/`api` en prod)
+# (`frontend-recette`/`api-recette` en staging, `frontend`/`api` en prod)
 # et on relance les conteneurs.
 #
-# Secrets requis :
-#   SERVER_HOST / SERVER_USER / SERVER_SSH_KEY / SERVER_PORT                 --> prod
-#   SERVER_HOST_DEV / SERVER_USER_DEV / SERVER_SSH_KEY_DEV / SERVER_PORT_DEV --> recette
-#   ghrcToken / ghrcUser --> PAT pour tirer les images de ghcr.io
+# À configurer dans chaque environment GitHub (`staging` et `production`,
+# Settings > Environments) :
+#   secrets   SERVER_SSH_KEY_B64 --> clé privée autorisée sur le serveur, encodée
+#                                    en base64 (`base64 -w0 ~/.ssh/cle`)
+#             SERVER_HOST        --> IP ou domaine du serveur
+#   variables SERVER_USER        --> utilisateur SSH
+#             SERVER_PORT        --> port SSH (22 si vide)
+# Au niveau du repo :
+#   secret    GHRCTOKEN --> PAT pour tirer les images de ghcr.io
+#   variable  GHRCUSER  --> propriétaire du PAT
 
 on:
   workflow_call:
     inputs:
       environment:
-        description: "recette ou production"
+        description: "staging ou production"
         required: true
         type: string
 
@@ -27,38 +33,36 @@ jobs:
     concurrency:
       group: deploy-${{ inputs.environment }}
       cancel-in-progress: false
+    env:
+      HOST: ${{ secrets.SERVER_HOST }}
+      USER: ${{ vars.SERVER_USER }}
+      PORT: ${{ vars.SERVER_PORT || '22' }}
     steps:
       - name: Vérifier l'environnement
         run: |
           case "${{ inputs.environment }}" in
-            recette|production) ;;
+            staging|production) ;;
             *) echo "Environnement inconnu : ${{ inputs.environment }}"; exit 1 ;;
           esac
 
       - name: Préparer la connexion SSH
-        env:
-          SSH_KEY: ${{ inputs.environment == 'production' && secrets.SERVER_SSH_KEY || secrets.SERVER_SSH_KEY_DEV }}
-          HOST: ${{ inputs.environment == 'production' && secrets.SERVER_HOST || secrets.SERVER_HOST_DEV }}
-          PORT: ${{ inputs.environment == 'production' && secrets.SERVER_PORT || secrets.SERVER_PORT_DEV }}
         run: |
           mkdir -p ~/.ssh && chmod 700 ~/.ssh
-          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy
+          echo "${{ secrets.SERVER_SSH_KEY_B64 }}" | base64 -d > ~/.ssh/id_deploy
           chmod 600 ~/.ssh/id_deploy
-          ssh-keyscan -p "${PORT:-22}" -H "$HOST" >> ~/.ssh/known_hosts
+          ssh-keyscan -p "$PORT" -H "$HOST" >> ~/.ssh/known_hosts
 
       - name: Déployer
         env:
-          HOST: ${{ inputs.environment == 'production' && secrets.SERVER_HOST || secrets.SERVER_HOST_DEV }}
-          USER: ${{ inputs.environment == 'production' && secrets.SERVER_USER || secrets.SERVER_USER_DEV }}
-          PORT: ${{ inputs.environment == 'production' && secrets.SERVER_PORT || secrets.SERVER_PORT_DEV }}
           SETUP_DIR: ${{ inputs.environment == 'production' && 'cleanwalk-v2/setup-production' || 'setup-production' }}
+          # Branche du repo de setup sur le serveur de staging (ancien nom gardé).
           SETUP_BRANCH: ${{ inputs.environment == 'production' && 'main' || 'recette' }}
-          GHCR_USER: ${{ secrets.ghrcUser }}
-          GHCR_TOKEN: ${{ secrets.ghrcToken }}
+          GHCR_USER: ${{ vars.GHRCUSER }}
+          GHCR_TOKEN: ${{ secrets.GHRCTOKEN }}
         # Le script passe par stdin (bash -s) : le token n'apparaît pas dans
         # la ligne de commande du serveur.
         run: |
-          ssh -i ~/.ssh/id_deploy -p "${PORT:-22}" "$USER@$HOST" bash -s <<EOF
+          ssh -i ~/.ssh/id_deploy -p "$PORT" "$USER@$HOST" bash -s <<EOF
           set -euo pipefail
           cd "\$HOME/$SETUP_DIR"
           docker compose run --rm -e BACKUP_PREFIX=backups/pre-deploy db_backup

@@ -1,13 +1,18 @@
 name: CI/CD
 
 # - pull_request      -> checks (lint, build, scan Trivy)
-# - push sur main     -> build des images + déploiement en recette
+# - push sur main     -> build des images + déploiement en staging
 # - tag vX.Y.Z        -> promotion des images du commit tagué + déploiement en prod
 #
-# Secrets requis :
-#   ghrcToken / ghrcUser   --> PAT (write:packages, delete:packages) pour ghcr.io
-#   ENVFRONT / ENVFRONT_DEV --> contenu du front/.env (prod / recette), intégré au build
-#   + ceux de deploy.yml (SSH prod et recette)
+# Au niveau du repo :
+#   secret    GHRCTOKEN --> PAT (write:packages, delete:packages) pour ghcr.io
+#   variable  GHRCUSER  --> propriétaire du PAT
+# + ceux des environments `staging` et `production` (voir deploy.yml)
+#
+# Les images ne contiennent aucune config d'environnement : la même image
+# passe du staging à la prod. Le compose de chaque serveur fournit
+# NUXT_PUBLIC_API_URL (et NUXT_NO_INDEX=true en staging) au front, et le
+# .env de l'API.
 on:
   pull_request:
   push:
@@ -81,68 +86,37 @@ jobs:
   # changements) : chaque commit de main doit avoir ses images taguées
   # avec son SHA pour pouvoir être promu en prod par un tag.
   #
-  # L'API est la même image partout (sa config est lue au lancement,
-  # dans le .env du serveur). Le front, lui, intègre l'URL de l'API au
-  # build (front/.env) et le robots.txt : il faut une image par environnement.
+  # Tags poussés :
+  #   <image>:<sha>             --> promu en prod par un tag vX.Y.Z
+  #   <image>-recette:latest    --> tiré par le compose du staging (ancien
+  #                                 nom gardé pour ne pas modifier ce compose)
+  # `<image>:latest` (prod) n'est posé qu'au tag de version.
   # ---------------------------------------------------------------------
-  build-api:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: docker/login-action@v4
-        with:
-          registry: ghcr.io
-          username: ${{ secrets.ghrcUser }}
-          password: ${{ secrets.ghrcToken }}
-      - uses: docker/build-push-action@v7
-        with:
-          context: ./api
-          file: api/Dockerfile
-          push: true
-          tags: |
-            ${{ env.REGISTRY }}/api:${{ github.sha }}
-            ${{ env.REGISTRY }}/api-recette:latest
-
-  build-front:
+  build-push-images:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
-          - target: recette
-            image: frontend-recette
-          - target: production
-            image: frontend
+          - image: frontend
+            context: front
+          - image: api
+            context: api
     steps:
       - uses: actions/checkout@v7
-
-      - name: Écrire front/.env
-        env:
-          ENVFRONT: ${{ matrix.target == 'production' && secrets.ENVFRONT || secrets.ENVFRONT_DEV }}
-        run: printf '%s\n' "$ENVFRONT" > front/.env
-
-      - name: Bloquer l'indexation de la recette
-        if: matrix.target == 'recette'
-        run: |
-          printf 'User-agent: *\nDisallow: /\n' > front/public/robots.txt
-
       - uses: docker/login-action@v4
         with:
           registry: ghcr.io
-          username: ${{ secrets.ghrcUser }}
-          password: ${{ secrets.ghrcToken }}
-
-      # Recette : déployée tout de suite, donc taguée latest.
-      # Prod : seulement le SHA, `latest` n'est posé qu'au tag de version.
+          username: ${{ vars.GHRCUSER }}
+          password: ${{ secrets.GHRCTOKEN }}
       - uses: docker/build-push-action@v7
         with:
-          context: ./front
-          file: front/Dockerfile
+          context: ./${{ matrix.context }}
+          file: ${{ matrix.context }}/Dockerfile
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ matrix.image }}:${{ github.sha }}
-            ${{ matrix.target == 'recette' && format('{0}/{1}:latest', env.REGISTRY, matrix.image) || '' }}
+            ${{ env.REGISTRY }}/${{ matrix.image }}-recette:latest
 
   # ---------------------------------------------------------------------
   # PROMOTE — sur un tag vX.Y.Z, pas de rebuild : les images prod du
@@ -161,8 +135,8 @@ jobs:
       - uses: docker/login-action@v4
         with:
           registry: ghcr.io
-          username: ${{ secrets.ghrcUser }}
-          password: ${{ secrets.ghrcToken }}
+          username: ${{ vars.GHRCUSER }}
+          password: ${{ secrets.GHRCTOKEN }}
       - name: Taguer ${{ matrix.image }}:${{ github.sha }} en ${{ github.ref_name }} et latest
         run: |
           docker buildx imagetools create \
@@ -173,12 +147,12 @@ jobs:
   # ---------------------------------------------------------------------
   # DEPLOY — workflow réutilisable deploy.yml
   # ---------------------------------------------------------------------
-  deploy-recette:
-    needs: [build-api, build-front]
+  deploy-staging:
+    needs: build-push-images
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/deploy.yml
     with:
-      environment: recette
+      environment: staging
     secrets: inherit
 
   deploy-production:
