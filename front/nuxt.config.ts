@@ -56,11 +56,12 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // Adresse utilisée par le serveur Nuxt pour joindre l'API. Vide : même adresse que le navigateur.
     apiInternalUrl: '',
+    // NUXT_NO_INDEX=true (staging) : robots.txt en Disallow et en-tête X-Robots-Tag noindex.
+    noIndex: false,
     public: {
-      // Valeur intégrée au build, lue dans front/.env (écrit par les workflows de déploiement).
-      // NUXT_PUBLIC_API_URL la remplace aussi au lancement du serveur.
-      // VITE_API_URL : nom utilisé par l'ancien front, gardé tant que les secrets ENVFRONT n'ont pas été renommés.
-      apiUrl: process.env.NUXT_PUBLIC_API_URL || process.env.VITE_API_URL || 'http://127.0.0.1:8080',
+      // En déploiement, NUXT_PUBLIC_API_URL est lue au lancement du serveur (compose du serveur) :
+      // la même image sert le staging et la prod. La valeur ci-dessous n'est que celle par défaut.
+      apiUrl: process.env.NUXT_PUBLIC_API_URL || 'http://127.0.0.1:8080',
     },
   },
 

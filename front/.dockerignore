@@ -4,7 +4,8 @@
 .output
 .data
 node_modules
-# .env reste dans le contexte : le build y lit l'adresse de l'API. L'image finale ne garde que .output.
+# La config (adresse de l'API, NUXT_NO_INDEX) est lue au lancement du conteneur, pas au build.
+.env
 .env.*
 !.env.example
 *.log
