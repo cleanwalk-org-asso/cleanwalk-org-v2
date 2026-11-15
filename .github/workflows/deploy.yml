@@ -1,99 +1,153 @@
-name: Deploy Prod
+name: Deploy (reusable)
 
-# WORKFLOW SETUP : 
-# 1 : Generate token (write:packages, delete:packages)
-# 2 : Add secret ['secrets.SERVER_HOST','secrets.SERVER_USER','secrets.SERVER_SSH_KEY','secrets.SERVER_PORT',"ghrcToken","ghrcUser"]
-# 3 : Replace 'git pull origin main' with 'git pull origin release' during the rebuild phase
-# 4 : Change the push branch name to 'main"
+# Called by ci-cd.yml and rollback.yml. Copies compose.<env>.yml to the server as
+# compose.yml next to a .env generated from the GitHub environment, backs up the
+# database, then pulls and restarts. A plain `docker compose ...` on the server
+# (backup crons included) therefore uses the last deploy's config.
+#
+# GitHub environment settings (`staging` and `production`):
+#   secrets    SERVER_HOST, SERVER_SSH_KEY_B64 (private key, `base64 -w0`),
+#              POSTGRES_PASSWORD, JWT_SECRET, GOOGLE_CLIENT_SECRET,
+#              S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, SMTP_PASS,
+#              BACKUP_S3_ACCESS_KEY_ID, BACKUP_S3_SECRET_ACCESS_KEY,
+#              BACKUP_GPG_PASSPHRASE, BACKUP_WEBHOOK_URL
+#   variables  SERVER_USER, SERVER_PORT (default 22),
+#              DEPLOY_PATH (absolute, must already exist),
+#              FRONT_DOMAIN, API_DOMAIN (host names only, no www. or https://),
+#              POSTGRES_USER, POSTGRES_DB, GOOGLE_CLIENT_ID,
+#              S3_ENDPOINT, S3_BUCKET, S3_PUBLIC_URL, SMTP_HOST, SMTP_PORT, SMTP_USER,
+#              BACKUP_S3_ENDPOINT_URL, BACKUP_S3_BUCKET_NAME
+# Repo level: secret GHRCTOKEN, variable GHRCUSER.
 
 on:
-  push:
-    branches:
-      - main
+  workflow_call:
+    inputs:
+      environment:
+        description: "staging or production"
+        required: true
+        type: string
+      image_tag:
+        description: "frontend and api image tag (commit SHA or vX.Y.Z)"
+        required: true
+        type: string
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      # Fix uppercase issues with URLs
-      - name: UPPER to lower
-        run: |
-          echo "ACTOR_LOWER=$(echo '${{ github.actor }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-          echo "REPO_LOWER=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-
-      # Track updates on API & front
-      - name: Set up Git for checking changes
-        run: git fetch --prune --unshallow
-
-      - name: Check if front has changed
-        id: check_frontend
-        run: |
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^front/'; then
-            echo "FRONTEND_CHANGED=true" >> $GITHUB_ENV
-          else
-            echo "FRONTEND_CHANGED=false" >> $GITHUB_ENV
-          fi
-
-      - name: Check if api has changed
-        id: check_api
-        run: |
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^api/'; then
-            echo "API_CHANGED=true" >> $GITHUB_ENV
-          else
-            echo "API_CHANGED=false" >> $GITHUB_ENV
-          fi
-
-      # Stop if no changes were made
-      - name: Stop if no changes were made to front or api
-        run: |
-          if [[ "$FRONTEND_CHANGED" == "false" && "$API_CHANGED" == "false" ]]; then
-            echo "Aucun changement dans frontend ou API, arrêt du workflow."
-            exit 0
-          fi
-
-      - name: Login
-        run: echo "${{ secrets.ghrcToken }}" | docker login ghcr.io -u ${{ secrets.ghrcUser }} --password-stdin
-
-
-      # SECRET FRONT (mv .env.exemple .env + add .ENVFRONT to .env)
-      - name: Build Front
-        if: env.FRONTEND_CHANGED == 'true'
-        run: |
-          touch ./front/.env
-          echo "${{ secrets.ENVFRONT }}" | tee -a ./front/.env > /dev/null
-          docker build -f ./front/Dockerfile -t ghcr.io/${{ env.REPO_LOWER }}/frontend:latest ./front
-          docker push ghcr.io/${{ env.REPO_LOWER }}/frontend:latest
-
-      - name: Build API
-        if: env.API_CHANGED == 'true'
-        run: |
-          docker build -f ./api/Dockerfile -t ghcr.io/${{ env.REPO_LOWER }}/api:latest ./api
-          docker push ghcr.io/${{ env.REPO_LOWER }}/api:latest
-
   deploy:
-    needs: build
     runs-on: ubuntu-latest
-
-
-    # Rebuild without downtime, only if changes were made + remove unused images
+    environment: ${{ inputs.environment }}
+    concurrency:
+      group: deploy-${{ inputs.environment }}
+      cancel-in-progress: false
+    env:
+      HOST: ${{ secrets.SERVER_HOST }}
+      USER: ${{ vars.SERVER_USER }}
+      PORT: ${{ vars.SERVER_PORT || '22' }}
+      COMPOSE_FILE: ${{ inputs.environment == 'production' && 'compose.prod.yml' || 'compose.staging.yml' }}
+      DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
     steps:
-      - name: Deploy on Server
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          port: ${{ secrets.SERVER_PORT}}
-          script: |
-            cd /home/$(whoami)/cleanwalk-v2/setup-production
-            docker compose run --rm -e BACKUP_PREFIX=backups/pre-deploy db_backup
-            pwd
-            echo "${{ secrets.ghrcToken }}" | docker login ghcr.io -u ${{ secrets.ghrcUser }} --password-stdin
-            git pull origin main
-            docker compose -f compose.yml pull
-            docker compose -f compose.yml up -d --remove-orphans
-            docker image prune -f
+      - name: Check environment
+        run: |
+          case "${{ inputs.environment }}" in
+            staging|production) ;;
+            *) echo "Unknown environment: ${{ inputs.environment }}"; exit 1 ;;
+          esac
+
+      - uses: actions/checkout@v7
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          echo "${{ secrets.SERVER_SSH_KEY_B64 }}" | base64 -d > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -p "$PORT" -H "$HOST" >> ~/.ssh/known_hosts
+
+      - name: Upload compose.yml and .env
+        env:
+          IMAGE_TAG: ${{ inputs.image_tag }}
+          FRONT_DOMAIN: ${{ vars.FRONT_DOMAIN }}
+          API_DOMAIN: ${{ vars.API_DOMAIN }}
+          POSTGRES_USER: ${{ vars.POSTGRES_USER }}
+          POSTGRES_DB: ${{ vars.POSTGRES_DB }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          S3_ENDPOINT: ${{ vars.S3_ENDPOINT }}
+          S3_BUCKET: ${{ vars.S3_BUCKET }}
+          S3_PUBLIC_URL: ${{ vars.S3_PUBLIC_URL }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+          SMTP_HOST: ${{ vars.SMTP_HOST }}
+          SMTP_PORT: ${{ vars.SMTP_PORT }}
+          SMTP_USER: ${{ vars.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          BACKUP_S3_ENDPOINT_URL: ${{ vars.BACKUP_S3_ENDPOINT_URL }}
+          BACKUP_S3_BUCKET_NAME: ${{ vars.BACKUP_S3_BUCKET_NAME }}
+          BACKUP_S3_ACCESS_KEY_ID: ${{ secrets.BACKUP_S3_ACCESS_KEY_ID }}
+          BACKUP_S3_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_S3_SECRET_ACCESS_KEY }}
+          BACKUP_GPG_PASSPHRASE: ${{ secrets.BACKUP_GPG_PASSPHRASE }}
+          BACKUP_WEBHOOK_URL: ${{ secrets.BACKUP_WEBHOOK_URL }}
+        run: |
+          case "$DEPLOY_PATH" in
+            /*) ;;
+            *) echo "::error::DEPLOY_PATH must be an absolute path (got '$DEPLOY_PATH')"; exit 1 ;;
+          esac
+          if ! ssh -i ~/.ssh/id_deploy -p "$PORT" "$USER@$HOST" test -d "'$DEPLOY_PATH'"; then
+            echo "::error::$DEPLOY_PATH does not exist on the server"
+            exit 1
+          fi
+
+          # The backup script refuses to start without any of the BACKUP_* values.
+          for name in FRONT_DOMAIN API_DOMAIN POSTGRES_USER POSTGRES_DB POSTGRES_PASSWORD JWT_SECRET \
+            BACKUP_S3_ENDPOINT_URL BACKUP_S3_BUCKET_NAME BACKUP_S3_ACCESS_KEY_ID BACKUP_S3_SECRET_ACCESS_KEY \
+            BACKUP_GPG_PASSPHRASE BACKUP_WEBHOOK_URL; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name is missing from the ${{ inputs.environment }} environment"
+              exit 1
+            fi
+          done
+
+          uri() { jq -rn --arg v "$1" '$v | @uri'; }
+          DATABASE_URL="postgresql://$(uri "$POSTGRES_USER"):$(uri "$POSTGRES_PASSWORD")@database:5432/$(uri "$POSTGRES_DB")"
+
+          # Single-quoted so compose reads values literally; a quote or newline would break the file.
+          umask 077
+          : > deploy.env
+          for name in IMAGE_TAG FRONT_DOMAIN API_DOMAIN DATABASE_URL POSTGRES_USER POSTGRES_DB POSTGRES_PASSWORD JWT_SECRET \
+            GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET S3_ENDPOINT S3_BUCKET S3_PUBLIC_URL S3_ACCESS_KEY_ID \
+            S3_SECRET_ACCESS_KEY SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASS BACKUP_S3_ENDPOINT_URL \
+            BACKUP_S3_BUCKET_NAME BACKUP_S3_ACCESS_KEY_ID BACKUP_S3_SECRET_ACCESS_KEY BACKUP_GPG_PASSPHRASE \
+            BACKUP_WEBHOOK_URL; do
+            value="${!name}"
+            case "$value" in
+              *"'"*|*$'\n'*)
+                echo "::error::$name contains a single quote or a newline"
+                exit 1 ;;
+            esac
+            printf "%s='%s'\n" "$name" "$value" >> deploy.env
+          done
+
+          scp -p -i ~/.ssh/id_deploy -P "$PORT" "$COMPOSE_FILE" "$USER@$HOST:$DEPLOY_PATH/compose.yml"
+          scp -p -i ~/.ssh/id_deploy -P "$PORT" deploy.env "$USER@$HOST:$DEPLOY_PATH/.env"
+
+      - name: Deploy
+        env:
+          GHCR_USER: ${{ vars.GHRCUSER }}
+          GHCR_TOKEN: ${{ secrets.GHRCTOKEN }}
+        # Script sent on stdin so the token stays off the remote command line.
+        # { ... } </dev/null: bash reads the whole block first, so `docker compose run`
+        # cannot swallow the rest of the script from stdin.
+        run: |
+          ssh -i ~/.ssh/id_deploy -p "$PORT" "$USER@$HOST" bash -s <<EOF
+          {
+          set -euo pipefail
+          cd "$DEPLOY_PATH"
+          # No logout: the backup crons must be able to re-pull the private db-backup-cw image.
+          echo '$GHCR_TOKEN' | docker login ghcr.io -u '$GHCR_USER' --password-stdin
+          docker compose run --rm -e BACKUP_PREFIX=backups/pre-deploy db_backup
+          docker compose pull
+          docker compose up -d --remove-orphans
+          # Every deploy has its own image tag: drop unused images older than a week.
+          docker image prune -af --filter "until=168h"
+          } </dev/null
+          EOF

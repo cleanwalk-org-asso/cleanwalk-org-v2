@@ -1,0 +1,130 @@
+name: CI/CD
+
+# pull_request -> checks + Trivy scan
+# push to main -> build images tagged with the commit SHA, deploy to staging
+# tag vX.Y.Z   -> retag that commit's images as vX.Y.Z, deploy to production
+#
+# Images hold no environment config: the same image goes from staging to prod.
+# Repo-level settings: secret GHRCTOKEN, variable GHRCUSER (see deploy.yml for the rest).
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-cd-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  REGISTRY: ghcr.io/cleanwalk-org-asso/cleanwalk-org-v2
+
+jobs:
+  # Node versions match each app's Dockerfile. The API has no tests yet, so it is only built.
+  checks:
+    name: checks (${{ matrix.app }})
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app: front
+            node: "24"
+            run: npm run lint && npm run build
+          - app: api
+            node: "22"
+            run: DATABASE_URL=none npx prisma generate && npm run build
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: ${{ matrix.app }}/package-lock.json
+      - working-directory: ${{ matrix.app }}
+        run: npm ci
+      - working-directory: ${{ matrix.app }}
+        run: ${{ matrix.run }}
+
+  # Fails only on fixable CRITICAL vulnerabilities.
+  trivy-scan-repo:
+    needs: checks
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Scan repository (Trivy)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: 1
+
+  build-push-images:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - image: frontend
+            context: front
+          - image: api
+            context: api
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ vars.GHRCUSER }}
+          password: ${{ secrets.GHRCTOKEN }}
+      - uses: docker/build-push-action@v7
+        with:
+          context: ./${{ matrix.context }}
+          file: ${{ matrix.context }}/Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ matrix.image }}:${{ github.sha }}
+
+  # No rebuild: fails if the tagged commit was never built on main.
+  promote-images:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: [frontend, api]
+    steps:
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ vars.GHRCUSER }}
+          password: ${{ secrets.GHRCTOKEN }}
+      - name: Tag ${{ matrix.image }}:${{ github.sha }} as ${{ github.ref_name }}
+        run: |
+          docker buildx imagetools create \
+            -t ${{ env.REGISTRY }}/${{ matrix.image }}:${{ github.ref_name }} \
+            ${{ env.REGISTRY }}/${{ matrix.image }}:${{ github.sha }}
+
+  deploy-staging:
+    needs: build-push-images
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: staging
+      image_tag: ${{ github.sha }}
+    secrets: inherit
+
+  deploy-production:
+    needs: promote-images
+    if: startsWith(github.ref, 'refs/tags/v')
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: production
+      image_tag: ${{ github.ref_name }}
+    secrets: inherit

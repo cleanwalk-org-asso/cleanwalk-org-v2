@@ -1,0 +1,50 @@
+name: Rollback production
+
+# Redeploys an already published vX.Y.Z to production (no rebuild), using the
+# compose file of the branch the workflow runs from.
+# Prisma migrations are not reverted: restore the pre-deploy backup if needed.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to roll back to (e.g. v1.2.3)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  REGISTRY: ghcr.io/cleanwalk-org-asso/cleanwalk-org-v2
+
+jobs:
+  check-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check version format
+        run: |
+          if [[ ! "${{ inputs.version }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid version: expected vX.Y.Z"
+            exit 1
+          fi
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ vars.GHRCUSER }}
+          password: ${{ secrets.GHRCTOKEN }}
+
+      # Both images must exist so front and API never end up on different versions.
+      - name: Check both images exist
+        run: |
+          for image in frontend api; do
+            docker buildx imagetools inspect "$REGISTRY/$image:${{ inputs.version }}" > /dev/null
+          done
+
+  deploy-production:
+    needs: check-images
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: production
+      image_tag: ${{ inputs.version }}
+    secrets: inherit
