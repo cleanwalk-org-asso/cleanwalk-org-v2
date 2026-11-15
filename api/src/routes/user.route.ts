@@ -5,11 +5,13 @@ import {
   UserResponseSchema, 
   UsersResponseSchema, 
   UserParamsSchema,
+  DeleteUserSchema,
   ErrorResponseSchema 
 } from "../schemas/user.schema.js";
 
 export default async function userRoutes(app: FastifyInstance) {
   app.get("", {
+    preHandler: [app.requireAdmin],
     schema: {
       response: {
         200: UsersResponseSchema,
@@ -31,6 +33,7 @@ export default async function userRoutes(app: FastifyInstance) {
   }, getUserById);
 
   app.put("/:id", {
+    preHandler: [app.authorizeUser],
     schema: {
       params: UserParamsSchema,
       body: UpdateUserSchema,
@@ -44,5 +47,15 @@ export default async function userRoutes(app: FastifyInstance) {
 
   app.delete("/:id", {
     preHandler: [app.authorizeUser],
+    schema: {
+      params: UserParamsSchema,
+      body: DeleteUserSchema,
+      response: {
+        400: ErrorResponseSchema,
+        403: ErrorResponseSchema,
+        404: ErrorResponseSchema,
+        500: ErrorResponseSchema,
+      },
+    },
   }, deleteUser);  
 }

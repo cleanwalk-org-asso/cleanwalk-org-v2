@@ -1,0 +1,15 @@
+meta {
+  name: get profanity words
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{host}}/admin/profanity-words
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

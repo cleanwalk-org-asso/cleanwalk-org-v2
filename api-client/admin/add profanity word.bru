@@ -1,0 +1,27 @@
+meta {
+  name: add profanity word
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{host}}/admin/profanity-words
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "value": "exemple",
+    "kind": "BLOCK"
+  }
+}
+
+docs {
+  kind : BLOCK pour censurer, ALLOW pour laisser passer un mot des dictionnaires.
+  Une valeur avec une espace est une expression (par exemple deux mots).
+}
+
+settings {
+  encodeUrl: true
+}

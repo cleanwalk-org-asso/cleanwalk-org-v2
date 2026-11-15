@@ -1,0 +1,11 @@
+.git
+.github
+.nuxt
+.output
+.data
+node_modules
+# La config (adresse de l'API, NUXT_NO_INDEX) est lue au lancement du conteneur, pas au build.
+.env
+.env.*
+!.env.example
+*.log

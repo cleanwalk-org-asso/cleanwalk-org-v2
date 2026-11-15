@@ -21,6 +21,7 @@ export async function articleRoutes(fastify: FastifyInstance) {
 
   // POST /articles
   fastify.post('', {
+    preHandler: [fastify.requireAdmin],
     schema: {
       body: CreateArticleSchema
     }
@@ -28,6 +29,7 @@ export async function articleRoutes(fastify: FastifyInstance) {
 
   // PUT /articles/:articleId
   fastify.put('/:articleId', {
+    preHandler: [fastify.requireAdmin],
     schema: {
       params: ArticleParamsSchema,
       body: UpdateArticleSchema
@@ -36,6 +38,7 @@ export async function articleRoutes(fastify: FastifyInstance) {
 
   // DELETE /articles/:articleId
   fastify.delete('/:articleId', {
+    preHandler: [fastify.requireAdmin],
     schema: {
       params: ArticleParamsSchema
     }

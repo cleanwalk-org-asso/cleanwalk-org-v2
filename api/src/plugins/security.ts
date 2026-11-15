@@ -26,49 +26,69 @@ export default fp(async (fastify: FastifyInstance) => {
     namespace: "admin",
   });
 
+  // Les deux namespaces partagent JWT_SECRET : un token utilisateur placé dans le cookie
+  // admin_token passerait la vérification de signature. On exige donc aussi le rôle ADMIN.
+  async function verifyAdmin(req: FastifyRequest): Promise<boolean> {
+    try {
+      await req.adminJwtVerify();
+    } catch (_) {
+      return false;
+    }
+    return req.user?.role === "ADMIN";
+  }
+
+  fastify.decorate("verifyAdmin", verifyAdmin);
+
   fastify.decorate(
     "authenticate",
     async function (req: FastifyRequest, reply: FastifyReply) {
       try {
         await req.userJwtVerify();
       } catch (err) {
-        reply.code(401).send({ error: "Unauthorized" });
+        return reply.code(401).send({ error: "Unauthorized" });
+      }
+    },
+  );
+
+  // Accepte une session utilisateur ou une session admin (ex. upload d'image depuis l'admin)
+  fastify.decorate(
+    "authenticateUserOrAdmin",
+    async function (req: FastifyRequest, reply: FastifyReply) {
+      if (await verifyAdmin(req)) return;
+
+      try {
+        await req.userJwtVerify();
+      } catch (err) {
+        return reply.code(401).send({ error: "Unauthorized" });
       }
     },
   );
 
   fastify.decorate(
-  "authorizeUser",
-  async function (req: FastifyRequest, reply: FastifyReply) {
-    const { id } = req.params as { id: string };
+    "authorizeUser",
+    async function (req: FastifyRequest, reply: FastifyReply) {
+      const { id } = req.params as { id: string };
 
-    try {
-      await req.adminJwtVerify();
-      return;
-    } catch (_) {
-    }
+      if (await verifyAdmin(req)) return;
 
-    try {
-      await req.userJwtVerify();
-    } catch (_) {
-      return reply.code(401).send({ error: "Unauthorized" });
-    }
+      try {
+        await req.userJwtVerify();
+      } catch (_) {
+        return reply.code(401).send({ error: "Unauthorized" });
+      }
 
-    const userId = String(req.user?.id ?? "");
-    if (userId !== String(id)) {
-      return reply.code(403).send({ error: "Forbidden: You can only access your own resources" });
-    }
-  },
-);
-
+      const userId = String(req.user?.id ?? "");
+      if (userId !== String(id)) {
+        return reply.code(403).send({ error: "Forbidden: You can only access your own resources" });
+      }
+    },
+  );
 
   fastify.decorate(
     "requireAdmin",
     async function (req: FastifyRequest, reply: FastifyReply) {
-      try {
-        await req.adminJwtVerify();
-      } catch (err) {
-        reply.code(401).send({ error: "Unauthorized" });
+      if (!(await verifyAdmin(req))) {
+        return reply.code(401).send({ error: "Unauthorized" });
       }
     },
   );

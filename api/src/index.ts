@@ -15,6 +15,7 @@ import cleanwalkRoutes from "./routes/cleanwalk.route.js";
 import { articleRoutes } from "./routes/article.route.js";
 import uploadRoutes from "./routes/upload.route.js";
 import s3Plugin from "./plugins/s3.js";
+import profanityPlugin from "./plugins/profanity.js";
 import dotenv from "dotenv";
 import oauthPlugin from '@fastify/oauth2';
 import adminRoutes from "./routes/admin.route.js";
@@ -47,6 +48,7 @@ server.register(cors, {
 
 server.register(multipart);
 server.register(prismaPlugin);
+server.register(profanityPlugin);
 server.register(swagger, {
   openapi: {
     info: {
@@ -60,6 +62,14 @@ server.register(swaggerUi, {
 });
 server.register(jwtPlugin);
 server.register(loggingPlugin);
+
+// Masque de la doc Swagger les routes /admin et celles réservées aux admins
+server.addHook("onRoute", (route) => {
+  const preHandlers = [route.preHandler].flat() as unknown[];
+  if (route.url.startsWith("/admin") || preHandlers.includes(server.requireAdmin)) {
+    route.schema = { ...route.schema, hide: true };
+  }
+});
 
 server.register(oauthPlugin, {
   name: 'googleOAuth2',
@@ -78,7 +88,7 @@ server.register(oauthPlugin, {
 
 server.decorate('config', {
   isProduction: process.env.NODE_ENV === 'production',
-  FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:5173',
+  FRONTEND_URL: process.env.FRONTEND_URL || 'http://127.0.0.1:3000',
   SMTP_SECURE: process.env.SMTP_SECURE === 'true',
 });
 

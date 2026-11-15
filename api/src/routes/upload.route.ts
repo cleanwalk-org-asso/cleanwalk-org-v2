@@ -4,6 +4,7 @@ import { uploadFileController } from "../controllers/upload.controller.js";
 
 export default async function uploadRoutes(fastify: FastifyInstance) {
   fastify.post('/image', {
+    preHandler: [fastify.authenticateUserOrAdmin],
     schema: {
       consumes: ['multipart/form-data'],
       description: 'Upload d’un fichier image',

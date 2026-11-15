@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Thème : les composants utilisent uniquement ces rôles (bg-primary, text-muted...).
+ * Pour changer une couleur, il suffit de modifier sa valeur ici, et dans `.dark` pour le mode sombre.
+ */
+@theme {
+    --color-primary: #132778;
+    --color-primary-content: #EDF1FE;
+    --color-secondary: #E1F4F8;
+    --color-secondary-content: #94A3B8;
+    --color-accent: #72BDA3;
+    --color-accent-hover: #5AA98E;
+    --color-accent-content: #084D49;
+    --color-neutral: #F8FAFD;
+    --color-neutral-content: #E4E4E7;
+    --color-base-100: #ffffff;
+    --color-base-200: #F1F5F9;
+    --color-base-300: #E2E8F0;
+    --color-base-content: #373646;
+    --color-strong: #1E293B;
+    --color-muted: #65707F;
+    --color-border: #CBD5E1;
+    --color-info: #00BAFE;
+    --color-info-content: #042E49;
+    --color-success: #00D390;
+    --color-success-content: #004C39;
+    --color-warning: #FCB700;
+    --color-warning-content: #793205;
+    --color-error: #FF627D;
+    --color-error-content: #4D0218;
+    --color-overlay: rgb(0 0 0 / 0.5);
+
+    /* Couleurs de marque, identiques en clair et en sombre : barres, hero, dégradés. */
+    --color-brand: #132778;
+    --color-brand-end: #2348DE;
+    --color-on-brand: #ffffff;
+    --color-footer: #37363F;
+    --color-footer-content: #E5E7EB;
+    --color-tint: rgb(203 213 225 / 0.2);
+    --color-frosted: rgb(255 255 255 / 0.8);
+    --color-primary-overlay: rgb(19 39 120 / 0.78);
+
+    --shadow-top: 0 -10px 100px rgba(194, 194, 194, 0.2);
+
+    --font-sans: 'Catamaran', sans-serif;
+    --font-nav: 'Roboto', sans-serif;
+}
+
+.dark {
+    --color-primary: #9DB0FF;
+    --color-primary-content: #0F1320;
+    --color-secondary: #1D3440;
+    --color-secondary-content: #94A3B8;
+    --color-accent: #72BDA3;
+    --color-accent-hover: #8CCDB6;
+    --color-accent-content: #0F1320;
+    --color-neutral: #1F2536;
+    --color-neutral-content: #2B3244;
+    --color-base-100: #0F1320;
+    --color-base-200: #171C2B;
+    --color-base-300: #1F2536;
+    --color-base-content: #E2E8F0;
+    --color-strong: #F8FAFC;
+    --color-muted: #AEB8C7;
+    --color-border: #364157;
+    --color-overlay: rgb(0 0 0 / 0.65);
+    --color-tint: rgb(148 163 184 / 0.1);
+    --shadow-top: 0 -10px 100px rgba(0, 0, 0, 0.4);
+}
+
+@utility scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+}
+
+@layer base {
+    html {
+        color-scheme: light;
+    }
+
+    html.dark {
+        color-scheme: dark;
+    }
+
+    body {
+        min-height: 100vh;
+        background-color: var(--color-base-100);
+        color: var(--color-base-content);
+        font-family: var(--font-sans);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    button {
+        cursor: pointer;
+    }
+
+    button:disabled {
+        cursor: not-allowed;
+    }
+
+    input:-webkit-autofill,
+    textarea:-webkit-autofill,
+    select:-webkit-autofill {
+        -webkit-box-shadow: 0 0 0 1000px var(--color-base-100) inset !important;
+        -webkit-text-fill-color: var(--color-strong) !important;
+    }
+}
+
+/* Éléments générés par MapLibre, inaccessibles avec des classes Tailwind. */
+.dark .maplibregl-canvas {
+    filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9);
+}
+
+.dark .maplibregl-map {
+    background: var(--color-base-100);
+}

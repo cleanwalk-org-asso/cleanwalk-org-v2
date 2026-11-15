@@ -1,0 +1,15 @@
+meta {
+  name: delete profanity word
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{host}}/admin/profanity-words/1
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

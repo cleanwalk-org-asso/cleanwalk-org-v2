@@ -28,6 +28,10 @@ export const UserParamsSchema = Type.Object({
   id: Type.String({ pattern: "^[0-9]+$" }),
 });
 
+export const DeleteUserSchema = Type.Object({
+  password: Type.String({ minLength: 1 }),
+});
+
 export const ErrorResponseSchema = Type.Object({
   message: Type.String(),
 });
@@ -35,3 +39,4 @@ export const ErrorResponseSchema = Type.Object({
 export type UpdateUserInput = Static<typeof UpdateUserSchema>;
 export type UserResponse = Static<typeof UserResponseSchema>;
 export type UserParams = Static<typeof UserParamsSchema>;
+export type DeleteUserInput = Static<typeof DeleteUserSchema>;
