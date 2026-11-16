@@ -144,7 +144,14 @@ jobs:
           cd "$DEPLOY_PATH"
           # No logout: the backup crons must be able to re-pull the private db-backup-cw image.
           echo '$GHCR_TOKEN' | docker login ghcr.io -u '$GHCR_USER' --password-stdin
-          docker compose run --rm -e BACKUP_PREFIX=backups/pre-deploy db_backup
+          # No volume yet means a first deploy: nothing to back up. Otherwise make sure
+          # the database is up, since `run` does not start it.
+          if docker volume inspect setup-production_db_data >/dev/null 2>&1; then
+            docker compose up -d --wait database
+            docker compose run --rm -e BACKUP_PREFIX=backups/pre-deploy db_backup
+          else
+            echo "No setup-production_db_data volume: first deploy, skipping the pre-deploy backup"
+          fi
           docker compose pull
           docker compose up -d --remove-orphans
           # Every deploy has its own image tag: drop unused images older than a week.
