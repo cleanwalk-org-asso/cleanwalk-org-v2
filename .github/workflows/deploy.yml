@@ -43,6 +43,8 @@ jobs:
       USER: ${{ vars.SERVER_USER }}
       PORT: ${{ vars.SERVER_PORT || '22' }}
       COMPOSE_FILE: ${{ inputs.environment == 'production' && 'compose.prod.yml' || 'compose.staging.yml' }}
+      # volumes.db_data.name in that compose file.
+      DB_VOLUME: ${{ inputs.environment == 'production' && 'setup-production_db_data' || 'setup-staging_db_data' }}
       DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
     steps:
       - name: Check environment
@@ -146,11 +148,11 @@ jobs:
           echo '$GHCR_TOKEN' | docker login ghcr.io -u '$GHCR_USER' --password-stdin
           # No volume yet means a first deploy: nothing to back up. Otherwise make sure
           # the database is up, since `run` does not start it.
-          if docker volume inspect setup-production_db_data >/dev/null 2>&1; then
+          if docker volume inspect '$DB_VOLUME' >/dev/null 2>&1; then
             docker compose up -d --wait database
             docker compose run --rm -e BACKUP_PREFIX=backups/pre-deploy db_backup
           else
-            echo "No setup-production_db_data volume: first deploy, skipping the pre-deploy backup"
+            echo "No $DB_VOLUME volume: first deploy, skipping the pre-deploy backup"
           fi
           docker compose pull
           docker compose up -d --remove-orphans
