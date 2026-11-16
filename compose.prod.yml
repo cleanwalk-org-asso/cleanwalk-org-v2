@@ -83,7 +83,9 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
       POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB is required}
     volumes:
-      - db_data:/var/lib/postgresql/data
+      # Postgres 18+ keeps its data in /var/lib/postgresql/18/docker and refuses
+      # to start with a volume mounted on /var/lib/postgresql/data.
+      - db_data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 3s
